@@ -1,0 +1,348 @@
+# Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
+## Arquitectura de Software — Fase 1
+### AYD2 · Grupo 5 · 1S2026
+
+---
+
+## Índice
+
+1. [Identificación del Caso de Negocio y Stakeholders](#1-identificación-del-caso-de-negocio-y-stakeholders)
+   - 1.1 [Listado de Stakeholders y Preocupaciones Arquitectónicas](#11-listado-de-stakeholders-y-preocupaciones-arquitectónicas)
+   - 1.2 [Core del Negocio — CUN de Alto Nivel](#12-core-del-negocio--cun-de-alto-nivel)
+   - 1.3 [Primera Descomposición — CDU de Negocio](#13-primera-descomposición--cdu-de-negocio)
+
+2. [Características del Sistema y Drivers Arquitectónicos](#2-características-del-sistema-y-drivers-arquitectónicos)
+   - 2.1 [Drivers RF — Requerimientos Funcionales](#21-drivers-rf--requerimientos-funcionales)
+   - 2.2 [Drivers EaC — Escenarios de Atributos de Calidad](#22-drivers-eac--escenarios-de-atributos-de-calidad)
+   - 2.3 [Drivers de Restricción](#23-drivers-de-restricción)
+   - 2.4 [Características Principales del PRCCD (Priorizadas)](#24-características-principales-del-prccd-priorizadas)
+
+3. [Diagramas de CDU Expandidos](#3-diagramas-de-cdu-expandidos)
+   - 3.1 [Diagrama de Casos de Uso Expandidos](#31-diagrama-de-casos-de-uso-expandidos)
+   - 3.2 [Detalle de Drivers por CDU](#32-detalle-de-drivers-por-cdu)
+
+4. [Matrices de Trazabilidad](#4-matrices-de-trazabilidad)
+   - 4.1 [Stakeholders vs. Requerimientos](#41-stakeholders-vs-requerimientos)
+   - 4.2 [Stakeholders vs. CDU](#42-stakeholders-vs-cdu)
+   - 4.3 [Requerimiento vs. CDU](#43-requerimiento-vs-cdu)
+
+5. [Selección Arquitectónica](#5-selección-arquitectónica)
+
+6. [Vistas Arquitectónicas — Nivel de Sistema](#6-vistas-arquitectónicas--nivel-de-sistema)
+
+7. [Vistas Arquitectónicas — Nivel de Infraestructura](#7-vistas-arquitectónicas--nivel-de-infraestructura)
+
+8. [Diseño de Datos](#8-diseño-de-datos)
+
+9. [Diseño de Interfaces (UI/UX)](#9-diseño-de-interfaces-uiux)
+
+10. [Patrones de Diseño](#10-patrones-de-diseño)
+
+11. [Gestión del Proyecto — Enfoque Ágil](#11-gestión-del-proyecto--enfoque-ágil)
+
+---
+
+## 1. Identificación del Caso de Negocio y Stakeholders
+
+### 1.1 Listado de Stakeholders y Preocupaciones Arquitectónicas
+
+> Identificación clara de los involucrados (directivos, financieros, operativos, externos) y sus intereses o conflictos arquitectónicos.
+
+| Stakeholder | Tipo | Preocupaciones Arquitectónicas |
+|---|---|---|
+| | | |
+
+![Stakeholders](Images/stakeholders.png)
+
+---
+
+### 1.2 Core del Negocio — CUN de Alto Nivel
+
+> Diagrama de casos de uso de negocio de alto nivel (el más abstracto a nivel de arquitectura).
+
+<!-- DESCRIPCIÓN BREVE DEL CUN -->
+
+<!-- INSERTAR IMAGEN: CUN de alto nivel -->
+![CUN Alto Nivel](Images/cun_alto_nivel.png)
+
+---
+
+### 1.3 Primera Descomposición — CDU de Negocio
+
+> Diagrama CDU de negocio que muestra los procesos de negocio involucrados a nivel de arquitectura.
+
+<!-- DESCRIPCIÓN BREVE DE LA DESCOMPOSICIÓN -->
+
+<!-- INSERTAR IMAGEN: CDU de negocio descompuesto -->
+![CDU Negocio Descompuesto](Images/cdu_negocio.png)
+
+---
+
+## 2. Características del Sistema y Drivers Arquitectónicos
+
+### 2.1 Drivers RF — Requerimientos Funcionales
+
+> Listado de los requerimientos funcionales del sistema extraídos del enunciado.
+
+<!-- INSERTAR TABLA DE RF -->
+
+| ID | Requerimiento Funcional | Prioridad |
+|---|---|---|
+| RF-01 | | |
+
+---
+
+### 2.2 Drivers EaC — Escenarios de Atributos de Calidad
+
+> Escenarios de atributos de calidad relevantes para el PRCCD.
+
+<!-- INSERTAR TABLA DE EaC con columnas: ID, Atributo, Estímulo, Fuente, Respuesta, Medida -->
+
+| ID | Atributo de Calidad | Estímulo | Fuente | Respuesta Esperada | Medida |
+|---|---|---|---|---|---|
+| EaC-01 | | | | | |
+
+---
+
+### 2.3 Drivers de Restricción
+
+> Restricciones tecnológicas, normativas y operativas que condicionan la arquitectura.
+
+<!-- INSERTAR TABLA DE RESTRICCIONES -->
+
+| ID | Tipo | Descripción |
+|---|---|---|
+| R-01 | Tecnológica | |
+| R-02 | Normativa | |
+| R-03 | Operativa | |
+
+---
+
+### 2.4 Características Principales del PRCCD (Priorizadas)
+
+> Descripción de las características principales del sistema, ordenadas por impacto en el negocio.
+
+<!-- DESCRIPCIÓN PRIORIZADA DE CARACTERÍSTICAS -->
+
+<!-- INSERTAR IMAGEN si aplica: diagrama de características o mapa de capacidades -->
+![Características PRCCD](Images/caracteristicas_prccd.png)
+
+---
+
+## 3. Diagramas de CDU Expandidos
+
+### 3.1 Diagrama de Casos de Uso Expandidos
+
+> Diagrama de casos de uso del sistema con actores y relaciones detalladas.
+
+<!-- INSERTAR IMAGEN: diagrama CDU expandido -->
+![CDU Expandido](Images/cdu_expandido.png)
+
+---
+
+### 3.2 Detalle de Drivers por CDU
+
+> Para cada CDU: drivers RF, EaC y de Restricción asociados.
+
+<!-- INSERTAR TABLA O FICHAS POR CDU -->
+
+| CDU | Drivers RF Asociados | Drivers EaC Asociados | Restricciones Asociadas |
+|---|---|---|---|
+| | | | |
+
+<!-- INSERTAR IMAGEN si se cuenta con diagramas adicionales por CDU -->
+![Detalle CDU por Driver](Images/cdu_detalle_drivers.png)
+
+---
+
+## 4. Matrices de Trazabilidad
+
+### 4.1 Stakeholders vs. Requerimientos
+
+> Relación entre cada stakeholder y los requerimientos funcionales que le conciernen.
+
+<!-- INSERTAR IMAGEN: matriz stakeholders vs. requerimientos -->
+![Matriz Stakeholders vs RF](Images/matriz_stakeholders_rf.png)
+
+---
+
+### 4.2 Stakeholders vs. CDU
+
+> Relación entre cada stakeholder y los casos de uso del sistema.
+
+<!-- INSERTAR IMAGEN: matriz stakeholders vs. CDU -->
+![Matriz Stakeholders vs CDU](Images/matriz_stakeholders_cdu.png)
+
+---
+
+### 4.3 Requerimiento vs. CDU
+
+> Trazabilidad entre requerimientos funcionales y casos de uso.
+
+<!-- INSERTAR IMAGEN: matriz requerimientos vs. CDU -->
+![Matriz RF vs CDU](Images/matriz_rf_cdu.png)
+
+---
+
+## 5. Selección Arquitectónica
+
+> Selección del o los estilos arquitectónicos con argumentación técnica y económica que justifique la elección.
+
+<!-- DESCRIPCIÓN DEL ESTILO O ESTILOS SELECCIONADOS -->
+
+### Estilos Evaluados
+
+<!-- INSERTAR TABLA COMPARATIVA DE ESTILOS -->
+
+| Estilo Arquitectónico | Ventajas para PRCCD | Desventajas / Trade-offs |
+|---|---|---|
+| | | |
+
+### Estilo(s) Seleccionado(s) y Justificación
+
+<!-- ARGUMENTACIÓN TÉCNICA Y ECONÓMICA -->
+
+<!-- INSERTAR IMAGEN: diagrama de decisión arquitectónica o mapa de estilos -->
+![Selección Arquitectónica](Images/seleccion_arquitectonica.png)
+
+---
+
+## 6. Vistas Arquitectónicas — Nivel de Sistema
+
+> Diagrama de bloques que representa la arquitectura de software implementada.
+
+<!-- DESCRIPCIÓN DE LOS BLOQUES PRINCIPALES DEL SISTEMA -->
+
+<!-- INSERTAR IMAGEN: diagrama de bloques del sistema -->
+![Vista de Sistema](Images/vista_sistema.png)
+
+---
+
+## 7. Vistas Arquitectónicas — Nivel de Infraestructura
+
+> Diagrama de despliegue que incluye diagrama de componentes y diagrama de distribución. Se explica cómo las tecnologías seleccionadas cumplen con los drivers arquitectónicos.
+
+### Diagrama de Componentes
+
+<!-- DESCRIPCIÓN DE COMPONENTES -->
+
+<!-- INSERTAR IMAGEN: diagrama de componentes -->
+![Diagrama de Componentes](Images/diagrama_componentes.png)
+
+### Diagrama de Despliegue / Distribución
+
+<!-- DESCRIPCIÓN DE LA INFRAESTRUCTURA ON-PREMISE Y PLAN DE MIGRACIÓN A NUBE -->
+
+<!-- INSERTAR IMAGEN: diagrama de despliegue -->
+![Diagrama de Despliegue](Images/diagrama_despliegue.png)
+
+---
+
+## 8. Diseño de Datos
+
+> Diagrama Entidad-Relación (DER) o esquema para bases de datos NoSQL, justificando cómo soporta las necesidades de auditoría y almacenamiento a largo plazo.
+
+<!-- JUSTIFICACIÓN DEL MODELO DE DATOS ELEGIDO (relacional / NoSQL / híbrido) -->
+
+<!-- INSERTAR IMAGEN: DER o esquema NoSQL -->
+![Diseño de Datos](Images/diseno_datos.png)
+
+### Justificación Respecto a Drivers de Auditoría
+
+<!-- EXPLICAR CÓMO EL DISEÑO SOPORTA: rastro inmutable, retención 5 años, GDPR, derecho al olvido -->
+
+---
+
+## 9. Diseño de Interfaces (UI/UX)
+
+> Prototipos de interfaces de usuario elaborados para el PRCCD.
+
+<!-- BREVE DESCRIPCIÓN DE LOS FLUJOS DE USUARIO PROTOTIPADOS -->
+
+### Prototipo — [Nombre de la interfaz 1]
+
+<!-- INSERTAR IMAGEN: prototipo interfaz 1 -->
+![Prototipo 1](Images/prototipo_01.png)
+
+### Prototipo — [Nombre de la interfaz 2]
+
+![Prototipo 2](Images/prototipo_02.png)
+
+### Prototipo — [Nombre de la interfaz 3]
+
+![Prototipo 3](Images/prototipo_03.png)
+
+---
+
+## 10. Patrones de Diseño
+
+> Identificación de al menos **5 patrones de diseño** en la arquitectura, con sus diagramas de clases UML y justificación.
+
+| # | Patrón | Categoría | Punto de Aplicación en la Arquitectura |
+|---|---|---|---|
+| 1 | | | |
+| 2 | | | |
+| 3 | | | |
+| 4 | | | |
+| 5 | | | |
+
+### Patrón 1 — [Nombre del Patrón]
+
+**Justificación:** <!-- Por qué se aplica aquí -->
+
+<!-- INSERTAR IMAGEN: diagrama de clases UML -->
+![Patrón 1 UML](Images/patron_01_uml.png)
+
+---
+
+### Patrón 2 — [Nombre del Patrón]
+
+**Justificación:** <!-- Por qué se aplica aquí -->
+
+![Patrón 2 UML](Images/patron_02_uml.png)
+
+---
+
+### Patrón 3 — [Nombre del Patrón]
+
+**Justificación:** <!-- Por qué se aplica aquí -->
+
+<!-- INSERTAR IMAGEN: diagrama de clases UML -->
+![Patrón 3 UML](Images/patron_03_uml.png)
+
+---
+
+### Patrón 4 — [Nombre del Patrón]
+
+**Justificación:** <!-- Por qué se aplica aquí -->
+
+<!-- INSERTAR IMAGEN: diagrama de clases UML -->
+![Patrón 4 UML](Images/patron_04_uml.png)
+
+---
+
+### Patrón 5 — [Nombre del Patrón]
+
+**Justificación:** <!-- Por qué se aplica aquí -->
+
+<!-- INSERTAR IMAGEN: diagrama de clases UML -->
+![Patrón 5 UML](Images/patron_05_uml.png)
+
+---
+
+## 11. Gestión del Proyecto — Enfoque Ágil
+
+> Tablero Kanban con el backlog del proyecto, evidenciando un flujo de trabajo claro.  
+> **Columnas mínimas:** To Do · Blocked · In Progress · Ready for Testing · Test/QA · Done  
+> _(No incluir tareas de documentación; sí historias de usuario y tareas de desarrollo de arquitectura.)_
+
+<!-- LINK AL TABLERO KANBAN (GitHub Projects, Trello, etc.) -->
+
+**Enlace al tablero:** [Ver tablero Kanban](#)
+
+<!-- INSERTAR IMAGEN: captura del tablero Kanban -->
+![Tablero Kanban](Images/kanban.png)
+
+---
+
+*Documento elaborado por el Grupo 5 — AYD2 · 1S2026 · Universidad San Carlos de Guatemala*
