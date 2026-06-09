@@ -136,7 +136,8 @@
 > Diagrama de casos de uso del sistema con actores y relaciones detalladas.
 
 <!-- INSERTAR IMAGEN: diagrama CDU expandido -->
-![CDU Expandido](Images/cdu_expandido.png)
+![CDU Expandido 103](Images/CDU103.jpeg)
+![CDU Expandido 104](Images/CDU104.jpeg)
 
 ---
 
