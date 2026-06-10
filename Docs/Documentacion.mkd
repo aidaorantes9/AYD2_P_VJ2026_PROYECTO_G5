@@ -165,7 +165,29 @@
 > Diagrama de casos de uso del sistema con actores y relaciones detalladas.
 
 ![CDU Expandido 100](Images/CDU100.png)
+
 ![CDU Expandido 101](Images/CDU101.png)
+### CDU101 - Emisión de Certificaciones
+
+| Campo           | Detalle                                                                                                                                                                                                                                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Caso de Uso     | Recibir Certificado                                                                                                                                                                                                                                                                                                           |
+| Nombre          | Emitir Certificado                                                                                                                                                                                                                                                                                                            |
+| Actores         | Candidato                                                                                                                                                                                                                                                                                                                     |
+| Propósito       | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza.                                                                                                                                                                                                           |
+| Resumen         | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
+| Cursos Alternos | No aplica                                                                                                                                                                                                                                                                                                                     |
+
+#### Curso Normal de Eventos
+
+| Acción del Stakeholder                                                  | Respuesta del Proceso del Negocio                                                      |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1. El candidato completa y aprueba la evaluación realizada previamente. | 2. El sistema procede a emitir el certificado digital.                                 |
+|                                                                         | 3. El sistema verifica el cumplimiento de las leyes de protección de datos aplicables. |
+|                                                                         | 4. El sistema almacena el certificado en la bitácora inmutable.                        |
+
+<br>
+
 ![CDU Expandido 102](Images/CDU102.png)
 ![CDU Expandido 103](Images/CDU103.jpeg)
 ![CDU Expandido 104](Images/CDU104.jpeg)
