@@ -114,11 +114,15 @@
 
 > Listado de los requerimientos funcionales del sistema extraídos del enunciado.
 
-<!-- INSERTAR TABLA DE RF -->
+| ID    | Requerimiento Funcional                        | Descripción                                                                                                                                                                                                                          | Prioridad | CDU Asociado |
+| ----- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------ |
+| RF-01 | Gestionar evaluaciones adaptativas             | La plataforma debe permitir la realización de exámenes adaptativos, ajustando la dificultad y el flujo de preguntas en tiempo real según las respuestas previas del candidato.                                                       | Alta      | CDU100       |
+| RF-02 | Registrar evidencia y resultados de evaluación | Durante la evaluación, se debe recopilar evidencia antifraude y guardar los resultados obtenidos por cada candidato, incluyendo actividad de sesión, capturas, registros de tecleo, respuestas y calificación.                       | Alta      | CDU100       |
+| RF-03 | Gestionar certificados digitales               | Para los candidatos aprobados, la plataforma debe generar certificados digitales y permitir comprobar su autenticidad mediante identificadores únicos, firma electrónica o mecanismos criptográficos.                                | Alta      | CDU101       |
+| RF-04 | Integrar sistemas académicos                   | La solución debe conectarse con universidades participantes, soportando distintos protocolos de autenticación mencionados previamente y el intercambio de datos académicos en formatos como JSON, XML y CSV.                         | Media     | CDU102       |
+| RF-05 | Auditar certificaciones                        | Las entidades autorizadas deben poder consultar y verificar la trazabilidad de las certificaciones emitidas, incluyendo información sobre su emisión, resultado asociado, validaciones realizadas y posibles revisiones posteriores. | Media     | CDU103       |
+| RF-06 | Visualizar métricas obtenidas                  | La alta gerencia y los ministerios deben contar con dashboards o reportes para consultar métricas regionales sobre competencias digitales, utilizando información agregada, anonimizada y segmentada.                                | Media     | CDU104       |
 
-| ID | Requerimiento Funcional | Prioridad |
-|---|---|---|
-| RF-01 | | |
 
 ---
 
