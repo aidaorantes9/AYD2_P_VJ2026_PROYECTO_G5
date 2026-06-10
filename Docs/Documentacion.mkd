@@ -56,11 +56,13 @@
 | Direccion Financiera | Financiero | Que el presupuesto no supere USD 180,000. |
 | | | Que se prioricen tecnologías Open Source para minimizar costos de licenciamiento. |
 | | | Que exista un rastro de auditoría inmutable de cada certificado emitido. |
-| Candidatos | Externo | |
-| Ministerios Gubernamentales | Externo | |
-| Candidatos | Externo | |
-
-![Stakeholders](Images/stakeholders.png)
+| Candidatos | Externo | Que puedan realizar exámenes adaptativos sin degradación del servicio durante los picos de tráfico de la primera semana de cada mes. |
+| | |Que sus datos personales estén protegidos bajo GDPR y legislaciones locales. |
+| | |Que reciban certificados digitales con validez jurídica transfronteriza. |
+| Ministerios Gubernamentales | Externo | Que cada certificado emitido cuente con rastro de auditoría inmutable respaldado por firmas electrónicas. |
+| | |Que puedan visualizar métricas regionales de competencias digitales segmentadas por país, carrera y género. |
+| Universidades (USAC, UCR, UES) | Externo | Que no se les obligue a cambiar sus protocolos de autenticación (LDAP, SAML, OAuth2) ni sus formatos de datos (JSON, XML, CSV). |
+| | |Que la integración sea nativa mediante APIs y pasarelas. |
 
 ---
 
