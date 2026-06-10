@@ -192,6 +192,48 @@
 <br>
 
 ![CDU Expandido 102](Images/CDU102.png)
+
+##### Detalle CDU102 - Integración de Protocolos Dispares
+
+| Campo | Detalle |
+|---|---|
+| Caso de Uso | Integración de Protocolos Dispares |
+| Nombre | Proporcionar Protocolos de Autenticación |
+| Actores | Universidades |
+| Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
+| Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
+| Cursos Alternos | No aplica |
+
+#### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+|---|---|
+| 1. La universidad proporciona su protocolo de autenticación. | 2. El sistema recibe el protocolo de autenticación proporcionado. |
+| | 3. El sistema unifica el protocolo dentro del esquema de autenticación federada de la plataforma. |
+
+<br>
+
+##### Detalle CDU102 - Integración de Protocolos Dispares
+
+| Campo | Detalle |
+|---|---|
+| Caso de Uso | Integración de Protocolos Dispares |
+| Nombre | Proporcionar Datos Académicos |
+| Actores | Universidades |
+| Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
+| Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
+| Cursos Alternos | En el paso 3, si la universidad requiere obtener información desde la plataforma, el sistema ejecuta la extensión Exportar Datos Académicos y genera los datos solicitados en el formato correspondiente. <br><br> En el paso 3, si la universidad no puede enviar la información mediante una integración directa, el sistema permite ejecutar la extensión Importar Archivos Planos para cargar los datos académicos desde un archivo. <br><br> En el paso 3, si los datos proporcionados tienen errores de estructura, campos incompletos o información inconsistente, el sistema rechaza la ingesta y solicita la corrección de los datos académicos. |
+
+#### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+|---|---|
+| 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información enviada por la universidad. |
+| | 3. El sistema ingiere los datos académicos y valida que la estructura sea correcta. |
+| | 4. El sistema procesa los datos académicos y los deja disponibles para su uso dentro de la plataforma. |
+
+<br>
+
 ![CDU Expandido 103](Images/CDU103.jpeg)
 
 **CDU103 - AUDITORÍA DE CERTIFICACIONES**
