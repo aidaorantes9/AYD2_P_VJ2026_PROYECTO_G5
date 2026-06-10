@@ -48,9 +48,17 @@
 
 > Identificación clara de los involucrados (directivos, financieros, operativos, externos) y sus intereses o conflictos arquitectónicos.
 
-| Stakeholder | Tipo | Preocupaciones Arquitectónicas |
+| Stakeholder | Categoria | Preocupaciones Arquitectónicas |
 |---|---|---|
-| | | |
+| Alta Gerencia SICA| Directivo | Que el sistema unifique la región sin obligar a las instituciones a cambiar su forma de trabajar. | 
+| | | Que la primera versión esté completamente definida y documentada en 3 a 4 semanas. | 
+| | |Acceso a dashboards analíticos con métricas regionales de competencias digitales. |
+| Direccion Financiera | Financiero | Que el presupuesto no supere USD 180,000. |
+| | | Que se prioricen tecnologías Open Source para minimizar costos de licenciamiento. |
+| | | Que exista un rastro de auditoría inmutable de cada certificado emitido. |
+| Candidatos | Externo | |
+| Ministerios Gubernamentales | Externo | |
+| Candidatos | Externo | |
 
 ![Stakeholders](Images/stakeholders.png)
 
