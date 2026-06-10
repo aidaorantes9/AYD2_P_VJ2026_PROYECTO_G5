@@ -60,22 +60,13 @@
 
 > Identificación clara de los involucrados (directivos, financieros, operativos, externos) y sus intereses o conflictos arquitectónicos.
 
-| Stakeholder | Categoria | Preocupaciones Arquitectónicas |
+| Stakeholder | Categoría | Preocupaciones Arquitectónicas |
 |---|---|---|
-| Alta Gerencia SICA| Directivo | Que el sistema unifique la región sin obligar a las instituciones a cambiar su forma de trabajar. | 
-| | | Que la primera versión esté completamente definida y documentada en 3 a 4 semanas. | 
-| | |Acceso a dashboards analíticos con métricas regionales de competencias digitales. |
-| Direccion Financiera | Financiero | Que el presupuesto no supere USD 180,000. |
-| | | Que se prioricen tecnologías Open Source para minimizar costos de licenciamiento. |
-| | | Que exista un rastro de auditoría inmutable de cada certificado emitido. |
-| Candidatos | Externo | Que puedan realizar exámenes adaptativos sin degradación del servicio durante los picos de tráfico de la primera semana de cada mes. |
-| | |Que sus datos personales estén protegidos bajo GDPR y legislaciones locales. |
-| | |Que reciban certificados digitales con validez jurídica transfronteriza. |
-| Ministerios Gubernamentales | Externo | Que cada certificado emitido cuente con rastro de auditoría inmutable respaldado por firmas electrónicas. |
-| | |Que puedan visualizar métricas regionales de competencias digitales segmentadas por país, carrera y género. |
-| Universidades (USAC, UCR, UES) | Externo | Que no se les obligue a cambiar sus protocolos de autenticación (LDAP, SAML, OAuth2) ni sus formatos de datos (JSON, XML, CSV). |
-| | |Que la integración sea nativa mediante APIs y pasarelas. |
-
+| Alta Gerencia SICA | Directivo | - Que el sistema unifique la región sin obligar a las instituciones a cambiar su forma de trabajar. <br> - Que la primera versión esté completamente definida y documentada en 3 a 4 semanas. <br> - Acceso a dashboards analíticos con métricas regionales de competencias digitales. |
+| Dirección Financiera | Financiero | - Que el presupuesto no supere USD 180,000. <br> - Que se prioricen tecnologías Open Source para minimizar costos de licenciamiento. <br> - Que exista un rastro de auditoría inmutable de cada certificado emitido. |
+| Candidatos | Externo | - Que puedan realizar exámenes adaptativos sin degradación del servicio durante los picos de tráfico de la primera semana de cada mes. <br> - Que sus datos personales estén protegidos bajo GDPR y legislaciones locales. <br> - Que reciban certificados digitales con validez jurídica transfronteriza. |
+| Ministerios Gubernamentales | Externo | - Que cada certificado emitido cuente con rastro de auditoría inmutable respaldado por firmas electrónicas. <br> - Que puedan visualizar métricas regionales de competencias digitales segmentadas por país, carrera y género. |
+| Universidades (USAC, UCR, UES) | Externo | - Que no se les obligue a cambiar sus protocolos de autenticación (LDAP, SAML, OAuth2) ni sus formatos de datos (JSON, XML, CSV). <br> - Que la integración sea nativa mediante APIs y pasarelas. |
 ---
 
 ### 1.2 Diagrama de Contexto
@@ -180,22 +171,83 @@
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
 ---
-
 ### 3.2 Detalle de Drivers por CDU
 
 > Para cada CDU se detallan los drivers RF, EaC y de Restricción asociados.
 
-| CDU                                         | Drivers RF Asociados                                                                               | Drivers EaC Asociados                                                                                      | Restricciones Asociadas                                                                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CDU100 - Gestión de Evaluaciones            | RF01 - Gestionar evaluaciones adaptativas<br>RF02 - Registrar evidencia y resultados de evaluación | EaC01 - Atributo de Rendimiento<br>EaC02 - Atributo de Escalabilidad<br>EaC03 - Atributo de Disponibilidad | RE01 - Presupuesto Máximo del Piloto<br>RE02 - Uso Obligatorio de Open Source<br>RT01 - Despliegue On-Premise Obligatorio<br>RT02 - Arquitectura Preparada para la migración Cloud<br>RL02 - Retención de Evidencia por Cumplimiento Legal                                                                                                                                         |
-| CDU101 - Emisión de Certificaciones         | RF03 - Gestionar certificados digitales                                                            |                                                                                                            | RE01 - Presupuesto Máximo del Piloto<br>RE02 - Uso Obligatorio de Open Source<br>RT01 - Despliegue On-Premise Obligatorio<br>RT02 - Arquitectura Preparada para la migración Cloud<br>RT05 - Certificación Criptográfica de Credenciales<br>RL01 - Cumplimiento GDPR / Leyes de Protección de Datos de Múltiples Países<br>RL03 - Validez Jurídica Transfronteriza de Certificados |
-| CDU102 - Integración de Protocolos Dispares | RF04 - Integrar universidades y sistemas académicos externos                                       |                                                                                                            | RE01 - Presupuesto Máximo del Piloto<br>RE02 - Uso Obligatorio de Open Source<br>RT01 - Despliegue On-Premise Obligatorio<br>RT02 - Arquitectura Preparada para la migración Cloud<br>RT03 - Interoperabilidad con Protocolos Heterogéneos<br>RT04 - Soporte de Múltiples Formatos de Datos                                                                                        |
-| CDU103 - Auditoría de Certificaciones       | RF05 - Auditar certificaciones emitidas                                                            |                                                                                                            | RE01 - Presupuesto Máximo del Piloto<br>RE02 - Uso Obligatorio de Open Source<br>RT01 - Despliegue On-Premise Obligatorio<br>RT02 - Arquitectura Preparada para la migración Cloud<br>RT05 - Certificación Criptográfica de Credenciales<br>RL02 - Retención de Evidencia por Cumplimiento Legal<br>RL04 - Rastro de Auditoría Inmutable con Firma Electrónica                     |
-| CDU104 - Visualización de Competencias      | RF06 - Visualizar métricas regionales de competencias                                              | EaC04 - Atributo de Usabilidad                                                                             | RE01 - Presupuesto Máximo del Piloto<br>RE02 - Uso Obligatorio de Open Source<br>RT01 - Despliegue On-Premise Obligatorio<br>RT02 - Arquitectura Preparada para la migración Cloud<br>RL01 - Cumplimiento GDPR / Leyes de Protección de Datos de Múltiples Países<br>RL05 - Anonimización de Datos en Dashboards Analíticos                                                        |
+**CDU100 - Gestión de Evaluaciones**
 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF01 | Gestionar evaluaciones adaptativas |
+| RF | RF02 | Registrar evidencia y resultados de evaluación |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
+| Calidad | EaC01 | Atributo de Rendimiento |
+| Calidad | EaC02 | Atributo de Escalabilidad |
+| Calidad | EaC03 | Atributo de Disponibilidad |
 
-<!-- INSERTAR IMAGEN si se cuenta con diagramas adicionales por CDU -->
-![Detalle CDU por Driver](Images/cdu_detalle_drivers.png)
+---
+
+**CDU101 - Emisión de Certificaciones**
+
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF03 | Gestionar certificados digitales |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT05 | Certificación Criptográfica de Credenciales |
+| Restricción | RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) |
+| Restricción | RL03 | Validez Jurídica Transfronteriza de Certificados |
+
+---
+
+**CDU102 - Integración de Protocolos Dispares**
+
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF04 | Integrar universidades y sistemas académicos externos |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT03 | Interoperabilidad con Protocolos Heterogéneos |
+| Restricción | RT04 | Soporte de Múltiples Formatos de Datos |
+
+---
+
+**CDU103 - Auditoría de Certificaciones**
+
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF05 | Auditar certificaciones emitidas |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT05 | Certificación Criptográfica de Credenciales |
+| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
+| Restricción | RL04 | Rastro de Auditoría Inmutable con Firma Electrónica |
+
+---
+
+**CDU104 - Visualización de Competencias**
+
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF06 | Visualizar métricas regionales de competencias |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) |
+| Restricción | RL05 | Anonimización de Datos en Dashboards Analíticos |
+| Calidad | EaC04 | Atributo de Usabilidad |
 
 ---
 
