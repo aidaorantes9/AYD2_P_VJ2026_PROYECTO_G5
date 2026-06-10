@@ -168,6 +168,32 @@
 ![CDU Expandido 101](Images/CDU101.png)
 ![CDU Expandido 102](Images/CDU102.png)
 ![CDU Expandido 103](Images/CDU103.jpeg)
+
+**CDU103 - AUDITORÍA DE CERTIFICACIONES**
+
+| | |
+|---|---|
+| **Nombre del Caso de Uso** | Verificar Auditoría de Certificaciones |
+| **Actores** | Dirección Financiera, Ministerios Gubernamentales |
+| **Propósito** | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
+| **Resumen** | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
+
+**Curso Normal de Eventos**
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+|---|---|
+| 1. La entidad autorizada solicita verificar la auditoría de una certificación para garantizar su integridad. | 2. El sistema valida si existe el rastro de auditoría inmutable del certificado. |
+| | 3. El sistema valida que la auditoría inmutable del certificado sea respaldada por firmas electrónicas avanzadas. |
+
+**Cursos Alternos**
+
+| | |
+|---|---|
+| **Para el Paso 2** | Si durante la validación del rastro de auditoría se encuentra alteración en datos, el sistema detecta fraude académico. |
+| **Para el Paso 3** | Si no se logran validar las firmas electrónicas que respalden la auditoría inmutable, se detecta fraude académico. |
+
+---
+
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
 ---
@@ -255,7 +281,7 @@
 
 ### 4.1 Stakeholders vs. Requerimientos
 
-> Relación entre cada stakeholder y los requerimientos funcionales que le conciernen.
+> Esta matriz relaciona a cada stakeholder con los requerimientos funcionales que le conciernen, permitiendo identificar qué actor origina o tiene interés en cada requerimiento del sistema.
 
 ![Matriz Stakeholders vs RF](Images/STAKE_REQ.png)
 
@@ -263,7 +289,7 @@
 
 ### 4.2 Stakeholders vs. CDU
 
-> Relación entre cada stakeholder y los casos de uso del sistema.
+> Esta matriz relaciona a cada stakeholder con los casos de uso del sistema, permitiendo identificar qué actor participa o tiene interés en cada proceso de negocio.
 
 ![Matriz Stakeholders vs CDU](Images/STAKE_CDU.png)
 
@@ -271,7 +297,7 @@
 
 ### 4.3 Requerimiento vs. CDU
 
-> Trazabilidad entre requerimientos funcionales y casos de uso.
+> Esta matriz relaciona cada requerimiento funcional con su caso de uso correspondiente, garantizando que todos los requerimientos están cubiertos por al menos un proceso del sistema.
 
 ![Matriz RF vs CDU](Images/REQ_CDU.png)
 
