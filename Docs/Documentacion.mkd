@@ -1,6 +1,17 @@
-# Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
-## Arquitectura de Software — Fase 1
-### AYD2 · Grupo 5 · 1S2026
+# UNIVERSIDAD SAN CARLOS DE GUATEMALA
+## FACULTAD DE INGENIERÍA
+### INGENIERÍA EN CIENCIAS Y SISTEMAS
+### ANÁLISIS Y DISEÑO DE SISTEMAS 2
+### SECCIÓN P
+
+---
+
+## PROYECTO ÚNICO
+### Desarrollo de Arquitectura de Software para una Plataforma Solicitada por la Secretaria General del SICA a Nivel Regional
+
+---
+
+![Integrantes](Images/integrantes.png)
 
 ---
 
@@ -8,8 +19,9 @@
 
 1. [Identificación del Caso de Negocio y Stakeholders](#1-identificación-del-caso-de-negocio-y-stakeholders)
    - 1.1 [Listado de Stakeholders y Preocupaciones Arquitectónicas](#11-listado-de-stakeholders-y-preocupaciones-arquitectónicas)
-   - 1.2 [Core del Negocio — CUN de Alto Nivel](#12-core-del-negocio--cun-de-alto-nivel)
-   - 1.3 [Primera Descomposición — CDU de Negocio](#13-primera-descomposición--cdu-de-negocio)
+   - 1.2 [Diagrama de Contexto](#12-diagrama-de-contexto)
+   - 1.3 [Core del Negocio — CUN de Alto Nivel](#13-core-del-negocio--cun-de-alto-nivel)
+   - 1.4 [Primera Descomposición — CDU de Negocio](#14-primera-descomposición--cdu-de-negocio)
 
 2. [Características del Sistema y Drivers Arquitectónicos](#2-características-del-sistema-y-drivers-arquitectónicos)
    - 2.1 [Drivers RF — Requerimientos Funcionales](#21-drivers-rf--requerimientos-funcionales)
@@ -66,7 +78,15 @@
 
 ---
 
-### 1.2 Core del Negocio — CUN de Alto Nivel
+### 1.2 Diagrama de Contexto
+
+> Diagrama de contexto del sistema que muestra las interacciones de alto nivel entre el PRCCD y los actores externos.
+
+<!-- INSERTAR IMAGEN: Diagrama de Contexto -->
+
+---
+
+### 1.3 Core del Negocio — CUN de Alto Nivel
 
 > Diagrama de casos de uso de negocio de alto nivel (el más abstracto a nivel de arquitectura).
 
@@ -77,7 +97,7 @@
 
 ---
 
-### 1.3 Primera Descomposición — CDU de Negocio
+### 1.4 Primera Descomposición — CDU de Negocio
 
 > Diagrama CDU de negocio que muestra los procesos de negocio involucrados a nivel de arquitectura.
 
@@ -106,11 +126,12 @@
 
 > Escenarios de atributos de calidad relevantes para el PRCCD.
 
-<!-- INSERTAR TABLA DE EaC con columnas: ID, Atributo, Estímulo, Fuente, Respuesta, Medida -->
-
-| ID | Atributo de Calidad | Estímulo | Fuente | Respuesta Esperada | Medida |
-|---|---|---|---|---|---|
-| EaC-01 | | | | | |
+| ID | Atributo | Escenario | CDU Asociado |
+|---|---|---|---|
+| EaC01 | Rendimiento | Durante la primera semana de cada mes, miles de candidatos acceden simultáneamente al sistema para realizar exámenes adaptativos. El sistema debe soportar esta carga sin degradación del servicio. | CDU100 |
+| EaC02 | Escalabilidad | El sistema debe soportar el crecimiento masivo de usuarios y datos durante los períodos de certificación, así como la retención de evidencia biométrica por 5 años, sin rediseño de la arquitectura. | CDU100 |
+| EaC03 | Disponibilidad | Durante los períodos de certificación, el sistema debe mantenerse disponible sin interrupciones mientras los candidatos realizan sus exámenes adaptativos. | CDU100 |
+| EaC04 | Usabilidad | Los dashboards analíticos deben permitir a la alta gerencia y ministerios visualizar métricas regionales de competencias segmentadas por país, carrera universitaria y género de forma intuitiva. | CDU104 |
 
 ---
 
@@ -132,12 +153,6 @@
 
 > Descripción de las características principales del sistema, ordenadas por impacto en el negocio.
 
-<!-- DESCRIPCIÓN PRIORIZADA DE CARACTERÍSTICAS -->
-
-<!-- INSERTAR IMAGEN si aplica: diagrama de características o mapa de capacidades -->
-![Características PRCCD](Images/caracteristicas_prccd.png)
-
-
 | ID | CARACTERÍSTICA | IMPACTO Y DESCRIPCIÓN |
 |----|----------------|----------------------|
 | 1 | Gestión de Evaluaciones | **Muy Alto:** Es el núcleo principal de la PRCCD, ya que permite que los candidatos realicen evaluaciones adaptativas donde la dificultad cambia según sus respuestas. Tiene impacto directo en la calidad de la certificación, porque de este proceso depende validar si una persona realmente posee la competencia digital evaluada. Además, debe soportar alta concurrencia durante los períodos de certificación. |
@@ -145,6 +160,7 @@
 | 3 | Auditoría de Certificaciones | **Muy Alto:** Permite mantener un registro confiable e inmutable de las evaluaciones, resultados y certificados emitidos. Es importante para prevenir fraude académico, alteración de notas o modificación no autorizada de certificados. También responde a las necesidades de la dirección financiera y ministerios gubernamentales, quienes requieren trazabilidad y respaldo legal. |
 | 4 | Emisión de Certificados | **Alto:** Representa el resultado final del proceso de evaluación, ya que permite entregar al candidato una certificación digital válida. Su importancia aumenta porque el certificado no debe ser solo un documento visual, sino una credencial verificable mediante firma electrónica, PKI o tecnologías similares. |
 | 5 | Visualización de Competencias | **Medio:** Permite a la alta gerencia del SICA y a los ministerios consultar información analítica sobre las competencias digitales por país, carrera universitaria y género. Aunque no es el proceso operativo principal, aporta valor para el análisis regional y la planificación de programas educativos o laborales. |
+
 ---
 
 ## 3. Diagramas de CDU Expandidos
@@ -153,7 +169,9 @@
 
 > Diagrama de casos de uso del sistema con actores y relaciones detalladas.
 
-<!-- INSERTAR IMAGEN: diagrama CDU expandido -->
+![CDU Expandido 100](Images/CDU100.png)
+![CDU Expandido 101](Images/CDU101.png)
+![CDU Expandido 102](Images/CDU102.png)
 ![CDU Expandido 103](Images/CDU103.jpeg)
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
@@ -162,8 +180,6 @@
 ### 3.2 Detalle de Drivers por CDU
 
 > Para cada CDU: drivers RF, EaC y de Restricción asociados.
-
-<!-- INSERTAR TABLA O FICHAS POR CDU -->
 
 | CDU | Drivers RF Asociados | Drivers EaC Asociados | Restricciones Asociadas |
 |---|---|---|---|
@@ -180,8 +196,7 @@
 
 > Relación entre cada stakeholder y los requerimientos funcionales que le conciernen.
 
-<!-- INSERTAR IMAGEN: matriz stakeholders vs. requerimientos -->
-![Matriz Stakeholders vs RF](Images/matriz_stakeholders_rf.png)
+![Matriz Stakeholders vs RF](Images/STAKE_REQ.png)
 
 ---
 
@@ -189,8 +204,7 @@
 
 > Relación entre cada stakeholder y los casos de uso del sistema.
 
-<!-- INSERTAR IMAGEN: matriz stakeholders vs. CDU -->
-![Matriz Stakeholders vs CDU](Images/matriz_stakeholders_cdu.png)
+![Matriz Stakeholders vs CDU](Images/STAKE_CDU.png)
 
 ---
 
@@ -198,8 +212,7 @@
 
 > Trazabilidad entre requerimientos funcionales y casos de uso.
 
-<!-- INSERTAR IMAGEN: matriz requerimientos vs. CDU -->
-![Matriz RF vs CDU](Images/matriz_rf_cdu.png)
+![Matriz RF vs CDU](Images/REQ_CDU.png)
 
 ---
 
@@ -211,8 +224,6 @@
 
 ### Estilos Evaluados
 
-<!-- INSERTAR TABLA COMPARATIVA DE ESTILOS -->
-
 | Estilo Arquitectónico | Ventajas para PRCCD | Desventajas / Trade-offs |
 |---|---|---|
 | | | |
@@ -221,7 +232,6 @@
 
 <!-- ARGUMENTACIÓN TÉCNICA Y ECONÓMICA -->
 
-<!-- INSERTAR IMAGEN: diagrama de decisión arquitectónica o mapa de estilos -->
 ![Selección Arquitectónica](Images/seleccion_arquitectonica.png)
 
 ---
@@ -232,7 +242,6 @@
 
 <!-- DESCRIPCIÓN DE LOS BLOQUES PRINCIPALES DEL SISTEMA -->
 
-<!-- INSERTAR IMAGEN: diagrama de bloques del sistema -->
 ![Vista de Sistema](Images/vista_sistema.png)
 
 ---
@@ -245,14 +254,12 @@
 
 <!-- DESCRIPCIÓN DE COMPONENTES -->
 
-<!-- INSERTAR IMAGEN: diagrama de componentes -->
 ![Diagrama de Componentes](Images/diagrama_componentes.png)
 
 ### Diagrama de Despliegue / Distribución
 
 <!-- DESCRIPCIÓN DE LA INFRAESTRUCTURA ON-PREMISE Y PLAN DE MIGRACIÓN A NUBE -->
 
-<!-- INSERTAR IMAGEN: diagrama de despliegue -->
 ![Diagrama de Despliegue](Images/diagrama_despliegue.png)
 
 ---
@@ -263,7 +270,6 @@
 
 <!-- JUSTIFICACIÓN DEL MODELO DE DATOS ELEGIDO (relacional / NoSQL / híbrido) -->
 
-<!-- INSERTAR IMAGEN: DER o esquema NoSQL -->
 ![Diseño de Datos](Images/diseno_datos.png)
 
 ### Justificación Respecto a Drivers de Auditoría
@@ -280,7 +286,6 @@
 
 ### Prototipo — [Nombre de la interfaz 1]
 
-<!-- INSERTAR IMAGEN: prototipo interfaz 1 -->
 ![Prototipo 1](Images/prototipo_01.png)
 
 ### Prototipo — [Nombre de la interfaz 2]
@@ -309,7 +314,6 @@
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
 ![Patrón 1 UML](Images/patron_01_uml.png)
 
 ---
@@ -326,7 +330,6 @@
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
 ![Patrón 3 UML](Images/patron_03_uml.png)
 
 ---
@@ -335,7 +338,6 @@
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
 ![Patrón 4 UML](Images/patron_04_uml.png)
 
 ---
@@ -344,7 +346,6 @@
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
 ![Patrón 5 UML](Images/patron_05_uml.png)
 
 ---
@@ -355,13 +356,8 @@
 > **Columnas mínimas:** To Do · Blocked · In Progress · Ready for Testing · Test/QA · Done  
 > _(No incluir tareas de documentación; sí historias de usuario y tareas de desarrollo de arquitectura.)_
 
-<!-- LINK AL TABLERO KANBAN (GitHub Projects, Trello, etc.) -->
-
 **Enlace al tablero:** [Ver tablero Kanban](#)
 
-<!-- INSERTAR IMAGEN: captura del tablero Kanban -->
 ![Tablero Kanban](Images/kanban.png)
 
 ---
-
-*Documento elaborado por el Grupo 5 — AYD2 · 1S2026 · Universidad San Carlos de Guatemala*
