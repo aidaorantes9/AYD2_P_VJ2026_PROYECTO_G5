@@ -374,23 +374,153 @@
 
 ---
 
-## 5. Selección Arquitectónica
+# 5. Selección Arquitectónica
 
-> Selección del o los estilos arquitectónicos con argumentación técnica y económica que justifique la elección.
+## 5.1 Estilos Arquitectónicos Seleccionados
 
-<!-- DESCRIPCIÓN DEL ESTILO O ESTILOS SELECCIONADOS -->
+La arquitectura de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) no puede resolverse con un único estilo arquitectónico. El análisis de los drivers identificados en los entregables anteriores revela cuatro tensiones simultáneas: alta concurrencia con persistencia inalterable, integración con sistemas externos heterogéneos, despliegue on-premise con preparación para migración cloud, y separación entre procesamiento transaccional y consulta analítica.
 
-### Estilos Evaluados
+Para abordar estas tensiones de forma coherente, se seleccionó una combinación de estilos arquitectónicos del catálogo C&C, junto con un patrón arquitectónico complementario. Cada uno cumple un propósito específico dentro de la solución propuesta.
 
-| Estilo Arquitectónico | Ventajas para PRCCD | Desventajas / Trade-offs |
-|---|---|---|
-| | | |
+---
 
-### Estilo(s) Seleccionado(s) y Justificación
+### 5.1.1 Estilo Principal: Multi-tier / Arquitectura por Capas
 
-<!-- ARGUMENTACIÓN TÉCNICA Y ECONÓMICA -->
+#### Descripción
 
-![Selección Arquitectónica](Images/seleccion_arquitectonica.png)
+El sistema se organiza en capas horizontales bien definidas, donde cada capa interactúa únicamente con sus capas vecinas. Para la PRCCD se consideran las siguientes capas:
+
+| Capa                      | Descripción                                                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Capa de Presentación      | Contiene las interfaces utilizadas por candidatos, auditores, administradores y usuarios de visualización de métricas.                    |
+| Capa de Lógica de Negocio | Gestiona las reglas principales del sistema, como evaluaciones adaptativas, emisión de certificados, auditorías y generación de métricas. |
+| Capa de Integración       | Permite la comunicación con universidades participantes y sistemas académicos externos.                                                   |
+| Capa de Datos             | Administra la persistencia de evaluaciones, evidencias, certificados, auditorías y datos agregados.                                       |
+
+#### Justificación técnica
+
+La arquitectura por capas se selecciona porque permite separar las diferentes responsabilidades que realiza el sistema, tales como exámenes adaptativos, visualización de métricas, generación de certificaciones, integración con universidades y almacenamiento de información.
+
+El sistema requiere una separación clara entre lo que visualiza el usuario, lo que consulta la alta gerencia, lo que procesa la lógica interna y la forma en que se persisten los datos. Esta separación reduce el acoplamiento entre componentes y facilita que los cambios en una parte del sistema no afecten directamente a las demás.
+
+Sin esta separación, cualquier modificación en infraestructura, lógica de negocio, presentación o persistencia podría generar impactos en varias áreas del proyecto, aumentando el riesgo técnico y el costo de mantenimiento.
+
+#### Justificación económica
+
+El uso de herramientas Open Source para la lógica de negocio, frameworks como Angular o React para la capa de presentación y MySQL para la capa de datos permite que cada capa pueda desarrollarse y mantenerse de manera independiente.
+
+Esto reduce el costo de cambios futuros y facilita una posible migración hacia cloud, ya que las capas son más portables. Por ejemplo, la capa de datos podría redirigirse hacia servicios cloud sin modificar completamente la lógica de negocio.
+
+---
+
+### 5.1.2 Estilo Complementario: SOA / Arquitectura Orientada a Servicios
+
+#### Descripción
+
+Los servicios de integración con universidades deben ser adaptativos, ya que cada universidad cuenta con sus propios protocolos y formatos de datos. Debido a que no es posible obligar a las instituciones participantes a cambiar su forma de trabajo, se requiere una arquitectura que permita adaptar y unificar estas comunicaciones.
+
+#### Justificación técnica
+
+Las universidades participantes, como USAC, UCR y UES, pueden utilizar protocolos distintos como LDAP, SAML u OAuth2, además de formatos diferentes como JSON, XML o CSV.
+
+SOA permite resolver esta situación mediante la creación de adaptadores de servicio por universidad. Cada institución puede mantener su propio protocolo, mientras que el sistema central expone una interfaz de integración unificada. De esta manera, se crea un entorno heterogéneo controlado, donde la complejidad de cada protocolo externo queda encapsulada dentro de su respectivo adaptador.
+
+#### Justificación económica
+
+SOA permite reutilizar componentes de integración. Por ejemplo, un adaptador desarrollado para OAuth2 podría reutilizarse posteriormente con otra universidad que adopte el mismo protocolo.
+
+Además, al utilizar herramientas Open Source como Apache Camel o WSO2 Community Edition, se evita depender de licencias comerciales costosas, lo cual ayuda a mantener el proyecto dentro del presupuesto disponible.
+
+---
+
+### 5.1.3 Estilo Complementario: Pipes and Filters / Flujo de Datos
+
+#### Descripción
+
+La ingestión de datos académicos puede modelarse como una secuencia de filtros, donde cada filtro realiza una transformación específica y pasa el resultado al siguiente paso.
+
+El flujo general propuesto sería el siguiente:
+
+| Paso                     | Descripción                                                                 |
+| ------------------------ | --------------------------------------------------------------------------- |
+| 1. Recepción             | Se reciben datos provenientes de APIs, sistemas externos o archivos planos. |
+| 2. Validación de formato | Se verifica que los datos cumplan con la estructura esperada.               |
+| 3. Normalización         | Se convierten los datos a una estructura común para el sistema.             |
+| 4. Transformación        | Se adaptan los datos según las reglas internas de la plataforma.            |
+| 5. Persistencia          | Se almacenan los datos procesados en el repositorio correspondiente.        |
+
+#### Justificación técnica
+
+Dentro del CDU102, los casos de uso relacionados con ingerir datos, exportar datos académicos e importar archivos planos representan transformaciones secuenciales sobre datos entrantes.
+
+El enunciado indica que los datos provienen de fuentes distintas y con estructuras diferentes, como JSON desde APIs, XML desde sistemas legacy y CSV desde archivos planos. Por ello, Pipes and Filters es adecuado, ya que permite que cada paso de transformación sea independiente y reutilizable.
+
+Por ejemplo, el filtro de validación puede mantenerse separado del filtro de normalización. Si en el futuro se agrega un nuevo formato de datos, se puede incorporar un nuevo filtro sin modificar por completo el proceso existente.
+
+#### Justificación económica
+
+Un pipeline de ingestión basado en filtros independientes reduce el costo de mantenimiento, porque cada filtro puede probarse, corregirse o reemplazarse de forma aislada.
+
+Si una universidad cambia su formato de exportación, únicamente sería necesario modificar el filtro correspondiente, sin afectar todo el proceso de ingestión. Esto ayuda a proteger el presupuesto del proyecto y reduce el retrabajo técnico.
+
+---
+
+### 5.1.4 Estilo Complementario: Repository / Shared Data
+
+#### Descripción
+
+Los datos históricos de evaluaciones, evidencia antifraude, certificados emitidos y métricas agregadas se centralizan en un repositorio compartido.
+
+Este repositorio puede ser consultado por los módulos de auditoría y visualización, sin interferir directamente con el procesamiento transaccional de evaluaciones y certificaciones.
+
+#### Justificación técnica
+
+El CDU103 necesita acceder a rastros de auditoría inmutables, mientras que el CDU104 necesita consultar datos agregados y anonimizados. Ambos casos de uso se enfocan principalmente en lectura de información histórica, por lo que no deben competir directamente con el procesamiento de exámenes en tiempo real ni con la emisión de certificados.
+
+Un repositorio compartido permite separar el flujo transaccional del flujo analítico. Esto ayuda a que las operaciones de consulta, auditoría y reportería no afecten el rendimiento de los procesos críticos del sistema.
+
+Además, la retención de evidencia por cumplimiento legal requiere que exista un repositorio central que no dependa del ciclo de vida de una sesión de evaluación individual. Este repositorio también permite aplicar controles de privacidad, anonimización y acceso antes de que los datos sean utilizados en auditorías o dashboards.
+
+#### Justificación económica
+
+Un repositorio compartido centraliza la gestión de respaldos, retención de datos y cumplimiento legal. Esto reduce la duplicación de lógica de persistencia en distintos módulos del sistema.
+
+Desde el punto de vista económico, esta centralización permite administrar el almacenamiento y las políticas de seguridad desde un solo punto, evitando costos innecesarios por duplicación de infraestructura o licenciamiento.
+
+---
+
+### 5.1.5 Patrón Arquitectónico: Modelo-Vista-Controlador / MVC
+
+#### Descripción
+
+Dentro de la capa de presentación definida por la arquitectura Multi-tier, se aplica el patrón Modelo-Vista-Controlador para separar los datos del sistema, las interfaces de usuario y la lógica de control.
+
+| Componente  | Responsabilidad                                                                                          |
+| ----------- | -------------------------------------------------------------------------------------------------------- |
+| Modelo      | Representa los datos, métricas agregadas, certificados, resultados y reglas relacionadas.                |
+| Vista       | Presenta la información al usuario mediante interfaces, dashboards, formularios o pantallas de consulta. |
+| Controlador | Gestiona las solicitudes del usuario y coordina la interacción entre la Vista y el Modelo.               |
+
+#### Justificación técnica
+
+El patrón MVC es útil porque permite separar la interfaz gráfica de la lógica de control y de los datos. Esto es importante en módulos como los dashboards analíticos, donde se necesita visualizar información segmentada por país, carrera o género.
+
+Con MVC, el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista muestra los dashboards, y el Controlador gestiona las solicitudes del usuario, como filtrar información por país, carrera o género.
+
+Este patrón también puede aplicarse a las interfaces de evaluación y a las interfaces de visualización de certificados, ya que facilita mantener el sistema organizado y más fácil de modificar.
+
+---
+
+### 5.1.6 Resumen de la Arquitectura Seleccionada
+
+| Estilo / Patrón          | Categoría                   | CDU Principal          | Razón Central                                                                                                        |
+| ------------------------ | --------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Multi-tier               | Estilo principal            | Todos                  | Separación de responsabilidades, portabilidad y escalabilidad por capa.                                              |
+| SOA                      | Estilo complementario       | CDU102                 | Integración con universidades heterogéneas sin forzar cambios institucionales.                                       |
+| Pipes and Filters        | Estilo complementario       | CDU102                 | Ingestión modular de datos en múltiples formatos.                                                                    |
+| Repository / Shared Data | Estilo complementario       | CDU103, CDU104         | Centralización de evidencia inmutable, auditoría y dashboards analíticos.                                            |
+| MVC                      | Patrón dentro de Multi-tier | CDU100, CDU101, CDU104 | Separación entre presentación, lógica y datos para dashboards, formularios de evaluación y consulta de certificados. |
+
 
 ---
 
