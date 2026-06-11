@@ -167,6 +167,31 @@
 #### CDU100 - Gestion de evaluaciones
 ![CDU Expandido 100](Images/CDU100.png)
 
+### CDU100 - Gestión de Evaluaciones
+
+| Campo                  | Detalle                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nombre del Caso de Uso | Realizar Examen Adaptativo                                                                                                                                                                                                                                                                                                              |
+| Actores                | Candidato                                                                                                                                                                                                                                                                                                                               |
+| Propósito              | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas.                                                                                                                              |
+| Resumen                | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. 
+ |
+
+#### Curso Normal de Eventos
+
+| Acción del Stakeholder                                 | Respuesta del Proceso del Negocio                                                       |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo).   |
+|                                                        | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
+|                
+
+#### Cursos Alternos
+
+| Paso           | Descripción                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| En el paso 1 | Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal. |
+| En el paso 2 | Durante la recopilación de evidencia, si el sistema identifica indicios de fraude, se registra la detección para revisión posterior. De lo contrario, la evidencia se almacena normalmente. |
+
 #### CDU101 - Emision de Certificaciones
 ![CDU Expandido 101](Images/CDU101.png)
 
@@ -174,12 +199,10 @@
 
 | Campo | Detalle |
 |---|---|
-| Caso de Uso | Recibir Certificado |
-| Nombre | Emitir Certificado |
+| Nombre del Caso de Uso | Emitir Certificado |
 | Actores | Candidato |
 | Propósito | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza. |
 | Resumen | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
-| Cursos Alternos | No aplica |
 
 #### Curso Normal de Eventos
 
@@ -197,12 +220,10 @@
 
 | Campo | Detalle |
 |---|---|
-| Caso de Uso | Integración de Protocolos Dispares |
-| Nombre | Proporcionar Protocolos de Autenticación |
+| Nombre del Caso de Uso | Unificar sistemas de Autenticación |
 | Actores | Universidades |
 | Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
 | Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
-| Cursos Alternos | No aplica |
 
 #### Curso Normal de Eventos
 
@@ -217,12 +238,10 @@
 
 | Campo | Detalle |
 |---|---|
-| Caso de Uso | Integración de Protocolos Dispares |
-| Nombre | Proporcionar Datos Académicos |
+| Nombre del Caso de Uso | Ingerir Datos |
 | Actores | Universidades |
 | Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
 | Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
-| Cursos Alternos | En el paso 3, si la universidad requiere obtener información desde la plataforma, el sistema ejecuta la extensión Exportar Datos Académicos y genera los datos solicitados en el formato correspondiente. <br><br> En el paso 3, si la universidad no puede enviar la información mediante una integración directa, el sistema permite ejecutar la extensión Importar Archivos Planos para cargar los datos académicos desde un archivo. <br><br> En el paso 3, si los datos proporcionados tienen errores de estructura, campos incompletos o información inconsistente, el sistema rechaza la ingesta y solicita la corrección de los datos académicos. |
 
 #### Curso Normal de Eventos
 
@@ -265,7 +284,29 @@
 
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
-![Detalle CDU Expandido 104](Images/CDU104_Detalle.png)
+### CDU104 - Visualización de Competencias
+
+| Campo       | Detalle              |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nombre del Caso de Uso | Visualizar Métricas                             |Métricas                             |
+| Actores     | Alta Gerencia SICA, Ministerios Gubernamentales                      |
+| Propósito   | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados.                         |
+| Resumen     | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
+
+#### Curso Normal de Eventos
+
+| Acción del Actor                                              | Respuesta del Sistema         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 1. El actor accede a la sección de visualización de métricas. | 2. El sistema ejecuta los procesos de agregación y anonimización de datos.      |
+|                                                               | 3. El sistema genera el dashboard analítico con las métricas regionales.        |
+|                                                               | 4. El sistema segmenta la información por país, carrera universitaria y género. |
+
+#### Cursos Alternos
+
+| Paso   | Descripción                  |
+| ------ | ---------------------------- |
+| Paso 4 | No aplicable en caso de uso. |
+
 
 ---
 ### 3.2 Detalle de Drivers por CDU
