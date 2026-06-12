@@ -14,7 +14,6 @@
 ![Integrantes](Images/integrantes.png)
 
 ---
-
 ## Índice
 
 1. [Identificación del Caso de Negocio y Stakeholders](#1-identificación-del-caso-de-negocio-y-stakeholders)
@@ -39,6 +38,12 @@
    - 4.3 [Requerimiento vs. CDU](#43-requerimiento-vs-cdu)
 
 5. [Selección Arquitectónica](#5-selección-arquitectónica)
+   - 5.1 [Estilos Arquitectónicos Seleccionados](#51-estilos-arquitectónicos-seleccionados)
+   - 5.1.1 [Estilo Principal: Arquitectura por Capas (Multi-tier)](#511-estilo-principal-arquitectura-por-capas-multi-tier)
+   - 5.1.2 [Estilo Complementario: Arquitectura Orientada a Servicios (SOA)](#512-estilo-complementario-arquitectura-orientada-a-servicios-soa)
+   - 5.1.3 [Estilo Complementario: Pipes and Filters (Flujo de Datos)](#513-estilo-complementario-pipes-and-filters-flujo-de-datos)
+   - 5.1.4 [Estilo Complementario: Repository / Shared Data (Datos Compartidos)](#514-estilo-complementario-repository--shared-data-datos-compartidos)
+   - 5.1.5 [Patrón Arquitectónico: Modelo-Vista-Controlador (MVC)](#515-patrón-arquitectónico-modelo-vista-controlador-mvc)
 
 6. [Vistas Arquitectónicas — Nivel de Sistema](#6-vistas-arquitectónicas--nivel-de-sistema)
 
@@ -157,157 +162,178 @@
 | 5 | Visualización de Competencias | **Medio:** Permite a la alta gerencia del SICA y a los ministerios consultar información analítica sobre las competencias digitales por país, carrera universitaria y género. Aunque no es el proceso operativo principal, aporta valor para el análisis regional y la planificación de programas educativos o laborales. |
 
 ---
-
 ## 3. Diagramas de CDU Expandidos
 
 ### 3.1 Diagrama de Casos de Uso Expandidos
 
 > Diagrama de casos de uso del sistema con actores y relaciones detalladas.
 
-#### CDU100 - Gestion de evaluaciones
+---
+
+#### CDU100 - Gestión de Evaluaciones
+
 ![CDU Expandido 100](Images/CDU100.png)
 
-### CDU100 - Gestión de Evaluaciones
+##### Descripción Textual del Caso de Uso Base
 
-| Campo                  | Detalle                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Nombre del Caso de Uso | Realizar Examen Adaptativo                                                                                                                                                                                                                                                                                                              |
-| Actores                | Candidato                                                                                                                                                                                                                                                                                                                               |
-| Propósito              | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas.                                                                                                                              |
-| Resumen                | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. 
- |
+| Campo | Detalle |
+| --- | --- |
+| Nombre del Caso de Uso | Realizar Examen Adaptativo |
+| Actores | Candidato |
+| Propósito | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas. |
+| Resumen | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. |
 
-#### Curso Normal de Eventos
+##### Curso Normal de Eventos
 
-| Acción del Stakeholder                                 | Respuesta del Proceso del Negocio                                                       |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo).   |
-|                                                        | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
-|                
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo). |
+| | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
 
-#### Cursos Alternos
+##### Cursos Alternos
 
-| Paso           | Descripción                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Paso | Descripción |
+| --- | --- |
 | En el paso 1 | Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal. |
 | En el paso 2 | Durante la recopilación de evidencia, si el sistema identifica indicios de fraude, se registra la detección para revisión posterior. De lo contrario, la evidencia se almacena normalmente. |
 
-#### CDU101 - Emision de Certificaciones
+---
+
+#### CDU101 - Emisión de Certificaciones
+
 ![CDU Expandido 101](Images/CDU101.png)
 
-##### Detalle CDU101 - Emision de Certificaciones
+##### Descripción Textual del Caso de Uso Base
 
 | Campo | Detalle |
-|---|---|
+| --- | --- |
 | Nombre del Caso de Uso | Emitir Certificado |
 | Actores | Candidato |
 | Propósito | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza. |
 | Resumen | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
 
-#### Curso Normal de Eventos
+##### Curso Normal de Eventos
 
 | Acción del Stakeholder | Respuesta del Proceso del Negocio |
-|---|---|
+| --- | --- |
 | 1. El candidato completa y aprueba la evaluación realizada previamente. | 2. El sistema procede a emitir el certificado digital. |
 | | 3. El sistema verifica el cumplimiento de las leyes de protección de datos aplicables. |
 | | 4. El sistema almacena el certificado en la bitácora inmutable. |
 
-<br>
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
+
+---
+
+#### CDU102 - Integración de Protocolos Dispares
 
 ![CDU Expandido 102](Images/CDU102.png)
 
-##### Detalle CDU102 - Integración de Protocolos Dispares
+##### Descripción Textual del Caso de Uso Base — Proporcionar Protocolos de Autenticación
 
 | Campo | Detalle |
-|---|---|
-| Nombre del Caso de Uso | Unificar sistemas de Autenticación |
+| --- | --- |
+| Nombre del Caso de Uso | Proporcionar Protocolos de Autenticación |
 | Actores | Universidades |
 | Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
 | Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
 
-#### Curso Normal de Eventos
+##### Curso Normal de Eventos
 
 | Acción del Stakeholder | Respuesta del Proceso del Negocio |
-|---|---|
-| 1. La universidad proporciona su protocolo de autenticación. | 2. El sistema recibe el protocolo de autenticación proporcionado. |
-| | 3. El sistema unifica el protocolo dentro del esquema de autenticación federada de la plataforma. |
+| --- | --- |
+| 1. La universidad proporciona su protocolo de autenticación. | 2. El sistema recibe los protocolos de autenticación y los unifica dentro del esquema de autenticación federada. |
 
-<br>
+##### Cursos Alternos
 
-##### Detalle CDU102 - Integración de Protocolos Dispares
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
+
+---
+
+##### Descripción Textual del Caso de Uso Base — Proporcionar Datos Académicos
 
 | Campo | Detalle |
-|---|---|
+| --- | --- |
 | Nombre del Caso de Uso | Ingerir Datos |
 | Actores | Universidades |
 | Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
 | Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
 
-#### Curso Normal de Eventos
+##### Curso Normal de Eventos
 
 | Acción del Stakeholder | Respuesta del Proceso del Negocio |
-|---|---|
-| 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información enviada por la universidad. |
-| | 3. El sistema ingiere los datos académicos y valida que la estructura sea correcta. |
-| | 4. El sistema procesa los datos académicos y los deja disponibles para su uso dentro de la plataforma. |
+| --- | --- |
+| 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información e ingiere los datos para procesarlos y tenerlos disponibles para uso dentro de la plataforma. |
 
-<br>
+##### Cursos Alternos
 
-![CDU Expandido 103](Images/CDU103.jpeg)
-
-**CDU103 - AUDITORÍA DE CERTIFICACIONES**
-
-| | |
-|---|---|
-| **Nombre del Caso de Uso** | Verificar Auditoría de Certificaciones |
-| **Actores** | Dirección Financiera, Ministerios Gubernamentales |
-| **Propósito** | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
-| **Resumen** | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
-
-**Curso Normal de Eventos**
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
-|---|---|
-| 1. La entidad autorizada solicita verificar la auditoría de una certificación para garantizar su integridad. | 2. El sistema valida si existe el rastro de auditoría inmutable del certificado. |
-| | 3. El sistema valida que la auditoría inmutable del certificado sea respaldada por firmas electrónicas avanzadas. |
-
-**Cursos Alternos**
-
-| | |
-|---|---|
-| **Para el Paso 2** | Si durante la validación del rastro de auditoría se encuentra alteración en datos, el sistema detecta fraude académico. |
-| **Para el Paso 3** | Si no se logran validar las firmas electrónicas que respalden la auditoría inmutable, se detecta fraude académico. |
+| Paso | Descripción |
+| --- | --- |
+| En el paso 2 | El sistema puede permitir exportar datos académicos en distintos tipos de formato. |
+| En el paso 2 | El sistema puede permitir importar datos académicos en distintos tipos de formato, como archivos planos. |
 
 ---
 
-#### **CDU104 - Visualizacion de Competencias**
+#### CDU103 - Auditoría de Certificaciones
+
+![CDU Expandido 103](Images/CDU103.jpeg)
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del Caso de Uso | Verificar Auditoría de Certificaciones |
+| Actores | Dirección Financiera, Ministerios Gubernamentales |
+| Propósito | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
+| Resumen | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. La entidad autorizada solicita verificar la auditoría de una certificación para garantizar su integridad. | 2. El sistema valida si existe el rastro de auditoría inmutable del certificado. |
+| | 3. El sistema valida que la auditoría inmutable del certificado sea respaldada por firmas electrónicas avanzadas. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| En el paso 2 | Si durante la validación del rastro de auditoría se encuentra alteración en datos, el sistema detecta fraude académico. |
+| En el paso 3 | Si no se logran validar las firmas electrónicas que respalden la auditoría inmutable, se detecta fraude académico. |
+
+---
+
+#### CDU104 - Visualización de Competencias
 
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
-### CDU104 - Visualización de Competencias
+##### Descripción Textual del Caso de Uso Base
 
-| Campo       | Detalle              |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Nombre del Caso de Uso | Visualizar Métricas                             |Métricas                             |
-| Actores     | Alta Gerencia SICA, Ministerios Gubernamentales                      |
-| Propósito   | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados.                         |
-| Resumen     | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
+| Campo | Detalle |
+| --- | --- |
+| Nombre del Caso de Uso | Visualizar Métricas |
+| Actores | Alta Gerencia SICA, Ministerios Gubernamentales |
+| Propósito | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados. |
+| Resumen | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
 
-#### Curso Normal de Eventos
+##### Curso Normal de Eventos
 
-| Acción del Actor                                              | Respuesta del Sistema         |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| 1. El actor accede a la sección de visualización de métricas. | 2. El sistema ejecuta los procesos de agregación y anonimización de datos.      |
-|                                                               | 3. El sistema genera el dashboard analítico con las métricas regionales.        |
-|                                                               | 4. El sistema segmenta la información por país, carrera universitaria y género. |
+| Acción del Actor | Respuesta del Sistema |
+| --- | --- |
+| 1. El actor accede a la sección de visualización de métricas. | 2. El sistema ejecuta los procesos de agregación y anonimización de datos. |
+| | 3. El sistema genera el dashboard analítico con las métricas regionales. |
+| | 4. El sistema segmenta la información por país, carrera universitaria y género. |
 
-#### Cursos Alternos
+##### Cursos Alternos
 
-| Paso   | Descripción                  |
-| ------ | ---------------------------- |
-| Paso 4 | No aplicable en caso de uso. |
-
-
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
 ---
 ### 3.2 Detalle de Drivers por CDU
 
@@ -414,155 +440,116 @@
 ![Matriz RF vs CDU](Images/REQ_CDU.png)
 
 ---
+## 5. Selección Arquitectónica
 
-# 5. Selección Arquitectónica
+### 5.1 Estilos Arquitectónicos Seleccionados
 
-## 5.1 Estilos Arquitectónicos Seleccionados
-
-La arquitectura de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) no puede resolverse con un único estilo arquitectónico. El análisis de los drivers identificados en los entregables anteriores revela cuatro tensiones simultáneas: alta concurrencia con persistencia inalterable, integración con sistemas externos heterogéneos, despliegue on-premise con preparación para migración cloud, y separación entre procesamiento transaccional y consulta analítica.
-
-Para abordar estas tensiones de forma coherente, se seleccionó una combinación de estilos arquitectónicos del catálogo C&C, junto con un patrón arquitectónico complementario. Cada uno cumple un propósito específico dentro de la solución propuesta.
+La arquitectura de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) no puede resolverse con un único estilo arquitectónico. El análisis de los drivers identificados en los entregables anteriores revela cuatro tensiones simultáneas: alta concurrencia con persistencia inalterable, integración con sistemas externos heterogéneos, despliegue on-premise con preparación para migración cloud, y separación entre procesamiento transaccional y consulta analítica. Para abordar estas tensiones de forma coherente, se seleccionó una combinación de estilos arquitectónicos del catálogo C&C, junto con un patrón arquitectónico complementario. El estilo principal es **Multi-tier**, que estructura todo el sistema en capas. Como estilos complementarios se incorporan **SOA** para la integración con universidades heterogéneas, **Pipes and Filters** para la ingestión modular de datos académicos, y **Repository / Shared Data** para la centralización de evidencia inmutable, auditoría y dashboards analíticos. Dentro de la capa de presentación se aplica adicionalmente el patrón **MVC** para separar la lógica de control de las interfaces de usuario. Cada decisión responde directamente a drivers específicos del enunciado.
 
 ---
 
-### 5.1.1 Estilo Principal: Multi-tier / Arquitectura por Capas
+### 5.1.1 Estilo Principal: Arquitectura por Capas (Multi-tier)
 
 #### Descripción
 
-El sistema se organiza en capas horizontales bien definidas, donde cada capa interactúa únicamente con sus capas vecinas. Para la PRCCD se consideran las siguientes capas:
+El sistema se organiza en capas horizontales bien definidas donde cada capa únicamente interactúa con sus capas vecinas. Las cuatro capas para la PRCCD son las siguientes:
 
-| Capa                      | Descripción                                                                                                                               |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Capa de Presentación      | Contiene las interfaces utilizadas por candidatos, auditores, administradores y usuarios de visualización de métricas.                    |
-| Capa de Lógica de Negocio | Gestiona las reglas principales del sistema, como evaluaciones adaptativas, emisión de certificados, auditorías y generación de métricas. |
-| Capa de Integración       | Permite la comunicación con universidades participantes y sistemas académicos externos.                                                   |
-| Capa de Datos             | Administra la persistencia de evaluaciones, evidencias, certificados, auditorías y datos agregados.                                       |
+| Capa | Descripción |
+| --- | --- |
+| Capa de Presentación | Contiene las interfaces utilizadas por candidatos, auditores, administradores y usuarios de visualización de métricas. |
+| Capa de Lógica de Negocio | Gestiona las reglas principales del sistema: evaluaciones adaptativas, emisión de certificados, auditorías y generación de métricas. |
+| Capa de Integración | Permite la comunicación con universidades participantes y sistemas académicos externos. |
+| Capa de Datos | Administra la persistencia de evaluaciones, evidencias, certificados, auditorías y datos agregados. |
 
-#### Justificación técnica
+#### Justificación Técnica
 
-La arquitectura por capas se selecciona porque permite separar las diferentes responsabilidades que realiza el sistema, tales como exámenes adaptativos, visualización de métricas, generación de certificaciones, integración con universidades y almacenamiento de información.
+La arquitectura por capas se selecciona por la separación de las diferentes tareas que se realizan en el sistema, tales como los exámenes adaptativos, la visualización de métricas y la generación de certificaciones. El sistema requiere una separación clara entre lo que un usuario ve, lo que un directivo consulta, lo que el sistema procesa internamente y la forma en que los datos persisten de forma inmutable.
 
-El sistema requiere una separación clara entre lo que visualiza el usuario, lo que consulta la alta gerencia, lo que procesa la lógica interna y la forma en que se persisten los datos. Esta separación reduce el acoplamiento entre componentes y facilita que los cambios en una parte del sistema no afecten directamente a las demás.
+Sin esta separación, cualquier cambio en la infraestructura podría afectar otras áreas del proyecto, dado que cada área se mantiene encapsulada. Esto aplica directamente a RT01 y RT02: la capa de infraestructura es intercambiable sin afectar las capas superiores, y la portabilidad por capas permite una migración cloud sin impactar la lógica de negocio. Adicionalmente, los atributos de calidad EaC01 y EaC02 se benefician porque la capa de negocio puede escalar horizontalmente de forma independiente, y cada capa puede dimensionarse según la carga sin rediseñar el resto del sistema.
 
-Sin esta separación, cualquier modificación en infraestructura, lógica de negocio, presentación o persistencia podría generar impactos en varias áreas del proyecto, aumentando el riesgo técnico y el costo de mantenimiento.
+#### Justificación Económica
 
-#### Justificación económica
-
-El uso de herramientas Open Source para la lógica de negocio, frameworks como Angular o React para la capa de presentación y MySQL para la capa de datos permite que cada capa pueda desarrollarse y mantenerse de manera independiente.
-
-Esto reduce el costo de cambios futuros y facilita una posible migración hacia cloud, ya que las capas son más portables. Por ejemplo, la capa de datos podría redirigirse hacia servicios cloud sin modificar completamente la lógica de negocio.
+Con herramientas Open Source para la lógica de negocio, frameworks como Angular o React para la capa de presentación, y MySQL para la capa de datos, cada capa puede desarrollarse y mantenerse de forma independiente. Esto reduce el costo de cambios futuros y protege el presupuesto de RE01, ya que la separación clara reduce el retrabajo. La portabilidad por capas también facilita la migración cloud de RT02, bastando con redirigir la capa de datos hacia servicios cloud sin modificar la lógica de negocio.
 
 ---
 
-### 5.1.2 Estilo Complementario: SOA / Arquitectura Orientada a Servicios
+### 5.1.2 Estilo Complementario: Arquitectura Orientada a Servicios (SOA)
 
 #### Descripción
 
-Los servicios de integración con universidades deben ser adaptativos, ya que cada universidad cuenta con sus propios protocolos y formatos de datos. Debido a que no es posible obligar a las instituciones participantes a cambiar su forma de trabajo, se requiere una arquitectura que permita adaptar y unificar estas comunicaciones.
+Los servicios de integración con universidades deben ser adaptativos, dado que cada universidad cuenta con su propio protocolo de autenticación y formato de datos, los cuales no pueden modificarse. SOA permite adaptar y unificar estas comunicaciones heterogéneas mediante la creación de adaptadores de servicio por institución.
 
-#### Justificación técnica
+#### Justificación Técnica
 
-Las universidades participantes, como USAC, UCR y UES, pueden utilizar protocolos distintos como LDAP, SAML u OAuth2, además de formatos diferentes como JSON, XML o CSV.
+Las universidades USAC, UCR y UES utilizan protocolos distintos como LDAP, SAML y OAuth2, además de formatos diferentes como JSON, XML y CSV, y no se les puede obligar a cambiar su forma de trabajar, tal como lo establece RT03 y RT04. SOA resuelve esta situación porque permite crear un adaptador por universidad, donde cada institución mantiene su propio protocolo mientras el sistema central expone una interfaz de integración unificada que abstrae la heterogeneidad del resto del sistema, cumpliendo así con RF04.
 
-SOA permite resolver esta situación mediante la creación de adaptadores de servicio por universidad. Cada institución puede mantener su propio protocolo, mientras que el sistema central expone una interfaz de integración unificada. De esta manera, se crea un entorno heterogéneo controlado, donde la complejidad de cada protocolo externo queda encapsulada dentro de su respectivo adaptador.
+Adicionalmente, cada adaptador encapsula las transformaciones de formato correspondientes, de manera que agregar una nueva universidad o un nuevo protocolo no implica modificar los servicios existentes.
 
-#### Justificación económica
+#### Justificación Económica
 
-SOA permite reutilizar componentes de integración. Por ejemplo, un adaptador desarrollado para OAuth2 podría reutilizarse posteriormente con otra universidad que adopte el mismo protocolo.
-
-Además, al utilizar herramientas Open Source como Apache Camel o WSO2 Community Edition, se evita depender de licencias comerciales costosas, lo cual ayuda a mantener el proyecto dentro del presupuesto disponible.
+SOA permite la reutilización de componentes de integración. Por ejemplo, el adaptador desarrollado para OAuth2 puede reutilizarse con otra universidad que adopte el mismo protocolo en el futuro, sin costo adicional. Al utilizar herramientas Open Source como Apache Camel o WSO2 Community Edition, tal como lo exige RE02, el bus de servicios no requiere licencias comerciales, manteniendo el proyecto dentro del presupuesto de RE01.
 
 ---
 
-### 5.1.3 Estilo Complementario: Pipes and Filters / Flujo de Datos
+### 5.1.3 Estilo Complementario: Pipes and Filters (Flujo de Datos)
 
 #### Descripción
 
-La ingestión de datos académicos puede modelarse como una secuencia de filtros, donde cada filtro realiza una transformación específica y pasa el resultado al siguiente paso.
+La ingestión de datos académicos se modela como una secuencia de filtros donde cada filtro realiza una transformación específica y pasa el resultado al siguiente paso. El flujo propuesto para la PRCCD es el siguiente:
 
-El flujo general propuesto sería el siguiente:
+| Paso | Descripción |
+| --- | --- |
+| 1. Recepción | Se reciben datos provenientes de APIs, sistemas externos o archivos planos. |
+| 2. Validación de formato | Se verifica que los datos cumplan con la estructura esperada. |
+| 3. Normalización | Se convierten los datos a una estructura común para el sistema. |
+| 4. Transformación | Se adaptan los datos según las reglas internas de la plataforma. |
+| 5. Persistencia | Se almacenan los datos procesados en el repositorio correspondiente. |
 
-| Paso                     | Descripción                                                                 |
-| ------------------------ | --------------------------------------------------------------------------- |
-| 1. Recepción             | Se reciben datos provenientes de APIs, sistemas externos o archivos planos. |
-| 2. Validación de formato | Se verifica que los datos cumplan con la estructura esperada.               |
-| 3. Normalización         | Se convierten los datos a una estructura común para el sistema.             |
-| 4. Transformación        | Se adaptan los datos según las reglas internas de la plataforma.            |
-| 5. Persistencia          | Se almacenan los datos procesados en el repositorio correspondiente.        |
+#### Justificación Técnica
 
-#### Justificación técnica
+Dentro de CDU102, los casos de uso INGERIR DATOS, EXPORTAR DATOS ACADÉMICOS e IMPORTAR ARCHIVOS PLANOS representan transformaciones secuenciales sobre datos entrantes. El enunciado establece que los datos provienen de fuentes distintas con estructuras diferentes: JSON desde APIs, XML desde sistemas legacy y CSV desde archivos planos, lo que corresponde a RT04.
 
-Dentro del CDU102, los casos de uso relacionados con ingerir datos, exportar datos académicos e importar archivos planos representan transformaciones secuenciales sobre datos entrantes.
+Pipes and Filters es adecuado porque permite que cada paso de transformación sea independiente y reutilizable. El filtro de validación de formato funciona igual independientemente de si el dato proviene de una API o de un archivo. Además, este estilo resuelve RT04 de forma directa, ya que el pipeline puede incorporar un nuevo filtro por cada nuevo formato de datos sin modificar los filtros existentes, haciendo que RF04 sea sostenible a largo plazo.
 
-El enunciado indica que los datos provienen de fuentes distintas y con estructuras diferentes, como JSON desde APIs, XML desde sistemas legacy y CSV desde archivos planos. Por ello, Pipes and Filters es adecuado, ya que permite que cada paso de transformación sea independiente y reutilizable.
+#### Justificación Económica
 
-Por ejemplo, el filtro de validación puede mantenerse separado del filtro de normalización. Si en el futuro se agrega un nuevo formato de datos, se puede incorporar un nuevo filtro sin modificar por completo el proceso existente.
-
-#### Justificación económica
-
-Un pipeline de ingestión basado en filtros independientes reduce el costo de mantenimiento, porque cada filtro puede probarse, corregirse o reemplazarse de forma aislada.
-
-Si una universidad cambia su formato de exportación, únicamente sería necesario modificar el filtro correspondiente, sin afectar todo el proceso de ingestión. Esto ayuda a proteger el presupuesto del proyecto y reduce el retrabajo técnico.
+Un pipeline de ingestión basado en filtros independientes reduce el costo de mantenimiento porque cada filtro puede probarse, corregirse o reemplazarse de forma aislada. Si una universidad cambia su formato de exportación, únicamente se modifica el filtro correspondiente sin afectar todo el proceso de ingestión, protegiendo así la inversión dentro del presupuesto de RE01.
 
 ---
 
-### 5.1.4 Estilo Complementario: Repository / Shared Data
+### 5.1.4 Estilo Complementario: Repository / Shared Data (Datos Compartidos)
 
 #### Descripción
 
-Los datos históricos de evaluaciones, evidencia antifraude, certificados emitidos y métricas agregadas se centralizan en un repositorio compartido.
+Los datos históricos de evaluaciones, evidencia antifraude, certificados emitidos y métricas agregadas se centralizan en un repositorio compartido al que acceden de forma independiente los módulos de auditoría (CDU103) y visualización (CDU104), sin interferir con el procesamiento transaccional de CDU100 y CDU101.
 
-Este repositorio puede ser consultado por los módulos de auditoría y visualización, sin interferir directamente con el procesamiento transaccional de evaluaciones y certificaciones.
+#### Justificación Técnica
 
-#### Justificación técnica
+CDU103 necesita acceder a rastros de auditoría inmutables según RL04, y CDU104 necesita acceder a datos agregados y anonimizados según RL05. Ambos casos de uso operan principalmente sobre lectura de datos históricos y no deben competir con el procesamiento de exámenes en tiempo real, lo cual es crítico para EaC01 y EaC03. Un repositorio compartido con separación entre el flujo transaccional y el flujo analítico resuelve este conflicto.
 
-El CDU103 necesita acceder a rastros de auditoría inmutables, mientras que el CDU104 necesita consultar datos agregados y anonimizados. Ambos casos de uso se enfocan principalmente en lectura de información histórica, por lo que no deben competir directamente con el procesamiento de exámenes en tiempo real ni con la emisión de certificados.
+Adicionalmente, RL02 exige retención de evidencia por 5 años, restricción que solo puede cumplirse si existe un repositorio central que no dependa del ciclo de vida de ninguna sesión de evaluación individual. Este repositorio es también el punto donde se aplica RL01 (GDPR) y RL05 (anonimización) antes de que los datos lleguen a las capas de consulta, centralizando así el control de privacidad. Las escrituras al repositorio de evidencia son de tipo append-only, garantizando que ningún módulo pueda sobreescribir el rastro, lo que soporta directamente RL04. Los dashboards de RF06 consultan únicamente el repositorio de datos agregados, nunca datos transaccionales directos, y la auditoría de RF05 lee del repositorio sin afectar las transacciones activas.
 
-Un repositorio compartido permite separar el flujo transaccional del flujo analítico. Esto ayuda a que las operaciones de consulta, auditoría y reportería no afecten el rendimiento de los procesos críticos del sistema.
+#### Justificación Económica
 
-Además, la retención de evidencia por cumplimiento legal requiere que exista un repositorio central que no dependa del ciclo de vida de una sesión de evaluación individual. Este repositorio también permite aplicar controles de privacidad, anonimización y acceso antes de que los datos sean utilizados en auditorías o dashboards.
-
-#### Justificación económica
-
-Un repositorio compartido centraliza la gestión de respaldos, retención de datos y cumplimiento legal. Esto reduce la duplicación de lógica de persistencia en distintos módulos del sistema.
-
-Desde el punto de vista económico, esta centralización permite administrar el almacenamiento y las políticas de seguridad desde un solo punto, evitando costos innecesarios por duplicación de infraestructura o licenciamiento.
+Un repositorio compartido centraliza la gestión de respaldo, retención y cumplimiento legal, reduciendo la duplicación de lógica de persistencia en múltiples módulos. Esto es crítico con el presupuesto de RE01 porque el costo de almacenamiento se paga una sola vez en lugar de replicarlo por módulo. Al utilizar una solución Open Source según RE02, el costo de licenciamiento es cero.
 
 ---
 
-### 5.1.5 Patrón Arquitectónico: Modelo-Vista-Controlador / MVC
+### 5.1.5 Patrón Arquitectónico: Modelo-Vista-Controlador (MVC)
 
 #### Descripción
 
-Dentro de la capa de presentación definida por la arquitectura Multi-tier, se aplica el patrón Modelo-Vista-Controlador para separar los datos del sistema, las interfaces de usuario y la lógica de control.
+Dentro de la capa de presentación definida por la arquitectura Multi-tier, se aplica el patrón MVC para separar los datos del sistema, las interfaces de usuario y la lógica de control. Sus tres componentes se distribuyen de la siguiente manera:
 
-| Componente  | Responsabilidad                                                                                          |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| Modelo      | Representa los datos, métricas agregadas, certificados, resultados y reglas relacionadas.                |
-| Vista       | Presenta la información al usuario mediante interfaces, dashboards, formularios o pantallas de consulta. |
-| Controlador | Gestiona las solicitudes del usuario y coordina la interacción entre la Vista y el Modelo.               |
+| Componente | Responsabilidad |
+| --- | --- |
+| Modelo | Contiene las métricas agregadas, certificados, resultados y la lógica de segmentación de datos. |
+| Vista | Renderiza los dashboards, formularios de evaluación e interfaces de consulta de certificados. |
+| Controlador | Gestiona las solicitudes del usuario y coordina la interacción entre la Vista y el Modelo. |
 
-#### Justificación técnica
+#### Justificación Técnica
 
-El patrón MVC es útil porque permite separar la interfaz gráfica de la lógica de control y de los datos. Esto es importante en módulos como los dashboards analíticos, donde se necesita visualizar información segmentada por país, carrera o género.
-
-Con MVC, el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista muestra los dashboards, y el Controlador gestiona las solicitudes del usuario, como filtrar información por país, carrera o género.
-
-Este patrón también puede aplicarse a las interfaces de evaluación y a las interfaces de visualización de certificados, ya que facilita mantener el sistema organizado y más fácil de modificar.
-
----
-
-### 5.1.6 Resumen de la Arquitectura Seleccionada
-
-| Estilo / Patrón          | Categoría                   | CDU Principal          | Razón Central                                                                                                        |
-| ------------------------ | --------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Multi-tier               | Estilo principal            | Todos                  | Separación de responsabilidades, portabilidad y escalabilidad por capa.                                              |
-| SOA                      | Estilo complementario       | CDU102                 | Integración con universidades heterogéneas sin forzar cambios institucionales.                                       |
-| Pipes and Filters        | Estilo complementario       | CDU102                 | Ingestión modular de datos en múltiples formatos.                                                                    |
-| Repository / Shared Data | Estilo complementario       | CDU103, CDU104         | Centralización de evidencia inmutable, auditoría y dashboards analíticos.                                            |
-| MVC                      | Patrón dentro de Multi-tier | CDU100, CDU101, CDU104 | Separación entre presentación, lógica y datos para dashboards, formularios de evaluación y consulta de certificados. |
-
-
+EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir visualización segmentada por país, carrera y género. Para cumplir esto sin acoplar la lógica de segmentación a la interfaz gráfica, MVC es el patrón adecuado: el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista renderiza los dashboards, y el Controlador gestiona las solicitudes del usuario como filtrar por país, carrera o género. La Vista es independiente del Modelo, por lo que los cambios en la interfaz de usuario no afectan la lógica interna. Este patrón aplica también a las interfaces de evaluación de CDU100 y a la visualización de certificados de CDU101. Para su implementación se dispone de frameworks MVC Open Source maduros como Spring MVC, Django o Angular, en cumplimiento con RE02.
 ---
 
 ## 6. Vistas Arquitectónicas — Nivel de Sistema
