@@ -148,18 +148,17 @@
 | R-03 | Operativa | |
 
 ---
-
-### 2.4 Características Principales del PRCCD (Priorizadas)
+## 2.4 Características Principales del PRCCD (Priorizadas)
 
 > Descripción de las características principales del sistema, ordenadas por impacto en el negocio.
 
-| ID | CARACTERÍSTICA | IMPACTO Y DESCRIPCIÓN |
-|----|----------------|----------------------|
-| 1 | Gestión de Evaluaciones | **Muy Alto:** Es el núcleo principal de la PRCCD, ya que permite que los candidatos realicen evaluaciones adaptativas donde la dificultad cambia según sus respuestas. Tiene impacto directo en la calidad de la certificación, porque de este proceso depende validar si una persona realmente posee la competencia digital evaluada. Además, debe soportar alta concurrencia durante los períodos de certificación. |
-| 2 | Integración de Protocolos Dispares | **Muy Alto:** Es una condición clave para la adopción institucional, ya que permite conectar la plataforma con universidades que usan tecnologías distintas, como LDAP, SAML, OAuth2, JSON, XML o archivos CSV. Sin esta integración, las instituciones tendrían que cambiar su forma de trabajo, lo cual dificultaría la implementación regional del sistema. |
-| 3 | Auditoría de Certificaciones | **Muy Alto:** Permite mantener un registro confiable e inmutable de las evaluaciones, resultados y certificados emitidos. Es importante para prevenir fraude académico, alteración de notas o modificación no autorizada de certificados. También responde a las necesidades de la dirección financiera y ministerios gubernamentales, quienes requieren trazabilidad y respaldo legal. |
-| 4 | Emisión de Certificados | **Alto:** Representa el resultado final del proceso de evaluación, ya que permite entregar al candidato una certificación digital válida. Su importancia aumenta porque el certificado no debe ser solo un documento visual, sino una credencial verificable mediante firma electrónica, PKI o tecnologías similares. |
-| 5 | Visualización de Competencias | **Medio:** Permite a la alta gerencia del SICA y a los ministerios consultar información analítica sobre las competencias digitales por país, carrera universitaria y género. Aunque no es el proceso operativo principal, aporta valor para el análisis regional y la planificación de programas educativos o laborales. |
+| ID | Característica | Impacto | Descripción |
+|----|----------------|---------|-------------|
+| 1 | Gestión de Evaluaciones | Muy Alto | Es el núcleo principal de la PRCCD, ya que permite que los candidatos realicen evaluaciones adaptativas donde la dificultad cambia según sus respuestas. Tiene impacto directo en la calidad de la certificación, porque de este proceso depende validar si una persona realmente posee la competencia digital evaluada. Además, debe soportar alta concurrencia durante los períodos de certificación. |
+| 2 | Integración de Protocolos Dispares | Muy Alto | Es una condición clave para la adopción institucional, ya que permite conectar la plataforma con universidades que usan tecnologías distintas, como LDAP, SAML, OAuth2, JSON, XML o archivos CSV. Sin esta integración, las instituciones tendrían que cambiar su forma de trabajo, lo cual dificultaría la implementación regional del sistema. |
+| 3 | Auditoría de Certificaciones | Muy Alto | Permite mantener un registro confiable e inmutable de las evaluaciones, resultados y certificados emitidos. Es importante para prevenir fraude académico, alteración de notas o modificación no autorizada de certificados. También responde a las necesidades de la dirección financiera y ministerios gubernamentales, quienes requieren trazabilidad y respaldo legal. |
+| 4 | Emisión de Certificados | Alto | Representa el resultado final del proceso de evaluación, ya que permite entregar al candidato una certificación digital válida. Su importancia aumenta porque el certificado no debe ser solo un documento visual, sino una credencial verificable mediante firma electrónica, PKI o tecnologías similares. |
+| 5 | Visualización de Competencias | Medio | Permite a la alta gerencia del SICA y a los ministerios consultar información analítica sobre las competencias digitales por país, carrera universitaria y género. Aunque no es el proceso operativo principal, aporta valor para el análisis regional y la planificación de programas educativos o laborales. |
 
 ---
 ## 3. Diagramas de CDU Expandidos
