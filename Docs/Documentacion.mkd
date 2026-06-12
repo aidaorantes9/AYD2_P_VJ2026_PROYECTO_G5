@@ -177,7 +177,7 @@
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Realizar Examen Adaptativo |
+| Nombre del CDU Base | Realizar Examen Adaptativo |
 | Actores | Candidato |
 | Propósito | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas. |
 | Resumen | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. |
@@ -206,7 +206,7 @@
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Emitir Certificado |
+| Nombre del CDU Base | Emitir Certificado |
 | Actores | Candidato |
 | Propósito | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza. |
 | Resumen | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
@@ -231,11 +231,11 @@
 
 ![CDU Expandido 102](Images/CDU102.png)
 
-##### Descripción Textual del Caso de Uso Base — Proporcionar Protocolos de Autenticación
+##### Descripción Textual del Caso de Uso Base 
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Proporcionar Protocolos de Autenticación |
+| Nombre del CDU Base | Unificar de Sistemas de Autenticación |
 | Actores | Universidades |
 | Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
 | Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
@@ -254,11 +254,11 @@
 
 ---
 
-##### Descripción Textual del Caso de Uso Base — Proporcionar Datos Académicos
+##### Descripción Textual del Caso de Uso Base
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Ingerir Datos |
+| Nombre del CDU Base | Ingerir Datos |
 | Actores | Universidades |
 | Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
 | Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
@@ -286,7 +286,7 @@
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Verificar Auditoría de Certificaciones |
+| Nombre del CDU Base | Verificar Auditoría de Certificaciones |
 | Actores | Dirección Financiera, Ministerios Gubernamentales |
 | Propósito | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
 | Resumen | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
@@ -315,7 +315,7 @@
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del Caso de Uso | Visualizar Métricas |
+| Nombre del CDU Base | Visualizar Métricas |
 | Actores | Alta Gerencia SICA, Ministerios Gubernamentales |
 | Propósito | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados. |
 | Resumen | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
@@ -578,19 +578,24 @@ EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir v
 ![Diagrama de Despliegue](Images/diagrama_despliegue.png)
 
 ---
-
 ## 8. Diseño de Datos
 
-> Diagrama Entidad-Relación (DER) o esquema para bases de datos NoSQL, justificando cómo soporta las necesidades de auditoría y almacenamiento a largo plazo.
+### 8.1 Diagrama Entidad-Relación
 
-<!-- JUSTIFICACIÓN DEL MODELO DE DATOS ELEGIDO (relacional / NoSQL / híbrido) -->
+![DER PRCCD](Images/ER.png)
 
-![Diseño de Datos](Images/diseno_datos.png)
+### 8.2 Justificación
 
-### Justificación Respecto a Drivers de Auditoría
-
-<!-- EXPLICAR CÓMO EL DISEÑO SOPORTA: rastro inmutable, retención 5 años, GDPR, derecho al olvido -->
-
+El modelo relacional de 18 tablas cubre la totalidad de los drivers arquitectónicos del 
+sistema. La auditoría se soporta mediante `BitacoraAuditoria`, que encadena `hash_anterior` 
+y `hash_actual` haciendo cualquier alteración retroactiva detectable (RT05, RL04), y 
+`EvidenciaAntifraude`, que almacena capturas, logs y video con `hash_sha256` y 
+`fecha_retencion_hasta` garantizando retención mínima de 5 años conforme al GDPR (RL02). 
+El almacenamiento a largo plazo de datos personales se gestiona cifrando nombre y correo 
+del candidato como `VARBINARY` y mediante `estado_gdpr(activo, anonimizado, olvidado)` que 
+implementa el derecho al olvido sin eliminar el historial de evaluaciones ni certificados. 
+`MetricaAgregada` garantiza que ningún dato llega al dashboard sin anonimizar, protegiendo 
+la privacidad individual mientras se cumplen los requerimientos analíticos de CDU104 y RL05.
 ---
 
 ## 9. Diseño de Interfaces (UI/UX)
