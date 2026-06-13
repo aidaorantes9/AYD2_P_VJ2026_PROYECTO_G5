@@ -555,19 +555,17 @@ EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir v
 
 ## 6. Vistas Arquitectónicas — Nivel de Sistema
 
-![Vista de Sistema](Images/diagramaComponentes.jpeg)
+> Diagrama de bloques que representa la arquitectura de software implementada.
+
+<!-- DESCRIPCIÓN DE LOS BLOQUES PRINCIPALES DEL SISTEMA -->
+
+![Vista de Sistema](Images/vista_sistema.png)
 
 ---
 
 ## 7. Vistas Arquitectónicas — Nivel de Infraestructura
 
-> Diagrama de despliegue que incluye diagrama de componentes y diagrama de distribución. Se explica cómo las tecnologías seleccionadas cumplen con los drivers arquitectónicos.
-
-### Diagrama de Componentes
-
-<!-- DESCRIPCIÓN DE COMPONENTES -->
-
-![Diagrama de Componentes](Images/diagrama_componentes.png)
+![Vista de Sistema](Images/diagramaComponentes.jpeg)
 
 ### Diagrama de Despliegue / Distribución
 
