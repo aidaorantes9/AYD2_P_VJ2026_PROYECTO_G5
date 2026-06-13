@@ -548,7 +548,9 @@ Dentro de la capa de presentación definida por la arquitectura Multi-tier, se a
 
 #### Justificación Técnica
 
+
 EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir visualización segmentada por país, carrera y género. Para cumplir esto sin acoplar la lógica de segmentación a la interfaz gráfica, MVC es el patrón adecuado: el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista renderiza los dashboards, y el Controlador gestiona las solicitudes del usuario como filtrar por país, carrera o género. La Vista es independiente del Modelo, por lo que los cambios en la interfaz de usuario no afectan la lógica interna. Este patrón aplica también a las interfaces de evaluación de CDU100 y a la visualización de certificados de CDU101. Para su implementación se dispone de frameworks MVC Open Source maduros como Spring MVC, Django o Angular, en cumplimiento con RE02.
+
 ---
 
 ## 6. Vistas Arquitectónicas — Nivel de Sistema
@@ -596,6 +598,7 @@ del candidato como `VARBINARY` y mediante `estado_gdpr(activo, anonimizado, olvi
 implementa el derecho al olvido sin eliminar el historial de evaluaciones ni certificados. 
 `MetricaAgregada` garantiza que ningún dato llega al dashboard sin anonimizar, protegiendo 
 la privacidad individual mientras se cumplen los requerimientos analíticos de CDU104 y RL05.
+
 ---
 
 ## 9. Diseño de Interfaces (UI/UX)
