@@ -79,7 +79,7 @@
 > Diagrama de contexto del sistema que muestra las interacciones de alto nivel entre el PRCCD y los actores externos.
 
 <!-- INSERTAR IMAGEN: Diagrama de Contexto -->
-
+![Diagrama Cntexto](Images/DiagramaContexto_.png)
 ---
 
 ### 1.3 Core del Negocio — CUN de Alto Nivel
@@ -140,12 +140,36 @@
 > Restricciones tecnológicas, normativas y operativas que condicionan la arquitectura.
 
 <!-- INSERTAR TABLA DE RESTRICCIONES -->
+## Restricciones Económicas
 
-| ID | Tipo | Descripción |
-|---|---|---|
-| R-01 | Tecnológica | |
-| R-02 | Normativa | |
-| R-03 | Operativa | |
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RE01 | Presupuesto Máximo del Piloto | La dirección financiera aprobó un presupuesto máximo de USD 180,000 para el piloto. Esto obliga a priorizar el uso de tecnologías Open Source y a optimizar los costos de licenciamiento. | Transversal: CDU100–CDU104 |
+| RE02 | Uso Obligatorio de Open Source | Derivado del presupuesto limitado, la arquitectura debe basarse en herramientas y frameworks de código abierto para minimizar costos de licencias comerciales. | Transversal: CDU100–CDU104 |
+
+---
+
+## Restricciones Tecnológicas / Operativas
+
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RT01 | Despliegue On-Premise Obligatorio | La primera versión del sistema debe desplegarse en soluciones on-premise, reutilizando servidores físicos e infraestructura existente del SICA. No se permite nube en la fase inicial. | Transversal: CDU100–CDU104 |
+| RT02 | Arquitectura Preparada para la Migración Cloud | Aunque el despliegue inicial es on-premise, la arquitectura debe estar intrínsecamente preparada para una migración transparente hacia la nube en fases posteriores. | Transversal: CDU100–CDU104 |
+| RT03 | Interoperabilidad con Protocolos Heterogéneos | La plataforma debe integrarse con al menos tres universidades (USAC, UCR, UES), cada una con protocolos distintos: LDAP, SAML y OAuth2, sin obligarlas a cambiar su forma de trabajar. | CDU102 |
+| RT04 | Soporte de Múltiples Formatos de Datos | El sistema debe ingerir y exportar datos académicos en formatos dispares: JSON, XML y archivos planos CSV, provenientes de sistemas legacy. | CDU102 |
+| RT05 | Certificación Criptográfica de Credenciales | Los certificados digitales deben ser verificables criptográficamente, incorporando tecnologías como Blockchain (Hyperledger) o PKI (Infraestructura de Llave Pública). | CDU101, CDU103 |
+
+---
+
+## Restricciones Legales / Normativas
+
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) | La arquitectura debe cumplir con el Reglamento General de Protección de Datos (GDPR), garantizando el derecho al olvido y la encriptación de datos sensibles en reposo y en tránsito. | CDU101 y CDU104 |
+| RL02 | Retención de Evidencia por Cumplimiento Legal | Toda la evidencia biométrica y de comportamiento recopilada durante las evaluaciones (capturas de pantalla, logs de tecleo, ráfagas de video) debe almacenarse de forma inalterable por un mínimo de 5 años, cumpliendo simultáneamente con el GDPR y la Ley de Acceso a la Información Pública de Guatemala. | CDU100 y CDU103 |
+| RL03 | Validez Jurídica Transfronteriza de Certificados | Los certificados emitidos deben garantizar validez jurídica transfronteriza, no solo ser una representación gráfica, asegurando que las competencias sean reconocidas legalmente entre países. | CDU101 |
+| RL04 | Rastro de Auditoría Inmutable con Firma Electrónica | Cada certificado emitido debe contar con un rastro de auditoría inmutable, respaldado por firmas electrónicas avanzadas que prevengan el fraude académico o la alteración de notas a nivel de base de datos. | CDU103 |
+| RL05 | Anonimización de Datos en Dashboards Analíticos | Antes de exponer métricas a interfaces gerenciales, la capa de datos debe ejecutar procesos rigurosos de agregación y anonimización, para no infringir normativas legales de privacidad. | CDU104 |
 
 ---
 ## 2.4 Características Principales del PRCCD (Priorizadas)
@@ -644,51 +668,44 @@ El dashboard presenta métricas regionales mediante filtros por país, carrera, 
 
 > Identificación de al menos **5 patrones de diseño** en la arquitectura, con sus diagramas de clases UML y justificación.
 
-| # | Patrón | Categoría | Punto de Aplicación en la Arquitectura |
-|---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
 
-### Patrón 1 — [Nombre del Patrón]
+### Patrón 1 — Adapter
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 1 UML](Images/patron_01_uml.png)
+![Patrón 1 UML](Images/Adapter.png)
 
 ---
 
-### Patrón 2 — [Nombre del Patrón]
+### Patrón 2 — Facade
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 2 UML](Images/patron_02_uml.png)
+![Patrón 2 UML](Images/Facade_.png)
 
 ---
 
-### Patrón 3 — [Nombre del Patrón]
+### Patrón 3 — Chain of Responsibility
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 3 UML](Images/patron_03_uml.png)
+![Patrón 3 UML](Images/Pipeline.png)
 
 ---
 
-### Patrón 4 — [Nombre del Patrón]
+### Patrón 4 — Observer
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 4 UML](Images/patron_04_uml.png)
+![Patrón 4 UML](Images/Observer.png)
 
 ---
 
-### Patrón 5 — [Nombre del Patrón]
+### Patrón 5 — MVC
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 5 UML](Images/patron_05_uml.png)
+![Patrón 5 UML](Images/MVC.png)
 
 ---
 ## 11. Gestión del Proyecto (Enfoque Ágil)
