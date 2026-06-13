@@ -669,15 +669,26 @@ la privacidad individual mientras se cumplen los requerimientos analíticos de C
 ![Patrón 5 UML](Images/patron_05_uml.png)
 
 ---
+## 11. Gestión del Proyecto (Enfoque Ágil)
 
-## 11. Gestión del Proyecto — Enfoque Ágil
+### 11.1 Tablero Kanban
 
-> Tablero Kanban con el backlog del proyecto, evidenciando un flujo de trabajo claro.  
-> **Columnas mínimas:** To Do · Blocked · In Progress · Ready for Testing · Test/QA · Done  
-> _(No incluir tareas de documentación; sí historias de usuario y tareas de desarrollo de arquitectura.)_
+El tablero Kanban del proyecto fue elaborado en Trello, evidenciando un flujo de trabajo 
+claro con las columnas: To Do, Blocked, In Progress, Ready for Testing, Test/QA y Done. 
+El backlog contiene 18 tareas de desarrollo derivadas de los 5 casos de uso del sistema 
+(CDU100, CDU101, CDU102, CDU103, CDU104), cada una con su historia de usuario asociada 
+en la descripción y su etiqueta de CDU correspondiente. Dado que esta es la fase 1 del 
+proyecto (arquitectura), todas las tareas se encuentran en To Do, ya que el desarrollo 
+de código corresponde a fases posteriores.
 
-**Enlace al tablero:** [Ver tablero Kanban](#)
+![Tablero Kanban](Images/trello.png)
 
-![Tablero Kanban](Images/kanban.png)
+### 11.2 Detalle de tarea
+
+Cada tarjeta contiene el título de la tarea de desarrollo, la etiqueta del CDU al que 
+pertenece y en la descripción la historia de usuario correspondiente en formato HDU, 
+vinculando el requerimiento del usuario con la tarea técnica a implementar.
+
+![Detalle de tarea](Images/tarea-hdu.png)
 
 ---
