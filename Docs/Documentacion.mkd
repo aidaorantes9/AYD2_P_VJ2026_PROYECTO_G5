@@ -548,9 +548,7 @@ Dentro de la capa de presentación definida por la arquitectura Multi-tier, se a
 
 #### Justificación Técnica
 
-
 EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir visualización segmentada por país, carrera y género. Para cumplir esto sin acoplar la lógica de segmentación a la interfaz gráfica, MVC es el patrón adecuado: el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista renderiza los dashboards, y el Controlador gestiona las solicitudes del usuario como filtrar por país, carrera o género. La Vista es independiente del Modelo, por lo que los cambios en la interfaz de usuario no afectan la lógica interna. Este patrón aplica también a las interfaces de evaluación de CDU100 y a la visualización de certificados de CDU101. Para su implementación se dispone de frameworks MVC Open Source maduros como Spring MVC, Django o Angular, en cumplimiento con RE02.
-
 ---
 
 ## 6. Vistas Arquitectónicas — Nivel de Sistema
@@ -565,13 +563,17 @@ EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir v
 
 ## 7. Vistas Arquitectónicas — Nivel de Infraestructura
 
-![Vista de Sistema](Images/diagramaComponentes.jpeg)
+> Diagrama de despliegue que incluye diagrama de componentes y diagrama de distribución. Se explica cómo las tecnologías seleccionadas cumplen con los drivers arquitectónicos.
 
-### Diagrama de Distribución
+### Diagrama de Componentes
 
-![Diagrama de Distribucion](Images/diagrama_distribucion.png)
+<!-- DESCRIPCIÓN DE COMPONENTES -->
 
-### Diagrama de Despliegue 
+![Diagrama de Componentes](Images/diagrama_componentes.png)
+
+### Diagrama de Despliegue / Distribución
+
+<!-- DESCRIPCIÓN DE LA INFRAESTRUCTURA ON-PREMISE Y PLAN DE MIGRACIÓN A NUBE -->
 
 ![Diagrama de Despliegue](Images/diagrama_despliegue.png)
 
@@ -594,26 +596,48 @@ del candidato como `VARBINARY` y mediante `estado_gdpr(activo, anonimizado, olvi
 implementa el derecho al olvido sin eliminar el historial de evaluaciones ni certificados. 
 `MetricaAgregada` garantiza que ningún dato llega al dashboard sin anonimizar, protegiendo 
 la privacidad individual mientras se cumplen los requerimientos analíticos de CDU104 y RL05.
-
 ---
 
 ## 9. Diseño de Interfaces (UI/UX)
 
-> Prototipos de interfaces de usuario elaborados para el PRCCD.
+#### Portal de Certificaciones
+El prototipo representa el acceso del candidato a la plataforma mediante autenticación institucional. Incluye la selección de universidad y compatibilidad con LDAP, SAML u OAuth2, según la configuración de cada entidad. De esta manera, se mantiene un punto de ingreso unificado sin modificar los mecanismos existentes.
 
-<!-- BREVE DESCRIPCIÓN DE LOS FLUJOS DE USUARIO PROTOTIPADOS -->
+![Portal de califiaciones](Images/Portal_de_Certificaciones.png)
 
-### Prototipo — [Nombre de la interfaz 1]
 
-![Prototipo 1](Images/prototipo_01.png)
 
-### Prototipo — [Nombre de la interfaz 2]
+### Examen Adaptativo
+El prototipo muestra la ejecución de una evaluación cuya dificultad cambia conforme a las respuestas del candidato. La pantalla incluye el avance, tiempo disponible, opciones de respuesta y controles de monitoreo antifraude. Asimismo, permite representar el registro de evidencia y resultados correspondiente al CDU100.
+![Prototipo 1](Images/Examen_Adaptativo.png)
 
-![Prototipo 2](Images/prototipo_02.png)
+### Descargar Certificado
+Esta pantalla confirma la aprobación de la evaluación y habilita la entrega del certificado digital. Presenta el identificador de la credencial y las opciones para descargarla o verificar su autenticidad. También informa sobre el tratamiento de datos personales y el uso de firma electrónica.
 
-### Prototipo — [Nombre de la interfaz 3]
 
-![Prototipo 3](Images/prototipo_03.png)
+![Prototipo 2](Images/Descargar_Certificado.png)
+
+### Certificado Digital
+El prototipo presenta el certificado emitido con los datos del candidato, fecha, código único de verificación y firma electrónica. Estos elementos permiten comprobar su autenticidad y trazabilidad mediante PKI o un código QR. La vista responde al requisito de validez jurídica transfronteriza de la credencial.
+
+![Prototipo 4](Images/Certificado_Digital.png)
+
+
+### Panel de Ingestión de Datos
+El panel permite a las universidades enviar información académica en formatos JSON, XML o CSV, utilizando su protocolo de autenticación. El flujo muestra las etapas de recepción, validación, normalización, transformación y persistencia. También incluye registros técnicos para dar seguimiento al proceso de integración.
+
+![Prototipo 3](Images/Panel_de_Ingestion.png)
+
+### Auditoría y Reportes
+La pantalla permite consultar un certificado y verificar su firma electrónica, integridad y rastro de auditoría inmutable. El historial detalla los eventos relacionados con la emisión y las consultas posteriores. Este prototipo respalda las actividades de cumplimiento, trazabilidad y detección de alteraciones.
+
+![Prototipo 3](Images/Auditoría_y_Reportes.png)
+
+### Dashboard Analítica
+El dashboard presenta métricas regionales mediante filtros por país, carrera, género y año. Los indicadores y gráficas utilizan información previamente agregada y anonimizada. La vista facilita el análisis de evaluaciones realizadas, certificados emitidos, cumplimiento del servicio y alertas de fraude. 
+
+![Prototipo 3](Images/Dashboard_Analítica.png)
+
 
 ---
 
