@@ -555,11 +555,7 @@ EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir v
 
 ## 6. Vistas Arquitectónicas — Nivel de Sistema
 
-> Diagrama de bloques que representa la arquitectura de software implementada.
-
-<!-- DESCRIPCIÓN DE LOS BLOQUES PRINCIPALES DEL SISTEMA -->
-
-![Vista de Sistema](Images/vista_sistema.png)
+![Vista de Sistema](Images/diagramaComponentes.jpeg)
 
 ---
 
