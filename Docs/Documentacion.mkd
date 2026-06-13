@@ -567,9 +567,11 @@ EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir v
 
 ![Vista de Sistema](Images/diagramaComponentes.jpeg)
 
-### Diagrama de Despliegue / Distribución
+### Diagrama de Distribución
 
-<!-- DESCRIPCIÓN DE LA INFRAESTRUCTURA ON-PREMISE Y PLAN DE MIGRACIÓN A NUBE -->
+![Diagrama de Distribucion](Images/diagrama_distribucion.png)
+
+### Diagrama de Despliegue 
 
 ![Diagrama de Despliegue](Images/diagrama_despliegue.png)
 
