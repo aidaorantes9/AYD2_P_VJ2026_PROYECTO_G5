@@ -195,7 +195,7 @@
 
 #### CDU100 - Gestión de Evaluaciones
 
-![CDU Expandido 100](Images/CDU100.png)
+![CDU Expandido 100](Images/CDU100V2.png)
 
 ##### Descripción Textual del Caso de Uso Base
 
@@ -212,13 +212,13 @@
 | --- | --- |
 | 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo). |
 | | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
+| | 4. Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal.|
 
 ##### Cursos Alternos
 
 | Paso | Descripción |
 | --- | --- |
-| En el paso 1 | Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal. |
-| En el paso 2 | Durante la recopilación de evidencia, si el sistema identifica indicios de fraude, se registra la detección para revisión posterior. De lo contrario, la evidencia se almacena normalmente. |
+| En el paso 1 | Durante la recopilación de evidencia, si el sistema identifica indicios de fraude, se registra la información para la auditoría posterior. De lo contrario, la evidencia se almacena normalmente. |
 
 ---
 
@@ -253,7 +253,7 @@
 
 #### CDU102 - Integración de Protocolos Dispares
 
-![CDU Expandido 102](Images/CDU102.png)
+![CDU Expandido 102](Images/CDU102V2.png)
 
 ##### Descripción Textual del Caso de Uso Base 
 
@@ -292,6 +292,7 @@
 | Acción del Stakeholder | Respuesta del Proceso del Negocio |
 | --- | --- |
 | 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información e ingiere los datos para procesarlos y tenerlos disponibles para uso dentro de la plataforma. |
+| | 3. El sistema válida el tipo de archivo que se va a procesar posteriormente. |
 
 ##### Cursos Alternos
 
@@ -304,7 +305,7 @@
 
 #### CDU103 - Auditoría de Certificaciones
 
-![CDU Expandido 103](Images/CDU103.jpeg)
+![CDU Expandido 103](Images/CDU103V2.png)
 
 ##### Descripción Textual del Caso de Uso Base
 
