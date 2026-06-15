@@ -218,7 +218,7 @@
 
 | Paso | Descripción |
 | --- | --- |
-| En el paso 1 | Durante la recopilación de evidencia, si el sistema identifica indicios de fraude, se registra la información para la auditoría posterior. De lo contrario, la evidencia se almacena normalmente. |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
 
 ---
 
