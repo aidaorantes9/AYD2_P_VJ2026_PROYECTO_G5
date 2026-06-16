@@ -13,7 +13,12 @@
 docker compose up --build
 ```
 
-### 1.2 Detener el proyecto
+### 1.2 Levantar el proyecto sin hacer build
+```bash
+docker compose up
+```
+
+### 1.3 Detener el proyecto
 
 ```bash
 docker compose down
