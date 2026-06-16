@@ -103,22 +103,39 @@
 ![CDU Negocio Descompuesto](Images/cdu_negocio.png)
 
 ---
-
 ## 2. Características del Sistema y Drivers Arquitectónicos
-
+ 
 ### 2.1 Drivers RF — Requerimientos Funcionales
-
-> Listado de los requerimientos funcionales del sistema extraídos del enunciado.
-
+ 
+> Listado de los requerimientos funcionales del sistema extraídos del enunciado. Cada RF corresponde a un caso de uso (elipse) identificado en los diagramas CDU expandidos.
+ 
 | ID | Requerimiento Funcional | Descripción | Prioridad | CDU Asociado |
-| --- | --- | --- | --- | --- |
-| RF-01 | Gestionar evaluaciones adaptativas | La plataforma debe permitir la realización de exámenes adaptativos, ajustando la dificultad y el flujo de preguntas en tiempo real según las respuestas previas del candidato. | Alta | CDU100 |
-| RF-02 | Registrar evidencia y resultados de evaluación | Durante la evaluación, se debe recopilar evidencia antifraude y guardar los resultados obtenidos por cada candidato, incluyendo actividad de sesión, capturas, registros de tecleo, respuestas y calificación. | Alta | CDU100 |
-| RF-03 | Gestionar certificados digitales | Para los candidatos aprobados, la plataforma debe generar certificados digitales y permitir comprobar su autenticidad mediante identificadores únicos, firma electrónica o mecanismos criptográficos. | Alta | CDU101 |
-| RF-04 | Integrar sistemas académicos | La solución debe conectarse con universidades participantes, soportando distintos protocolos de autenticación mencionados previamente y el intercambio de datos académicos en formatos como JSON, XML y CSV. | Media | CDU102 |
-| RF-05 | Auditar certificaciones | Las entidades autorizadas deben poder consultar y verificar la trazabilidad de las certificaciones emitidas, incluyendo información sobre su emisión, resultado asociado, validaciones realizadas y posibles revisiones posteriores. | Media | CDU103 |
-| RF-06 | Visualizar métricas obtenidas | La alta gerencia y los ministerios deben contar con dashboards o reportes para consultar métricas regionales sobre competencias digitales, utilizando información agregada, anonimizada y segmentada. | Media | CDU104 |
-
+|---|---|---|---|---|
+| RF01 | Realizar Examen Adaptativo | Permitir al candidato realizar una evaluación cuya dificultad se ajusta en tiempo real según sus respuestas previas. | Alta | CDU100 |
+| RF02 | Adecuar Dificultad | Ajustar el nivel de dificultad de la siguiente pregunta según si el candidato respondió correctamente o no la pregunta anterior. | Alta | CDU100 |
+| RF03 | Recopilar Evidencia | Capturar y almacenar telemetría concurrente durante la evaluación (capturas de pantalla, logs de tecleo y ráfagas de video). | Alta | CDU100 |
+| RF04 | Almacenar Resultados Inalterables | Persistir los resultados de cada evaluación de forma que no puedan ser modificados una vez registrados. | Alta | CDU100 |
+| RF05 | Adjuntar Información para Auditoría | Marcar la evidencia capturada durante la evaluación como disponible para el módulo de auditoría de CDU103. | Alta | CDU100 |
+| RF06 | Aprobar Certificado | Verificar que el candidato ha cumplido con los requisitos de aprobación para proceder a la emisión de su certificado. | Alta | CDU101 |
+| RF07 | Emitir Certificado | Generar el certificado digital del candidato aprobado con código de verificación único y firma electrónica. | Alta | CDU101 |
+| RF08 | Verificar Cumplimiento de Leyes de Protección de Datos | Validar que la emisión del certificado cumple con las normativas de protección de datos personales aplicables. | Alta | CDU101 |
+| RF09 | Almacenar en Bitácora | Registrar cada evento relacionado con un certificado en la bitácora inmutable, encadenando hashes para garantizar integridad. | Alta | CDU101 |
+| RF10 | Proporcionar Protocolos de Autenticación | Permitir que las universidades se conecten a la plataforma usando su propio protocolo de autenticación institucional. | Media | CDU102 |
+| RF11 | Unificar Sistemas de Autenticación | Adaptar los distintos protocolos de autenticación (LDAP, SAML, OAuth2) a una interfaz de acceso común dentro del sistema. | Media | CDU102 |
+| RF12 | Proporcionar Datos Académicos | Permitir que las universidades envíen sus datos académicos hacia la plataforma en el formato que utilizan actualmente. | Media | CDU102 |
+| RF13 | Validar Tipo de Archivo | Verificar que el archivo recibido de la universidad corresponde a un formato soportado por el sistema (JSON, XML o CSV). | Media | CDU102 |
+| RF14 | Ingerir Datos | Recibir, procesar y persistir los datos académicos enviados por las universidades mediante el pipeline de transformación. | Media | CDU102 |
+| RF15 | Exportar Datos Académicos | Permitir la exportación de datos académicos almacenados en la plataforma en el formato solicitado. | Media | CDU102 |
+| RF16 | Importar Archivos Planos | Permitir la importación de datos académicos desde archivos planos CSV generados por sistemas legacy de las universidades. | Media | CDU102 |
+| RF17 | Auditoría de Certificaciones | Permitir a las entidades autorizadas verificar la trazabilidad completa de los certificados emitidos por la plataforma. | Media | CDU103 |
+| RF18 | Validar Rastro de Auditoría Inmutable | Verificar que la cadena de hashes de la bitácora de un certificado no ha sido alterada desde su emisión. | Media | CDU103 |
+| RF19 | Validar Firmas Electrónicas | Comprobar que las firmas electrónicas avanzadas de un certificado son válidas y corresponden al emisor original. | Media | CDU103 |
+| RF20 | Detectar Alteración de Datos | Identificar y registrar cualquier modificación no autorizada en los datos de un certificado o su bitácora. | Media | CDU103 |
+| RF21 | Detectar Fraude Académico | Analizar la evidencia antifraude adjuntada desde CDU100 para identificar indicios de fraude durante la evaluación. | Media | CDU103 |
+| RF22 | Visualizar Métricas | Permitir a la alta gerencia y ministerios consultar el estado de las competencias digitales de la región mediante dashboards. | Media | CDU104 |
+| RF23 | Agregar y Anonimizar Datos | Ejecutar procesos de agregación y anonimización sobre los datos operativos antes de exponerlos en las interfaces gerenciales. | Media | CDU104 |
+| RF24 | Generar Dashboard Analítico | Construir y presentar el dashboard con indicadores y gráficas de competencias digitales regionales. | Media | CDU104 |
+| RF25 | Segmentar Información | Permitir la segmentación de las métricas por país, carrera universitaria y género para el análisis regional. | Media | CDU104 |
 
 ---
 
@@ -360,15 +377,18 @@
 | No aplicable | Este caso de uso no presenta cursos alternos. |
 ---
 ### 3.2 Detalle de Drivers por CDU
-
+ 
 > Para cada CDU se detallan los drivers RF, EaC y de Restricción asociados.
-
+ 
 **CDU100 - Gestión de Evaluaciones**
-
+ 
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
-| RF | RF01 | Gestionar evaluaciones adaptativas |
-| RF | RF02 | Registrar evidencia y resultados de evaluación |
+| RF | RF01 | Realizar Examen Adaptativo |
+| RF | RF02 | Adecuar Dificultad |
+| RF | RF03 | Recopilar Evidencia |
+| RF | RF04 | Almacenar Resultados Inalterables |
+| RF | RF05 | Adjuntar Información para Auditoría |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
 | Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
@@ -377,43 +397,56 @@
 | Calidad | EaC01 | Atributo de Rendimiento |
 | Calidad | EaC02 | Atributo de Escalabilidad |
 | Calidad | EaC03 | Atributo de Disponibilidad |
-
+ 
 ---
-
+ 
 **CDU101 - Emisión de Certificaciones**
-
+ 
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
-| RF | RF03 | Gestionar certificados digitales |
+| RF | RF06 | Aprobar Certificado |
+| RF | RF07 | Emitir Certificado |
+| RF | RF08 | Verificar Cumplimiento de Leyes de Protección de Datos |
+| RF | RF09 | Almacenar en Bitácora |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
 | Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
 | Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
 | Restricción | RT05 | Certificación Criptográfica de Credenciales |
-| Restricción | RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) |
+| Restricción | RL01 | Cumplimiento GDPR |
 | Restricción | RL03 | Validez Jurídica Transfronteriza de Certificados |
-
+ 
 ---
-
+ 
 **CDU102 - Integración de Protocolos Dispares**
-
+ 
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
-| RF | RF04 | Integrar universidades y sistemas académicos externos |
+| RF | RF10 | Proporcionar Protocolos de Autenticación |
+| RF | RF11 | Unificar Sistemas de Autenticación |
+| RF | RF12 | Proporcionar Datos Académicos |
+| RF | RF13 | Validar Tipo de Archivo |
+| RF | RF14 | Ingerir Datos |
+| RF | RF15 | Exportar Datos Académicos |
+| RF | RF16 | Importar Archivos Planos |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
 | Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
 | Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
 | Restricción | RT03 | Interoperabilidad con Protocolos Heterogéneos |
 | Restricción | RT04 | Soporte de Múltiples Formatos de Datos |
-
+ 
 ---
-
+ 
 **CDU103 - Auditoría de Certificaciones**
-
+ 
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
-| RF | RF05 | Auditar certificaciones emitidas |
+| RF | RF17 | Auditoría de Certificaciones |
+| RF | RF18 | Validar Rastro de Auditoría Inmutable |
+| RF | RF19 | Validar Firmas Electrónicas |
+| RF | RF20 | Detectar Alteración de Datos |
+| RF | RF21 | Detectar Fraude Académico |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
 | Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
@@ -421,48 +454,90 @@
 | Restricción | RT05 | Certificación Criptográfica de Credenciales |
 | Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
 | Restricción | RL04 | Rastro de Auditoría Inmutable con Firma Electrónica |
-
+ 
 ---
-
+ 
 **CDU104 - Visualización de Competencias**
-
+ 
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
-| RF | RF06 | Visualizar métricas regionales de competencias |
+| RF | RF22 | Visualizar Métricas |
+| RF | RF23 | Agregar y Anonimizar Datos |
+| RF | RF24 | Generar Dashboard Analítico |
+| RF | RF25 | Segmentar Información |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
 | Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
 | Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
-| Restricción | RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) |
+| Restricción | RL01 | Cumplimiento GDPR |
 | Restricción | RL05 | Anonimización de Datos en Dashboards Analíticos |
 | Calidad | EaC04 | Atributo de Usabilidad |
-
+ 
 ---
 
 ## 4. Matrices de Trazabilidad
-
+ 
 ### 4.1 Stakeholders vs. Requerimientos
-
+ 
 > Esta matriz relaciona a cada stakeholder con los requerimientos funcionales que le conciernen, permitiendo identificar qué actor origina o tiene interés en cada requerimiento del sistema.
-
-![Matriz Stakeholders vs RF](Images/STAKE_REQ.png)
-
+ 
+| | RF01 | RF02 | RF03 | RF04 | RF05 | RF06 | RF07 | RF08 | RF09 | RF10 | RF11 | RF12 | RF13 | RF14 | RF15 | RF16 | RF17 | RF18 | RF19 | RF20 | RF21 | RF22 | RF23 | RF24 | RF25 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Candidato | X | X | X | X | X | X | X | X | X | | | | | | | | | | | | | | | | |
+| Universidades | | | | | | | | | | X | X | X | X | X | X | X | | | | | | | | | |
+| Dirección Financiera | | | | | | | | | | | | | | | | | X | X | X | X | X | | | | |
+| Ministerios Gubernamentales | | | | | | | | | | | | | | | | | X | X | X | X | X | X | X | X | X |
+| Alta Gerencia SICA | | | | | | | | | | | | | | | | | | | | | | X | X | X | X |
+ 
 ---
-
+ 
 ### 4.2 Stakeholders vs. CDU
-
+ 
 > Esta matriz relaciona a cada stakeholder con los casos de uso del sistema, permitiendo identificar qué actor participa o tiene interés en cada proceso de negocio.
-
-![Matriz Stakeholders vs CDU](Images/STAKE_CDU.png)
-
+ 
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| Candidato | X | X | | | |
+| Universidades | | | X | | |
+| Dirección Financiera | | | | X | |
+| Ministerios Gubernamentales | | | | X | X |
+| Alta Gerencia SICA | | | | | X |
+ 
 ---
-
+ 
 ### 4.3 Requerimiento vs. CDU
-
+ 
 > Esta matriz relaciona cada requerimiento funcional con su caso de uso correspondiente, garantizando que todos los requerimientos están cubiertos por al menos un proceso del sistema.
-
-![Matriz RF vs CDU](Images/REQ_CDU.png)
-
+ 
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| RF01 | X | | | | |
+| RF02 | X | | | | |
+| RF03 | X | | | | |
+| RF04 | X | | | | |
+| RF05 | X | | | | |
+| RF06 | | X | | | |
+| RF07 | | X | | | |
+| RF08 | | X | | | |
+| RF09 | | X | | | |
+| RF10 | | | X | | |
+| RF11 | | | X | | |
+| RF12 | | | X | | |
+| RF13 | | | X | | |
+| RF14 | | | X | | |
+| RF15 | | | X | | |
+| RF16 | | | X | | |
+| RF17 | | | | X | |
+| RF18 | | | | X | |
+| RF19 | | | | X | |
+| RF20 | | | | X | |
+| RF21 | | | | X | |
+| RF22 | | | | | X |
+| RF23 | | | | | X |
+| RF24 | | | | | X |
+| RF25 | | | | | X |
+ 
+ 
 ---
 ## 5. Selección Arquitectónica
 
