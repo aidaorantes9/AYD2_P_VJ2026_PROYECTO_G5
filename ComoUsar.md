@@ -7,7 +7,7 @@
 > En caso de que usen podman, solo cambien la palabra `docker` por `podman`.
 
 ### 1.1 Crear build inicial
-> Este comando se ejecuta cada vez que se modifica el codigo fuente, para desarrollar recomiendo que mejor solo levanten el frontend, esto sera mas para la app final o por si quieren levantar junto con base de datos.
+> Este comando se ejecuta cada vez que se modifica el codigo fuente, si ustedes editan se actualizara solo, pero si algunos cambios si sera necesario que vuelvan a ejecutar el comando (tenganlo en cuenta para no perder tiempo resolviendo un problema que no existe).
 
 ```bash
 docker compose up --build
