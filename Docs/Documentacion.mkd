@@ -1,15 +1,26 @@
-# Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
-## Arquitectura de Software — Fase 1
-### AYD2 · Grupo 5 · 1S2026
+# UNIVERSIDAD SAN CARLOS DE GUATEMALA
+## FACULTAD DE INGENIERÍA
+### INGENIERÍA EN CIENCIAS Y SISTEMAS
+### ANÁLISIS Y DISEÑO DE SISTEMAS 2
+### SECCIÓN P
 
 ---
 
+## PROYECTO ÚNICO
+### Desarrollo de Arquitectura de Software para una Plataforma Solicitada por la Secretaria General del SICA a Nivel Regional
+
+---
+
+![Integrantes](Images/integrantes.png)
+
+---
 ## Índice
 
 1. [Identificación del Caso de Negocio y Stakeholders](#1-identificación-del-caso-de-negocio-y-stakeholders)
    - 1.1 [Listado de Stakeholders y Preocupaciones Arquitectónicas](#11-listado-de-stakeholders-y-preocupaciones-arquitectónicas)
-   - 1.2 [Core del Negocio — CUN de Alto Nivel](#12-core-del-negocio--cun-de-alto-nivel)
-   - 1.3 [Primera Descomposición — CDU de Negocio](#13-primera-descomposición--cdu-de-negocio)
+   - 1.2 [Diagrama de Contexto](#12-diagrama-de-contexto)
+   - 1.3 [Core del Negocio — CUN de Alto Nivel](#13-core-del-negocio--cun-de-alto-nivel)
+   - 1.4 [Primera Descomposición — CDU de Negocio](#14-primera-descomposición--cdu-de-negocio)
 
 2. [Características del Sistema y Drivers Arquitectónicos](#2-características-del-sistema-y-drivers-arquitectónicos)
    - 2.1 [Drivers RF — Requerimientos Funcionales](#21-drivers-rf--requerimientos-funcionales)
@@ -27,6 +38,12 @@
    - 4.3 [Requerimiento vs. CDU](#43-requerimiento-vs-cdu)
 
 5. [Selección Arquitectónica](#5-selección-arquitectónica)
+   - 5.1 [Estilos Arquitectónicos Seleccionados](#51-estilos-arquitectónicos-seleccionados)
+   - 5.1.1 [Estilo Principal: Arquitectura por Capas (Multi-tier)](#511-estilo-principal-arquitectura-por-capas-multi-tier)
+   - 5.1.2 [Estilo Complementario: Arquitectura Orientada a Servicios (SOA)](#512-estilo-complementario-arquitectura-orientada-a-servicios-soa)
+   - 5.1.3 [Estilo Complementario: Pipes and Filters (Flujo de Datos)](#513-estilo-complementario-pipes-and-filters-flujo-de-datos)
+   - 5.1.4 [Estilo Complementario: Repository / Shared Data (Datos Compartidos)](#514-estilo-complementario-repository--shared-data-datos-compartidos)
+   - 5.1.5 [Patrón Arquitectónico: Modelo-Vista-Controlador (MVC)](#515-patrón-arquitectónico-modelo-vista-controlador-mvc)
 
 6. [Vistas Arquitectónicas — Nivel de Sistema](#6-vistas-arquitectónicas--nivel-de-sistema)
 
@@ -48,15 +65,24 @@
 
 > Identificación clara de los involucrados (directivos, financieros, operativos, externos) y sus intereses o conflictos arquitectónicos.
 
-| Stakeholder | Tipo | Preocupaciones Arquitectónicas |
+| Stakeholder | Categoría | Preocupaciones Arquitectónicas |
 |---|---|---|
-| | | |
-
-![Stakeholders](Images/stakeholders.png)
-
+| Alta Gerencia SICA | Directivo | - Que el sistema unifique la región sin obligar a las instituciones a cambiar su forma de trabajar. <br> - Que la primera versión esté completamente definida y documentada en 3 a 4 semanas. <br> - Acceso a dashboards analíticos con métricas regionales de competencias digitales. |
+| Dirección Financiera | Financiero | - Que el presupuesto no supere USD 180,000. <br> - Que se prioricen tecnologías Open Source para minimizar costos de licenciamiento. <br> - Que exista un rastro de auditoría inmutable de cada certificado emitido. |
+| Candidatos | Externo | - Que puedan realizar exámenes adaptativos sin degradación del servicio durante los picos de tráfico de la primera semana de cada mes. <br> - Que sus datos personales estén protegidos bajo GDPR y legislaciones locales. <br> - Que reciban certificados digitales con validez jurídica transfronteriza. |
+| Ministerios Gubernamentales | Externo | - Que cada certificado emitido cuente con rastro de auditoría inmutable respaldado por firmas electrónicas. <br> - Que puedan visualizar métricas regionales de competencias digitales segmentadas por país, carrera y género. |
+| Universidades (USAC, UCR, UES) | Externo | - Que no se les obligue a cambiar sus protocolos de autenticación (LDAP, SAML, OAuth2) ni sus formatos de datos (JSON, XML, CSV). <br> - Que la integración sea nativa mediante APIs y pasarelas. |
 ---
 
-### 1.2 Core del Negocio — CUN de Alto Nivel
+### 1.2 Diagrama de Contexto
+
+> Diagrama de contexto del sistema que muestra las interacciones de alto nivel entre el PRCCD y los actores externos.
+
+<!-- INSERTAR IMAGEN: Diagrama de Contexto -->
+![Diagrama Cntexto](Images/DiagramaContexto_.png)
+---
+
+### 1.3 Core del Negocio — CUN de Alto Nivel
 
 > Diagrama de casos de uso de negocio de alto nivel (el más abstracto a nivel de arquitectura).
 
@@ -67,7 +93,7 @@
 
 ---
 
-### 1.3 Primera Descomposición — CDU de Negocio
+### 1.4 Primera Descomposición — CDU de Negocio
 
 > Diagrama CDU de negocio que muestra los procesos de negocio involucrados a nivel de arquitectura.
 
@@ -77,18 +103,39 @@
 ![CDU Negocio Descompuesto](Images/cdu_negocio.png)
 
 ---
-
 ## 2. Características del Sistema y Drivers Arquitectónicos
-
+ 
 ### 2.1 Drivers RF — Requerimientos Funcionales
-
-> Listado de los requerimientos funcionales del sistema extraídos del enunciado.
-
-<!-- INSERTAR TABLA DE RF -->
-
-| ID | Requerimiento Funcional | Prioridad |
-|---|---|---|
-| RF-01 | | |
+ 
+> Listado de los requerimientos funcionales del sistema extraídos del enunciado. Cada RF corresponde a un caso de uso (elipse) identificado en los diagramas CDU expandidos.
+ 
+| ID | Requerimiento Funcional | Descripción | Prioridad | CDU Asociado |
+|---|---|---|---|---|
+| RF01 | Realizar Examen Adaptativo | Permitir al candidato realizar una evaluación cuya dificultad se ajusta en tiempo real según sus respuestas previas. | Alta | CDU100 |
+| RF02 | Adecuar Dificultad | Ajustar el nivel de dificultad de la siguiente pregunta según si el candidato respondió correctamente o no la pregunta anterior. | Alta | CDU100 |
+| RF03 | Recopilar Evidencia | Capturar y almacenar telemetría concurrente durante la evaluación (capturas de pantalla, logs de tecleo y ráfagas de video). | Alta | CDU100 |
+| RF04 | Almacenar Resultados Inalterables | Persistir los resultados de cada evaluación de forma que no puedan ser modificados una vez registrados. | Alta | CDU100 |
+| RF05 | Adjuntar Información para Auditoría | Marcar la evidencia capturada durante la evaluación como disponible para el módulo de auditoría de CDU103. | Alta | CDU100 |
+| RF06 | Aprobar Certificado | Verificar que el candidato ha cumplido con los requisitos de aprobación para proceder a la emisión de su certificado. | Alta | CDU101 |
+| RF07 | Emitir Certificado | Generar el certificado digital del candidato aprobado con código de verificación único y firma electrónica. | Alta | CDU101 |
+| RF08 | Verificar Cumplimiento de Leyes de Protección de Datos | Validar que la emisión del certificado cumple con las normativas de protección de datos personales aplicables. | Alta | CDU101 |
+| RF09 | Almacenar en Bitácora | Registrar cada evento relacionado con un certificado en la bitácora inmutable, encadenando hashes para garantizar integridad. | Alta | CDU101 |
+| RF10 | Proporcionar Protocolos de Autenticación | Permitir que las universidades se conecten a la plataforma usando su propio protocolo de autenticación institucional. | Media | CDU102 |
+| RF11 | Unificar Sistemas de Autenticación | Adaptar los distintos protocolos de autenticación (LDAP, SAML, OAuth2) a una interfaz de acceso común dentro del sistema. | Media | CDU102 |
+| RF12 | Proporcionar Datos Académicos | Permitir que las universidades envíen sus datos académicos hacia la plataforma en el formato que utilizan actualmente. | Media | CDU102 |
+| RF13 | Validar Tipo de Archivo | Verificar que el archivo recibido de la universidad corresponde a un formato soportado por el sistema (JSON, XML o CSV). | Media | CDU102 |
+| RF14 | Ingerir Datos | Recibir, procesar y persistir los datos académicos enviados por las universidades mediante el pipeline de transformación. | Media | CDU102 |
+| RF15 | Exportar Datos Académicos | Permitir la exportación de datos académicos almacenados en la plataforma en el formato solicitado. | Media | CDU102 |
+| RF16 | Importar Archivos Planos | Permitir la importación de datos académicos desde archivos planos CSV generados por sistemas legacy de las universidades. | Media | CDU102 |
+| RF17 | Auditoría de Certificaciones | Permitir a las entidades autorizadas verificar la trazabilidad completa de los certificados emitidos por la plataforma. | Media | CDU103 |
+| RF18 | Validar Rastro de Auditoría Inmutable | Verificar que la cadena de hashes de la bitácora de un certificado no ha sido alterada desde su emisión. | Media | CDU103 |
+| RF19 | Validar Firmas Electrónicas | Comprobar que las firmas electrónicas avanzadas de un certificado son válidas y corresponden al emisor original. | Media | CDU103 |
+| RF20 | Detectar Alteración de Datos | Identificar y registrar cualquier modificación no autorizada en los datos de un certificado o su bitácora. | Media | CDU103 |
+| RF21 | Detectar Fraude Académico | Analizar la evidencia antifraude adjuntada desde CDU100 para identificar indicios de fraude durante la evaluación. | Media | CDU103 |
+| RF22 | Visualizar Métricas | Permitir a la alta gerencia y ministerios consultar el estado de las competencias digitales de la región mediante dashboards. | Media | CDU104 |
+| RF23 | Agregar y Anonimizar Datos | Ejecutar procesos de agregación y anonimización sobre los datos operativos antes de exponerlos en las interfaces gerenciales. | Media | CDU104 |
+| RF24 | Generar Dashboard Analítico | Construir y presentar el dashboard con indicadores y gráficas de competencias digitales regionales. | Media | CDU104 |
+| RF25 | Segmentar Información | Permitir la segmentación de las métricas por país, carrera universitaria y género para el análisis regional. | Media | CDU104 |
 
 ---
 
@@ -96,11 +143,12 @@
 
 > Escenarios de atributos de calidad relevantes para el PRCCD.
 
-<!-- INSERTAR TABLA DE EaC con columnas: ID, Atributo, Estímulo, Fuente, Respuesta, Medida -->
-
-| ID | Atributo de Calidad | Estímulo | Fuente | Respuesta Esperada | Medida |
-|---|---|---|---|---|---|
-| EaC-01 | | | | | |
+| ID | Atributo | Escenario | CDU Asociado |
+|---|---|---|---|
+| EaC01 | Rendimiento | Durante la primera semana de cada mes, miles de candidatos acceden simultáneamente al sistema para realizar exámenes adaptativos. El sistema debe soportar esta carga sin degradación del servicio. | CDU100 |
+| EaC02 | Escalabilidad | El sistema debe soportar el crecimiento masivo de usuarios y datos durante los períodos de certificación, así como la retención de evidencia biométrica por 5 años, sin rediseño de la arquitectura. | CDU100 |
+| EaC03 | Disponibilidad | Durante los períodos de certificación, el sistema debe mantenerse disponible sin interrupciones mientras los candidatos realizan sus exámenes adaptativos. | CDU100 |
+| EaC04 | Usabilidad | Los dashboards analíticos deben permitir a la alta gerencia y ministerios visualizar métricas regionales de competencias segmentadas por país, carrera universitaria y género de forma intuitiva. | CDU104 |
 
 ---
 
@@ -109,101 +157,499 @@
 > Restricciones tecnológicas, normativas y operativas que condicionan la arquitectura.
 
 <!-- INSERTAR TABLA DE RESTRICCIONES -->
+## Restricciones Económicas
 
-| ID | Tipo | Descripción |
-|---|---|---|
-| R-01 | Tecnológica | |
-| R-02 | Normativa | |
-| R-03 | Operativa | |
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RE01 | Presupuesto Máximo del Piloto | La dirección financiera aprobó un presupuesto máximo de USD 180,000 para el piloto. Esto obliga a priorizar el uso de tecnologías Open Source y a optimizar los costos de licenciamiento. | Transversal: CDU100–CDU104 |
+| RE02 | Uso Obligatorio de Open Source | Derivado del presupuesto limitado, la arquitectura debe basarse en herramientas y frameworks de código abierto para minimizar costos de licencias comerciales. | Transversal: CDU100–CDU104 |
 
 ---
 
-### 2.4 Características Principales del PRCCD (Priorizadas)
+## Restricciones Tecnológicas / Operativas
+
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RT01 | Despliegue On-Premise Obligatorio | La primera versión del sistema debe desplegarse en soluciones on-premise, reutilizando servidores físicos e infraestructura existente del SICA. No se permite nube en la fase inicial. | Transversal: CDU100–CDU104 |
+| RT02 | Arquitectura Preparada para la Migración Cloud | Aunque el despliegue inicial es on-premise, la arquitectura debe estar intrínsecamente preparada para una migración transparente hacia la nube en fases posteriores. | Transversal: CDU100–CDU104 |
+| RT03 | Interoperabilidad con Protocolos Heterogéneos | La plataforma debe integrarse con al menos tres universidades (USAC, UCR, UES), cada una con protocolos distintos: LDAP, SAML y OAuth2, sin obligarlas a cambiar su forma de trabajar. | CDU102 |
+| RT04 | Soporte de Múltiples Formatos de Datos | El sistema debe ingerir y exportar datos académicos en formatos dispares: JSON, XML y archivos planos CSV, provenientes de sistemas legacy. | CDU102 |
+| RT05 | Certificación Criptográfica de Credenciales | Los certificados digitales deben ser verificables criptográficamente, incorporando tecnologías como Blockchain (Hyperledger) o PKI (Infraestructura de Llave Pública). | CDU101, CDU103 |
+
+---
+
+## Restricciones Legales / Normativas
+
+| ID | Nombre | Descripción | CDU Asociado |
+|----|---------|-------------|--------------|
+| RL01 | Cumplimiento GDPR (Leyes de Protección de Datos de Múltiples Países) | La arquitectura debe cumplir con el Reglamento General de Protección de Datos (GDPR), garantizando el derecho al olvido y la encriptación de datos sensibles en reposo y en tránsito. | CDU101 y CDU104 |
+| RL02 | Retención de Evidencia por Cumplimiento Legal | Toda la evidencia biométrica y de comportamiento recopilada durante las evaluaciones (capturas de pantalla, logs de tecleo, ráfagas de video) debe almacenarse de forma inalterable por un mínimo de 5 años, cumpliendo simultáneamente con el GDPR y la Ley de Acceso a la Información Pública de Guatemala. | CDU100 y CDU103 |
+| RL03 | Validez Jurídica Transfronteriza de Certificados | Los certificados emitidos deben garantizar validez jurídica transfronteriza, no solo ser una representación gráfica, asegurando que las competencias sean reconocidas legalmente entre países. | CDU101 |
+| RL04 | Rastro de Auditoría Inmutable con Firma Electrónica | Cada certificado emitido debe contar con un rastro de auditoría inmutable, respaldado por firmas electrónicas avanzadas que prevengan el fraude académico o la alteración de notas a nivel de base de datos. | CDU103 |
+| RL05 | Anonimización de Datos en Dashboards Analíticos | Antes de exponer métricas a interfaces gerenciales, la capa de datos debe ejecutar procesos rigurosos de agregación y anonimización, para no infringir normativas legales de privacidad. | CDU104 |
+
+---
+## 2.4 Características Principales del PRCCD (Priorizadas)
 
 > Descripción de las características principales del sistema, ordenadas por impacto en el negocio.
 
-<!-- DESCRIPCIÓN PRIORIZADA DE CARACTERÍSTICAS -->
-
-<!-- INSERTAR IMAGEN si aplica: diagrama de características o mapa de capacidades -->
-![Características PRCCD](Images/caracteristicas_prccd.png)
+| ID | Característica | Impacto | Descripción |
+|----|----------------|---------|-------------|
+| 1 | Gestión de Evaluaciones | Muy Alto | Es el núcleo principal de la PRCCD, ya que permite que los candidatos realicen evaluaciones adaptativas donde la dificultad cambia según sus respuestas. Tiene impacto directo en la calidad de la certificación, porque de este proceso depende validar si una persona realmente posee la competencia digital evaluada. Además, debe soportar alta concurrencia durante los períodos de certificación. |
+| 2 | Integración de Protocolos Dispares | Muy Alto | Es una condición clave para la adopción institucional, ya que permite conectar la plataforma con universidades que usan tecnologías distintas, como LDAP, SAML, OAuth2, JSON, XML o archivos CSV. Sin esta integración, las instituciones tendrían que cambiar su forma de trabajo, lo cual dificultaría la implementación regional del sistema. |
+| 3 | Auditoría de Certificaciones | Muy Alto | Permite mantener un registro confiable e inmutable de las evaluaciones, resultados y certificados emitidos. Es importante para prevenir fraude académico, alteración de notas o modificación no autorizada de certificados. También responde a las necesidades de la dirección financiera y ministerios gubernamentales, quienes requieren trazabilidad y respaldo legal. |
+| 4 | Emisión de Certificados | Alto | Representa el resultado final del proceso de evaluación, ya que permite entregar al candidato una certificación digital válida. Su importancia aumenta porque el certificado no debe ser solo un documento visual, sino una credencial verificable mediante firma electrónica, PKI o tecnologías similares. |
+| 5 | Visualización de Competencias | Medio | Permite a la alta gerencia del SICA y a los ministerios consultar información analítica sobre las competencias digitales por país, carrera universitaria y género. Aunque no es el proceso operativo principal, aporta valor para el análisis regional y la planificación de programas educativos o laborales. |
 
 ---
-
 ## 3. Diagramas de CDU Expandidos
 
 ### 3.1 Diagrama de Casos de Uso Expandidos
 
 > Diagrama de casos de uso del sistema con actores y relaciones detalladas.
 
-<!-- INSERTAR IMAGEN: diagrama CDU expandido -->
-![CDU Expandido](Images/cdu_expandido.png)
+---
+
+#### CDU100 - Gestión de Evaluaciones
+
+![CDU Expandido 100](Images/CDU100V2.png)
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Realizar Examen Adaptativo |
+| Actores | Candidato |
+| Propósito | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas. |
+| Resumen | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo). |
+| | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
+| | 4. Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal.|
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
 
 ---
 
+#### CDU101 - Emisión de Certificaciones
+
+![CDU Expandido 101](Images/CDU101.png)
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Emitir Certificado |
+| Actores | Candidato |
+| Propósito | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza. |
+| Resumen | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. El candidato completa y aprueba la evaluación realizada previamente. | 2. El sistema procede a emitir el certificado digital. |
+| | 3. El sistema verifica el cumplimiento de las leyes de protección de datos aplicables. |
+| | 4. El sistema almacena el certificado en la bitácora inmutable. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
+
+---
+
+#### CDU102 - Integración de Protocolos Dispares
+
+![CDU Expandido 102](Images/CDU102V2.png)
+
+##### Descripción Textual del Caso de Uso Base 
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Unificar de Sistemas de Autenticación |
+| Actores | Universidades |
+| Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
+| Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. La universidad proporciona su protocolo de autenticación. | 2. El sistema recibe los protocolos de autenticación y los unifica dentro del esquema de autenticación federada. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
+
+---
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Ingerir Datos |
+| Actores | Universidades |
+| Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
+| Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información e ingiere los datos para procesarlos y tenerlos disponibles para uso dentro de la plataforma. |
+| | 3. El sistema válida el tipo de archivo que se va a procesar posteriormente. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| En el paso 2 | El sistema puede permitir exportar datos académicos en distintos tipos de formato. |
+| En el paso 2 | El sistema puede permitir importar datos académicos en distintos tipos de formato, como archivos planos. |
+
+---
+
+#### CDU103 - Auditoría de Certificaciones
+
+![CDU Expandido 103](Images/CDU103V2.png)
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Verificar Auditoría de Certificaciones |
+| Actores | Dirección Financiera, Ministerios Gubernamentales |
+| Propósito | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
+| Resumen | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
+
+##### Curso Normal de Eventos
+
+| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| --- | --- |
+| 1. La entidad autorizada solicita verificar la auditoría de una certificación para garantizar su integridad. | 2. El sistema valida si existe el rastro de auditoría inmutable del certificado. |
+| | 3. El sistema valida que la auditoría inmutable del certificado sea respaldada por firmas electrónicas avanzadas. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| En el paso 2 | Si durante la validación del rastro de auditoría se encuentra alteración en datos, el sistema detecta fraude académico. |
+| En el paso 3 | Si no se logran validar las firmas electrónicas que respalden la auditoría inmutable, se detecta fraude académico. |
+
+---
+
+#### CDU104 - Visualización de Competencias
+
+![CDU Expandido 104](Images/CDU104.jpeg)
+
+##### Descripción Textual del Caso de Uso Base
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre del CDU Base | Visualizar Métricas |
+| Actores | Alta Gerencia SICA, Ministerios Gubernamentales |
+| Propósito | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados. |
+| Resumen | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
+
+##### Curso Normal de Eventos
+
+| Acción del Actor | Respuesta del Sistema |
+| --- | --- |
+| 1. El actor accede a la sección de visualización de métricas. | 2. El sistema ejecuta los procesos de agregación y anonimización de datos. |
+| | 3. El sistema genera el dashboard analítico con las métricas regionales. |
+| | 4. El sistema segmenta la información por país, carrera universitaria y género. |
+
+##### Cursos Alternos
+
+| Paso | Descripción |
+| --- | --- |
+| No aplicable | Este caso de uso no presenta cursos alternos. |
+---
 ### 3.2 Detalle de Drivers por CDU
-
-> Para cada CDU: drivers RF, EaC y de Restricción asociados.
-
-<!-- INSERTAR TABLA O FICHAS POR CDU -->
-
-| CDU | Drivers RF Asociados | Drivers EaC Asociados | Restricciones Asociadas |
-|---|---|---|---|
-| | | | |
-
-<!-- INSERTAR IMAGEN si se cuenta con diagramas adicionales por CDU -->
-![Detalle CDU por Driver](Images/cdu_detalle_drivers.png)
-
+ 
+> Para cada CDU se detallan los drivers RF, EaC y de Restricción asociados.
+ 
+**CDU100 - Gestión de Evaluaciones**
+ 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF01 | Realizar Examen Adaptativo |
+| RF | RF02 | Adecuar Dificultad |
+| RF | RF03 | Recopilar Evidencia |
+| RF | RF04 | Almacenar Resultados Inalterables |
+| RF | RF05 | Adjuntar Información para Auditoría |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
+| Calidad | EaC01 | Atributo de Rendimiento |
+| Calidad | EaC02 | Atributo de Escalabilidad |
+| Calidad | EaC03 | Atributo de Disponibilidad |
+ 
+---
+ 
+**CDU101 - Emisión de Certificaciones**
+ 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF06 | Aprobar Certificado |
+| RF | RF07 | Emitir Certificado |
+| RF | RF08 | Verificar Cumplimiento de Leyes de Protección de Datos |
+| RF | RF09 | Almacenar en Bitácora |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT05 | Certificación Criptográfica de Credenciales |
+| Restricción | RL01 | Cumplimiento GDPR |
+| Restricción | RL03 | Validez Jurídica Transfronteriza de Certificados |
+ 
+---
+ 
+**CDU102 - Integración de Protocolos Dispares**
+ 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF10 | Proporcionar Protocolos de Autenticación |
+| RF | RF11 | Unificar Sistemas de Autenticación |
+| RF | RF12 | Proporcionar Datos Académicos |
+| RF | RF13 | Validar Tipo de Archivo |
+| RF | RF14 | Ingerir Datos |
+| RF | RF15 | Exportar Datos Académicos |
+| RF | RF16 | Importar Archivos Planos |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT03 | Interoperabilidad con Protocolos Heterogéneos |
+| Restricción | RT04 | Soporte de Múltiples Formatos de Datos |
+ 
+---
+ 
+**CDU103 - Auditoría de Certificaciones**
+ 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF17 | Auditoría de Certificaciones |
+| RF | RF18 | Validar Rastro de Auditoría Inmutable |
+| RF | RF19 | Validar Firmas Electrónicas |
+| RF | RF20 | Detectar Alteración de Datos |
+| RF | RF21 | Detectar Fraude Académico |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT05 | Certificación Criptográfica de Credenciales |
+| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
+| Restricción | RL04 | Rastro de Auditoría Inmutable con Firma Electrónica |
+ 
+---
+ 
+**CDU104 - Visualización de Competencias**
+ 
+| Tipo de Driver | ID | Nombre |
+|---|---|---|
+| RF | RF22 | Visualizar Métricas |
+| RF | RF23 | Agregar y Anonimizar Datos |
+| RF | RF24 | Generar Dashboard Analítico |
+| RF | RF25 | Segmentar Información |
+| Restricción | RE01 | Presupuesto Máximo del Piloto |
+| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RT01 | Despliegue On-Premise Obligatorio |
+| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RL01 | Cumplimiento GDPR |
+| Restricción | RL05 | Anonimización de Datos en Dashboards Analíticos |
+| Calidad | EaC04 | Atributo de Usabilidad |
+ 
 ---
 
 ## 4. Matrices de Trazabilidad
-
+ 
 ### 4.1 Stakeholders vs. Requerimientos
-
-> Relación entre cada stakeholder y los requerimientos funcionales que le conciernen.
-
-<!-- INSERTAR IMAGEN: matriz stakeholders vs. requerimientos -->
-![Matriz Stakeholders vs RF](Images/matriz_stakeholders_rf.png)
-
+ 
+> Esta matriz relaciona a cada stakeholder con los requerimientos funcionales que le conciernen, permitiendo identificar qué actor origina o tiene interés en cada requerimiento del sistema.
+ 
+| | RF01 | RF02 | RF03 | RF04 | RF05 | RF06 | RF07 | RF08 | RF09 | RF10 | RF11 | RF12 | RF13 | RF14 | RF15 | RF16 | RF17 | RF18 | RF19 | RF20 | RF21 | RF22 | RF23 | RF24 | RF25 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Candidato | X | X | X | X | X | X | X | X | X | | | | | | | | | | | | | | | | |
+| Universidades | | | | | | | | | | X | X | X | X | X | X | X | | | | | | | | | |
+| Dirección Financiera | | | | | | | | | | | | | | | | | X | X | X | X | X | | | | |
+| Ministerios Gubernamentales | | | | | | | | | | | | | | | | | X | X | X | X | X | X | X | X | X |
+| Alta Gerencia SICA | | | | | | | | | | | | | | | | | | | | | | X | X | X | X |
+ 
 ---
-
+ 
 ### 4.2 Stakeholders vs. CDU
-
-> Relación entre cada stakeholder y los casos de uso del sistema.
-
-<!-- INSERTAR IMAGEN: matriz stakeholders vs. CDU -->
-![Matriz Stakeholders vs CDU](Images/matriz_stakeholders_cdu.png)
-
+ 
+> Esta matriz relaciona a cada stakeholder con los casos de uso del sistema, permitiendo identificar qué actor participa o tiene interés en cada proceso de negocio.
+ 
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| Candidato | X | X | | | |
+| Universidades | | | X | | |
+| Dirección Financiera | | | | X | |
+| Ministerios Gubernamentales | | | | X | X |
+| Alta Gerencia SICA | | | | | X |
+ 
 ---
-
+ 
 ### 4.3 Requerimiento vs. CDU
-
-> Trazabilidad entre requerimientos funcionales y casos de uso.
-
-<!-- INSERTAR IMAGEN: matriz requerimientos vs. CDU -->
-![Matriz RF vs CDU](Images/matriz_rf_cdu.png)
-
+ 
+> Esta matriz relaciona cada requerimiento funcional con su caso de uso correspondiente, garantizando que todos los requerimientos están cubiertos por al menos un proceso del sistema.
+ 
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| RF01 | X | | | | |
+| RF02 | X | | | | |
+| RF03 | X | | | | |
+| RF04 | X | | | | |
+| RF05 | X | | | | |
+| RF06 | | X | | | |
+| RF07 | | X | | | |
+| RF08 | | X | | | |
+| RF09 | | X | | | |
+| RF10 | | | X | | |
+| RF11 | | | X | | |
+| RF12 | | | X | | |
+| RF13 | | | X | | |
+| RF14 | | | X | | |
+| RF15 | | | X | | |
+| RF16 | | | X | | |
+| RF17 | | | | X | |
+| RF18 | | | | X | |
+| RF19 | | | | X | |
+| RF20 | | | | X | |
+| RF21 | | | | X | |
+| RF22 | | | | | X |
+| RF23 | | | | | X |
+| RF24 | | | | | X |
+| RF25 | | | | | X |
+ 
+ 
 ---
-
 ## 5. Selección Arquitectónica
 
-> Selección del o los estilos arquitectónicos con argumentación técnica y económica que justifique la elección.
+### 5.1 Estilos Arquitectónicos Seleccionados
 
-<!-- DESCRIPCIÓN DEL ESTILO O ESTILOS SELECCIONADOS -->
+La arquitectura de la Plataforma Regional de Certificación de Competencias Digitales (PRCCD) no puede resolverse con un único estilo arquitectónico. El análisis de los drivers identificados en los entregables anteriores revela cuatro tensiones simultáneas: alta concurrencia con persistencia inalterable, integración con sistemas externos heterogéneos, despliegue on-premise con preparación para migración cloud, y separación entre procesamiento transaccional y consulta analítica. Para abordar estas tensiones de forma coherente, se seleccionó una combinación de estilos arquitectónicos del catálogo C&C, junto con un patrón arquitectónico complementario. El estilo principal es **Multi-tier**, que estructura todo el sistema en capas. Como estilos complementarios se incorporan **SOA** para la integración con universidades heterogéneas, **Pipes and Filters** para la ingestión modular de datos académicos, y **Repository / Shared Data** para la centralización de evidencia inmutable, auditoría y dashboards analíticos. Dentro de la capa de presentación se aplica adicionalmente el patrón **MVC** para separar la lógica de control de las interfaces de usuario. Cada decisión responde directamente a drivers específicos del enunciado.
 
-### Estilos Evaluados
+---
 
-<!-- INSERTAR TABLA COMPARATIVA DE ESTILOS -->
+### 5.1.1 Estilo Principal: Arquitectura por Capas (Multi-tier)
 
-| Estilo Arquitectónico | Ventajas para PRCCD | Desventajas / Trade-offs |
-|---|---|---|
-| | | |
+#### Descripción
 
-### Estilo(s) Seleccionado(s) y Justificación
+El sistema se organiza en capas horizontales bien definidas donde cada capa únicamente interactúa con sus capas vecinas. Las cuatro capas para la PRCCD son las siguientes:
 
-<!-- ARGUMENTACIÓN TÉCNICA Y ECONÓMICA -->
+| Capa | Descripción |
+| --- | --- |
+| Capa de Presentación | Contiene las interfaces utilizadas por candidatos, auditores, administradores y usuarios de visualización de métricas. |
+| Capa de Lógica de Negocio | Gestiona las reglas principales del sistema: evaluaciones adaptativas, emisión de certificados, auditorías y generación de métricas. |
+| Capa de Integración | Permite la comunicación con universidades participantes y sistemas académicos externos. |
+| Capa de Datos | Administra la persistencia de evaluaciones, evidencias, certificados, auditorías y datos agregados. |
 
-<!-- INSERTAR IMAGEN: diagrama de decisión arquitectónica o mapa de estilos -->
-![Selección Arquitectónica](Images/seleccion_arquitectonica.png)
+#### Justificación Técnica
+
+La arquitectura por capas se selecciona por la separación de las diferentes tareas que se realizan en el sistema, tales como los exámenes adaptativos, la visualización de métricas y la generación de certificaciones. El sistema requiere una separación clara entre lo que un usuario ve, lo que un directivo consulta, lo que el sistema procesa internamente y la forma en que los datos persisten de forma inmutable.
+
+Sin esta separación, cualquier cambio en la infraestructura podría afectar otras áreas del proyecto, dado que cada área se mantiene encapsulada. Esto aplica directamente a RT01 y RT02: la capa de infraestructura es intercambiable sin afectar las capas superiores, y la portabilidad por capas permite una migración cloud sin impactar la lógica de negocio. Adicionalmente, los atributos de calidad EaC01 y EaC02 se benefician porque la capa de negocio puede escalar horizontalmente de forma independiente, y cada capa puede dimensionarse según la carga sin rediseñar el resto del sistema.
+
+#### Justificación Económica
+
+Con herramientas Open Source para la lógica de negocio, frameworks como Angular o React para la capa de presentación, y MySQL para la capa de datos, cada capa puede desarrollarse y mantenerse de forma independiente. Esto reduce el costo de cambios futuros y protege el presupuesto de RE01, ya que la separación clara reduce el retrabajo. La portabilidad por capas también facilita la migración cloud de RT02, bastando con redirigir la capa de datos hacia servicios cloud sin modificar la lógica de negocio.
+
+---
+
+### 5.1.2 Estilo Complementario: Arquitectura Orientada a Servicios (SOA)
+
+#### Descripción
+
+Los servicios de integración con universidades deben ser adaptativos, dado que cada universidad cuenta con su propio protocolo de autenticación y formato de datos, los cuales no pueden modificarse. SOA permite adaptar y unificar estas comunicaciones heterogéneas mediante la creación de adaptadores de servicio por institución.
+
+#### Justificación Técnica
+
+Las universidades USAC, UCR y UES utilizan protocolos distintos como LDAP, SAML y OAuth2, además de formatos diferentes como JSON, XML y CSV, y no se les puede obligar a cambiar su forma de trabajar, tal como lo establece RT03 y RT04. SOA resuelve esta situación porque permite crear un adaptador por universidad, donde cada institución mantiene su propio protocolo mientras el sistema central expone una interfaz de integración unificada que abstrae la heterogeneidad del resto del sistema, cumpliendo así con RF04.
+
+Adicionalmente, cada adaptador encapsula las transformaciones de formato correspondientes, de manera que agregar una nueva universidad o un nuevo protocolo no implica modificar los servicios existentes.
+
+#### Justificación Económica
+
+SOA permite la reutilización de componentes de integración. Por ejemplo, el adaptador desarrollado para OAuth2 puede reutilizarse con otra universidad que adopte el mismo protocolo en el futuro, sin costo adicional. Al utilizar herramientas Open Source como Apache Camel o WSO2 Community Edition, tal como lo exige RE02, el bus de servicios no requiere licencias comerciales, manteniendo el proyecto dentro del presupuesto de RE01.
+
+---
+
+### 5.1.3 Estilo Complementario: Pipes and Filters (Flujo de Datos)
+
+#### Descripción
+
+La ingestión de datos académicos se modela como una secuencia de filtros donde cada filtro realiza una transformación específica y pasa el resultado al siguiente paso. El flujo propuesto para la PRCCD es el siguiente:
+
+| Paso | Descripción |
+| --- | --- |
+| 1. Recepción | Se reciben datos provenientes de APIs, sistemas externos o archivos planos. |
+| 2. Validación de formato | Se verifica que los datos cumplan con la estructura esperada. |
+| 3. Normalización | Se convierten los datos a una estructura común para el sistema. |
+| 4. Transformación | Se adaptan los datos según las reglas internas de la plataforma. |
+| 5. Persistencia | Se almacenan los datos procesados en el repositorio correspondiente. |
+
+#### Justificación Técnica
+
+Dentro de CDU102, los casos de uso INGERIR DATOS, EXPORTAR DATOS ACADÉMICOS e IMPORTAR ARCHIVOS PLANOS representan transformaciones secuenciales sobre datos entrantes. El enunciado establece que los datos provienen de fuentes distintas con estructuras diferentes: JSON desde APIs, XML desde sistemas legacy y CSV desde archivos planos, lo que corresponde a RT04.
+
+Pipes and Filters es adecuado porque permite que cada paso de transformación sea independiente y reutilizable. El filtro de validación de formato funciona igual independientemente de si el dato proviene de una API o de un archivo. Además, este estilo resuelve RT04 de forma directa, ya que el pipeline puede incorporar un nuevo filtro por cada nuevo formato de datos sin modificar los filtros existentes, haciendo que RF04 sea sostenible a largo plazo.
+
+#### Justificación Económica
+
+Un pipeline de ingestión basado en filtros independientes reduce el costo de mantenimiento porque cada filtro puede probarse, corregirse o reemplazarse de forma aislada. Si una universidad cambia su formato de exportación, únicamente se modifica el filtro correspondiente sin afectar todo el proceso de ingestión, protegiendo así la inversión dentro del presupuesto de RE01.
+
+---
+
+### 5.1.4 Estilo Complementario: Repository / Shared Data (Datos Compartidos)
+
+#### Descripción
+
+Los datos históricos de evaluaciones, evidencia antifraude, certificados emitidos y métricas agregadas se centralizan en un repositorio compartido al que acceden de forma independiente los módulos de auditoría (CDU103) y visualización (CDU104), sin interferir con el procesamiento transaccional de CDU100 y CDU101.
+
+#### Justificación Técnica
+
+CDU103 necesita acceder a rastros de auditoría inmutables según RL04, y CDU104 necesita acceder a datos agregados y anonimizados según RL05. Ambos casos de uso operan principalmente sobre lectura de datos históricos y no deben competir con el procesamiento de exámenes en tiempo real, lo cual es crítico para EaC01 y EaC03. Un repositorio compartido con separación entre el flujo transaccional y el flujo analítico resuelve este conflicto.
+
+Adicionalmente, RL02 exige retención de evidencia por 5 años, restricción que solo puede cumplirse si existe un repositorio central que no dependa del ciclo de vida de ninguna sesión de evaluación individual. Este repositorio es también el punto donde se aplica RL01 (GDPR) y RL05 (anonimización) antes de que los datos lleguen a las capas de consulta, centralizando así el control de privacidad. Las escrituras al repositorio de evidencia son de tipo append-only, garantizando que ningún módulo pueda sobreescribir el rastro, lo que soporta directamente RL04. Los dashboards de RF06 consultan únicamente el repositorio de datos agregados, nunca datos transaccionales directos, y la auditoría de RF05 lee del repositorio sin afectar las transacciones activas.
+
+#### Justificación Económica
+
+Un repositorio compartido centraliza la gestión de respaldo, retención y cumplimiento legal, reduciendo la duplicación de lógica de persistencia en múltiples módulos. Esto es crítico con el presupuesto de RE01 porque el costo de almacenamiento se paga una sola vez en lugar de replicarlo por módulo. Al utilizar una solución Open Source según RE02, el costo de licenciamiento es cero.
+
+---
+
+### 5.1.5 Patrón Arquitectónico: Modelo-Vista-Controlador (MVC)
+
+#### Descripción
+
+Dentro de la capa de presentación definida por la arquitectura Multi-tier, se aplica el patrón MVC para separar los datos del sistema, las interfaces de usuario y la lógica de control. Sus tres componentes se distribuyen de la siguiente manera:
+
+| Componente | Responsabilidad |
+| --- | --- |
+| Modelo | Contiene las métricas agregadas, certificados, resultados y la lógica de segmentación de datos. |
+| Vista | Renderiza los dashboards, formularios de evaluación e interfaces de consulta de certificados. |
+| Controlador | Gestiona las solicitudes del usuario y coordina la interacción entre la Vista y el Modelo. |
+
+#### Justificación Técnica
+
+
+EaC04 establece que los dashboards analíticos deben ser intuitivos y permitir visualización segmentada por país, carrera y género. Para cumplir esto sin acoplar la lógica de segmentación a la interfaz gráfica, MVC es el patrón adecuado: el Modelo contiene las métricas agregadas y la lógica de segmentación, la Vista renderiza los dashboards, y el Controlador gestiona las solicitudes del usuario como filtrar por país, carrera o género. La Vista es independiente del Modelo, por lo que los cambios en la interfaz de usuario no afectan la lógica interna. Este patrón aplica también a las interfaces de evaluación de CDU100 y a la visualización de certificados de CDU101. Para su implementación se dispone de frameworks MVC Open Source maduros como Spring MVC, Django o Angular, en cumplimiento con RE02.
 
 ---
 
@@ -213,64 +659,84 @@
 
 <!-- DESCRIPCIÓN DE LOS BLOQUES PRINCIPALES DEL SISTEMA -->
 
-<!-- INSERTAR IMAGEN: diagrama de bloques del sistema -->
 ![Vista de Sistema](Images/vista_sistema.png)
 
 ---
 
 ## 7. Vistas Arquitectónicas — Nivel de Infraestructura
 
-> Diagrama de despliegue que incluye diagrama de componentes y diagrama de distribución. Se explica cómo las tecnologías seleccionadas cumplen con los drivers arquitectónicos.
+![Vista de Sistema](Images/diagramaComponentes.jpeg)
 
-### Diagrama de Componentes
+### Diagrama de Distribución
 
-<!-- DESCRIPCIÓN DE COMPONENTES -->
+![Diagrama de Distribucion](Images/diagrama_distribucion.png)
 
-<!-- INSERTAR IMAGEN: diagrama de componentes -->
-![Diagrama de Componentes](Images/diagrama_componentes.png)
+### Diagrama de Despliegue 
 
-### Diagrama de Despliegue / Distribución
-
-<!-- DESCRIPCIÓN DE LA INFRAESTRUCTURA ON-PREMISE Y PLAN DE MIGRACIÓN A NUBE -->
-
-<!-- INSERTAR IMAGEN: diagrama de despliegue -->
 ![Diagrama de Despliegue](Images/diagrama_despliegue.png)
 
 ---
-
 ## 8. Diseño de Datos
 
-> Diagrama Entidad-Relación (DER) o esquema para bases de datos NoSQL, justificando cómo soporta las necesidades de auditoría y almacenamiento a largo plazo.
+### 8.1 Diagrama Entidad-Relación
 
-<!-- JUSTIFICACIÓN DEL MODELO DE DATOS ELEGIDO (relacional / NoSQL / híbrido) -->
+![DER PRCCD](Images/ER.png)
 
-<!-- INSERTAR IMAGEN: DER o esquema NoSQL -->
-![Diseño de Datos](Images/diseno_datos.png)
+### 8.2 Justificación
 
-### Justificación Respecto a Drivers de Auditoría
-
-<!-- EXPLICAR CÓMO EL DISEÑO SOPORTA: rastro inmutable, retención 5 años, GDPR, derecho al olvido -->
+El modelo relacional de 18 tablas cubre la totalidad de los drivers arquitectónicos del 
+sistema. La auditoría se soporta mediante `BitacoraAuditoria`, que encadena `hash_anterior` 
+y `hash_actual` haciendo cualquier alteración retroactiva detectable (RT05, RL04), y 
+`EvidenciaAntifraude`, que almacena capturas, logs y video con `hash_sha256` y 
+`fecha_retencion_hasta` garantizando retención mínima de 5 años conforme al GDPR (RL02). 
+El almacenamiento a largo plazo de datos personales se gestiona cifrando nombre y correo 
+del candidato como `VARBINARY` y mediante `estado_gdpr(activo, anonimizado, olvidado)` que 
+implementa el derecho al olvido sin eliminar el historial de evaluaciones ni certificados. 
+`MetricaAgregada` garantiza que ningún dato llega al dashboard sin anonimizar, protegiendo 
+la privacidad individual mientras se cumplen los requerimientos analíticos de CDU104 y RL05.
 
 ---
 
 ## 9. Diseño de Interfaces (UI/UX)
 
-> Prototipos de interfaces de usuario elaborados para el PRCCD.
+#### Portal de Certificaciones
+El prototipo representa el acceso del candidato a la plataforma mediante autenticación institucional. Incluye la selección de universidad y compatibilidad con LDAP, SAML u OAuth2, según la configuración de cada entidad. De esta manera, se mantiene un punto de ingreso unificado sin modificar los mecanismos existentes.
 
-<!-- BREVE DESCRIPCIÓN DE LOS FLUJOS DE USUARIO PROTOTIPADOS -->
+![Portal de califiaciones](Images/Portal_de_Certificaciones.png)
 
-### Prototipo — [Nombre de la interfaz 1]
 
-<!-- INSERTAR IMAGEN: prototipo interfaz 1 -->
-![Prototipo 1](Images/prototipo_01.png)
 
-### Prototipo — [Nombre de la interfaz 2]
+### Examen Adaptativo
+El prototipo muestra la ejecución de una evaluación cuya dificultad cambia conforme a las respuestas del candidato. La pantalla incluye el avance, tiempo disponible, opciones de respuesta y controles de monitoreo antifraude. Asimismo, permite representar el registro de evidencia y resultados correspondiente al CDU100.
+![Prototipo 1](Images/Examen_Adaptativo.png)
 
-![Prototipo 2](Images/prototipo_02.png)
+### Descargar Certificado
+Esta pantalla confirma la aprobación de la evaluación y habilita la entrega del certificado digital. Presenta el identificador de la credencial y las opciones para descargarla o verificar su autenticidad. También informa sobre el tratamiento de datos personales y el uso de firma electrónica.
 
-### Prototipo — [Nombre de la interfaz 3]
 
-![Prototipo 3](Images/prototipo_03.png)
+![Prototipo 2](Images/Descargar_Certificado.png)
+
+### Certificado Digital
+El prototipo presenta el certificado emitido con los datos del candidato, fecha, código único de verificación y firma electrónica. Estos elementos permiten comprobar su autenticidad y trazabilidad mediante PKI o un código QR. La vista responde al requisito de validez jurídica transfronteriza de la credencial.
+
+![Prototipo 4](Images/Certificado_Digital.png)
+
+
+### Panel de Ingestión de Datos
+El panel permite a las universidades enviar información académica en formatos JSON, XML o CSV, utilizando su protocolo de autenticación. El flujo muestra las etapas de recepción, validación, normalización, transformación y persistencia. También incluye registros técnicos para dar seguimiento al proceso de integración.
+
+![Prototipo 3](Images/Panel_de_Ingestion.png)
+
+### Auditoría y Reportes
+La pantalla permite consultar un certificado y verificar su firma electrónica, integridad y rastro de auditoría inmutable. El historial detalla los eventos relacionados con la emisión y las consultas posteriores. Este prototipo respalda las actividades de cumplimiento, trazabilidad y detección de alteraciones.
+
+![Prototipo 3](Images/Auditoría_y_Reportes.png)
+
+### Dashboard Analítica
+El dashboard presenta métricas regionales mediante filtros por país, carrera, género y año. Los indicadores y gráficas utilizan información previamente agregada y anonimizada. La vista facilita el análisis de evaluaciones realizadas, certificados emitidos, cumplimiento del servicio y alertas de fraude. 
+
+![Prototipo 3](Images/Dashboard_Analítica.png)
+
 
 ---
 
@@ -278,71 +744,66 @@
 
 > Identificación de al menos **5 patrones de diseño** en la arquitectura, con sus diagramas de clases UML y justificación.
 
-| # | Patrón | Categoría | Punto de Aplicación en la Arquitectura |
-|---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
 
-### Patrón 1 — [Nombre del Patrón]
+### Patrón 1 — Adapter
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
-![Patrón 1 UML](Images/patron_01_uml.png)
+![Patrón 1 UML](Images/Adapter.png)
 
 ---
 
-### Patrón 2 — [Nombre del Patrón]
+### Patrón 2 — Facade
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-![Patrón 2 UML](Images/patron_02_uml.png)
+![Patrón 2 UML](Images/Facade_.png)
 
 ---
 
-### Patrón 3 — [Nombre del Patrón]
+### Patrón 3 — Chain of Responsibility
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
-![Patrón 3 UML](Images/patron_03_uml.png)
+![Patrón 3 UML](Images/Pipeline.png)
 
 ---
 
-### Patrón 4 — [Nombre del Patrón]
+### Patrón 4 — Observer
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
-![Patrón 4 UML](Images/patron_04_uml.png)
+![Patrón 4 UML](Images/Observer.png)
 
 ---
 
-### Patrón 5 — [Nombre del Patrón]
+### Patrón 5 — MVC
 
 **Justificación:** <!-- Por qué se aplica aquí -->
 
-<!-- INSERTAR IMAGEN: diagrama de clases UML -->
-![Patrón 5 UML](Images/patron_05_uml.png)
+![Patrón 5 UML](Images/MVC.png)
 
 ---
+## 11. Gestión del Proyecto (Enfoque Ágil)
 
-## 11. Gestión del Proyecto — Enfoque Ágil
+### 11.1 Tablero Kanban
 
-> Tablero Kanban con el backlog del proyecto, evidenciando un flujo de trabajo claro.  
-> **Columnas mínimas:** To Do · Blocked · In Progress · Ready for Testing · Test/QA · Done  
-> _(No incluir tareas de documentación; sí historias de usuario y tareas de desarrollo de arquitectura.)_
+El tablero Kanban del proyecto fue elaborado en Trello, evidenciando un flujo de trabajo 
+claro con las columnas: To Do, Blocked, In Progress, Ready for Testing, Test/QA y Done. 
+El backlog contiene 18 tareas de desarrollo derivadas de los 5 casos de uso del sistema 
+(CDU100, CDU101, CDU102, CDU103, CDU104), cada una con su historia de usuario asociada 
+en la descripción y su etiqueta de CDU correspondiente. Dado que esta es la fase 1 del 
+proyecto (arquitectura), todas las tareas se encuentran en To Do, ya que el desarrollo 
+de código corresponde a fases posteriores.
 
-<!-- LINK AL TABLERO KANBAN (GitHub Projects, Trello, etc.) -->
+![Tablero Kanban](Images/trello.png)
 
-**Enlace al tablero:** [Ver tablero Kanban](#)
+### 11.2 Detalle de tarea
 
-<!-- INSERTAR IMAGEN: captura del tablero Kanban -->
-![Tablero Kanban](Images/kanban.png)
+Cada tarjeta contiene el título de la tarea de desarrollo, la etiqueta del CDU al que 
+pertenece y en la descripción la historia de usuario correspondiente en formato HDU, 
+vinculando el requerimiento del usuario con la tarea técnica a implementar.
+
+![Detalle de tarea](Images/tarea-hdu.png)
 
 ---
-
-*Documento elaborado por el Grupo 5 — AYD2 · 1S2026 · Universidad San Carlos de Guatemala*
