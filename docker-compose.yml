@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: prccd-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: prccd
+    ports:
+      - "3306:3306"
+    volumes:
+      - prccd_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend/portal-prccd
+      dockerfile: Dockerfile
+    container_name: prccd-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/portal-prccd:/app:Z
+      - /app/node_modules
+    depends_on:
+      - mysql
+
+volumes:
+  prccd_mysql_data:
