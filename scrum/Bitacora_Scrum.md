@@ -147,7 +147,87 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 
 ### Martes 16/06/2026
 
-#### [Nombre integrante — Dev/Rol]
+#### Lizz Castellanos — Dev1 Motor de Evaluaciones
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree las tablas del motor de evaluaciones y banco de preguntas (T1): `PeriodoCertificacion`, `InscripcionPeriodo`, `Competencia`, `Pregunta`, `OpcionRespuesta`, `Evaluacion`, `RespuestaEvaluacion` segun el DER de Fase 1. Resultado: schema.sql funcional en dev1-evaluaciones/.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementar el algoritmo de examen adaptativo (T2) y el endpoint para registrar respuesta y calcular dictamen aprobado/reprobado (T3), trazables con RF01, RF02 y RF04 del DDA.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos.
+
+---
+
+#### Kevin Santos — Dev2 Integracion e Ingesta
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree las tablas de integracion e HistorialAcademico (T5), genere los archivos de prueba JSON/XML/CSV para las tres universidades piloto (T6) y verifique el levantamiento del frontend con los puertos establecidos. Resultado: estructura de datos lista para implementar los adaptadores.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementar los adaptadores LDAP/SAML/OAuth2 con patron Adapter (T7), la cadena de filtros de ingesta con Chain of Responsibility (T8) y persistir Candidato + HistorialAcademico (T9), trazables con RF10, RF11, RF12, RF13 y RF14.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Complicaciones con el tiempo disponible para desarrollo, se priorizaran las tareas criticas del dia.
+
+---
+
+#### Ludwing Lopez — Dev3 Certificacion y Auditoria
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree las tablas de certificacion y auditoria con su normalizacion (T10): `Certificado`, `BitacoraAuditoria`, `EntidadAuditora`, `VerificacionAuditoria`. Resultado: schema.sql funcional en dev3-certificacion/.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementar la validacion de rastro, firmas y deteccion de fraude con patron Observer (T13) consumiendo `EvidenciaAntifraude` registrada por Allan, y la pantalla de descarga de certificado en React (T14). Trazable con RF17, RF18, RF19, RF20 y RF21.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos.
+
+---
+
+#### Allan Sltan — Dev4 Antifraude y Metricas
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree las tablas de antifraude y metricas (T15): `EvidenciaAntifraude`, `DeteccionFraude`, `MetricaAgregada`. Resultado: schema.sql funcional en dev4-antifraude/.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Simular y persistir evidencia antifraude en `EvidenciaAntifraude` (T16) como Observer Subject, trazable con RF03 y RF05 del DDA.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   El tablero Kanban aparecia cerrado al intentar acceder, se resolvio en el transcurso del dia.
+
+---
+
+#### Geovanni Nufio — Dev5 Dashboard y Portal
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree el proyecto React con Vite + CoreUI (T20), configure el docker-compose con MySQL 8 y el servicio frontend (T22/T23) y defini la estructura de navegacion del portal. Resultado: proyecto funcional en frontend/portal-prccd/ con puertos establecidos.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementar el Dashboard View con graficas usando patron MVC Vista (T21) y el Dashboard Controller y Model (T22), trazables con RF24 y RF25.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos reportados.
+
+---
+
+#### Alejandra Mansilla — Scrum Master Seguridad Transversal
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Cree el schema y seed de `CandidatoSeguridad` (T24) e implemente el modulo de cifrado/descifrado AES-256-CBC usando `crypto.createCipheriv` nativo de Node sobre los campos `nombre_cifrado` y `email_cifrado` (T25), incluyendo el endpoint `POST /api/seguridad/anonimizar/{id}` para el derecho al olvido GDPR (T26). Se verifico funcionamiento con pruebas en los 3 endpoints. Resultado: backend/sm-seguridad/ funcional en puerto 4005.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementar la pantalla React de gestion de privacidad con CoreUI con boton "Solicitar olvido" (T27), trazable con RF08 y RL01 del DDA. Coordinar dailies y documentacion SCRUM (T28/T29).
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Docker Desktop no inicio correctamente, se resolvio usando MySQL local con Workbench para las pruebas del modulo de seguridad.
+
+---
+
+### Miércoles 17/06/2026
+
+#### Lizz Castellanos — Dev1 Motor de Evaluaciones
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
    -
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
@@ -155,40 +235,179 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 3. **¿Existen impedimentos técnicos o de integración?**
    -
 
-*(repetir bloque para los 6 integrantes)*
+---
+
+#### Kevin Santos — Dev2 Integracion e Ingesta
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
 ---
 
-### Miércoles 17/06/2026
+#### Ludwing Lopez — Dev3 Certificacion y Auditoria
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
-#### [Nombre integrante — Dev/Rol]
-1.
-2.
-3.
+---
 
-*(repetir bloque para los 6 integrantes)*
+#### Allan Sltan — Dev4 Antifraude y Metricas
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Geovanni Nufio — Dev5 Dashboard y Portal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Alejandra Mansilla — Scrum Master Seguridad Transversal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
 ---
 
 ### Jueves 18/06/2026
 
-#### [Nombre integrante — Dev/Rol]
-1.
-2.
-3.
+#### Lizz Castellanos — Dev1 Motor de Evaluaciones
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
-*(repetir bloque para los 6 integrantes)*
+---
+
+#### Kevin Santos — Dev2 Integracion e Ingesta
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Ludwing Lopez — Dev3 Certificacion y Auditoria
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Allan Sltan — Dev4 Antifraude y Metricas
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Geovanni Nufio — Dev5 Dashboard y Portal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Alejandra Mansilla — Scrum Master Seguridad Transversal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
 ---
 
 ### Viernes 19/06/2026
 
-#### [Nombre integrante — Dev/Rol]
-1.
-2.
-3.
+#### Lizz Castellanos — Dev1 Motor de Evaluaciones
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
-*(repetir bloque para los 6 integrantes)*
+---
+
+#### Kevin Santos — Dev2 Integracion e Ingesta
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Ludwing Lopez — Dev3 Certificacion y Auditoria
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Allan Sltan — Dev4 Antifraude y Metricas
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Geovanni Nufio — Dev5 Dashboard y Portal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
+
+---
+
+#### Alejandra Mansilla — Scrum Master Seguridad Transversal
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   -
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   -
+3. **¿Existen impedimentos técnicos o de integración?**
+   -
 
 ---
 
@@ -196,7 +415,7 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 
 > Al finalizar la iteración, cada integrante responde de forma honesta.
 
-### [Nombre integrante 1]
+### Lizz Castellanos — Dev1 Motor de Evaluaciones
 
 - **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
   -
@@ -205,7 +424,60 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 - **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
   -
 
-*(repetir bloque para los 6 integrantes)*
+---
+
+### Kevin Santos — Dev2 Integracion e Ingesta
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
+  -
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
+  -
+- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
+  -
+
+---
+
+### Ludwing Lopez — Dev3 Certificacion y Auditoria
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
+  -
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
+  -
+- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
+  -
+
+---
+
+### Allan Sltan — Dev4 Antifraude y Metricas
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
+  -
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
+  -
+- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
+  -
+
+---
+
+### Geovanni Nufio — Dev5 Dashboard y Portal
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
+  -
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
+  -
+- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
+  -
+
+---
+
+### Alejandra Mansilla — Scrum Master Seguridad Transversal
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
+  -
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
+  -
+- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
+  -
 
 ---
 
