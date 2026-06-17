@@ -7,6 +7,9 @@ require('dotenv').config();
 // Se importan las rutas del módulo de autenticación
 const authRoutes = require('./routes/authRoutes');
 
+// siguiendo pues la misma logica de organizacion, se importa la ruta de integracion que se ha trabajado en la tarea 4
+const ingestionRoutes = require('./routes/ingestionRoutes');
+
 // Se inicializa la aplicación de Express
 const app = express();
 
@@ -25,6 +28,9 @@ app.get('/api/health', (req, res) => {
 
 // Se agrupan las rutas de integración bajo un mismo prefijo
 app.use('/api/integracion', authRoutes);
+
+// sobre la tarea 4: 
+app.use('/api/integracion/ingesta', ingestionRoutes);
 
 // Se usa el puerto definido en .env o el puerto 4002 acordado para mi persona (202101007/Kevin)
 const PORT = process.env.PORT || 4002;
