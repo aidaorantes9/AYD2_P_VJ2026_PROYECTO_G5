@@ -1,0 +1,61 @@
+{
+    "fuente": {
+        "universidad_origen": "USAC",
+        "nombre_universidad": "Universidad de San Carlos de Guatemala",
+        "pais": "Guatemala",
+        "codigo_iso": "GT",
+        "protocolo_auth": "LDAP",
+        "formato_datos": "JSON"
+    },
+    "candidatos": [
+        {
+        "id_candidato": 1,
+        "id_externo_univ": "USAC-2024-001",
+        "nombre_completo": "Ana Lopez",
+        "email": "ana.lopez@usac.edu.gt",
+        "genero": "F",
+        "universidad_origen": "USAC",
+        "carrera": "Ingenieria en Sistemas",
+        "estado_gdpr": "activo",
+        "cursos_aprobados": [
+            {
+            "codigo_curso": "SIS-101",
+            "nombre_curso": "Introduccion a la Programacion",
+            "nota_final": 85.00
+            },
+            {
+            "codigo_curso": "SIS-202",
+            "nombre_curso": "Estructuras de Datos",
+            "nota_final": 90.00
+            },
+            {
+            "codigo_curso": "SIS-301",
+            "nombre_curso": "Bases de Datos 1",
+            "nota_final": 88.00
+            }
+        ]
+        },
+        {
+        "id_candidato": 2,
+        "id_externo_univ": "USAC-2024-002",
+        "nombre_completo": "Luis Ramirez",
+        "email": "luis.ramirez@usac.edu.gt",
+        "genero": "M",
+        "universidad_origen": "USAC",
+        "carrera": "Ingenieria en Sistemas",
+        "estado_gdpr": "activo",
+        "cursos_aprobados": [
+            {
+            "codigo_curso": "SIS-101",
+            "nombre_curso": "Introduccion a la Programacion",
+            "nota_final": 79.00
+            },
+            {
+            "codigo_curso": "SIS-205",
+            "nombre_curso": "Arquitectura de Computadores",
+            "nota_final": 82.00
+            }
+        ]
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datos_academicos>
+    <fuente>
+        <universidad_origen>UCR</universidad_origen>
+        <nombre_universidad>Universidad de Costa Rica</nombre_universidad>
+        <pais>Costa Rica</pais>
+        <codigo_iso>CR</codigo_iso>
+        <protocolo_auth>SAML</protocolo_auth>
+        <formato_datos>XML</formato_datos>
+    </fuente>
+
+    <candidatos>
+        <candidato>
+        <id_candidato>3</id_candidato>
+        <id_externo_univ>UCR-2024-001</id_externo_univ>
+        <nombre_completo>Carlos Mora</nombre_completo>
+        <email>carlos.mora@ucr.ac.cr</email>
+        <genero>M</genero>
+        <universidad_origen>UCR</universidad_origen>
+        <carrera>Ingenieria en Sistemas</carrera>
+        <estado_gdpr>activo</estado_gdpr>
+
+        <cursos_aprobados>
+            <curso>
+            <codigo_curso>INF-100</codigo_curso>
+            <nombre_curso>Fundamentos de Informatica</nombre_curso>
+            <nota_final>82.00</nota_final>
+            </curso>
+            <curso>
+            <codigo_curso>INF-210</codigo_curso>
+            <nombre_curso>Bases de Datos</nombre_curso>
+            <nota_final>88.00</nota_final>
+            </curso>
+            <curso>
+            <codigo_curso>INF-320</codigo_curso>
+            <nombre_curso>Ingenieria de Software</nombre_curso>
+            <nota_final>91.00</nota_final>
+            </curso>
+        </cursos_aprobados>
+        </candidato>
+
+        <candidato>
+        <id_candidato>4</id_candidato>
+        <id_externo_univ>UCR-2024-002</id_externo_univ>
+        <nombre_completo>Sofia Hernandez</nombre_completo>
+        <email>sofia.hernandez@ucr.ac.cr</email>
+        <genero>F</genero>
+        <universidad_origen>UCR</universidad_origen>
+        <carrera>Ingenieria en Sistemas</carrera>
+        <estado_gdpr>activo</estado_gdpr>
+
+        <cursos_aprobados>
+            <curso>
+            <codigo_curso>INF-100</codigo_curso>
+            <nombre_curso>Fundamentos de Informatica</nombre_curso>
+            <nota_final>87.00</nota_final>
+            </curso>
+            <curso>
+            <codigo_curso>INF-250</codigo_curso>
+            <nombre_curso>Redes de Computadoras</nombre_curso>
+            <nota_final>84.00</nota_final>
+            </curso>
+        </cursos_aprobados>
+        </candidato>
+    </candidatos>
+</datos_academicos>
