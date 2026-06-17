@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { CSidebar, CSidebarNav, CNavItem, CNavTitle, CHeader, CContainer } from '@coreui/react'
-
 import Home from './componentes/Home'
+// importar pantalla de gestion de privacidad del modulo de seguridad
+import GestionPrivacidad from './views/seguridad/GestionPrivacidad'
 
 function App() {
   return (
@@ -11,27 +12,24 @@ function App() {
           <CSidebarNav>
             <CNavTitle>PRCCD</CNavTitle>
             <CNavItem component={Link} to="/">Inicio</CNavItem>
-            {/* Ejemplo de como agregar un nuevo componente */}
-            {/* <CNavItem component={Link} to="/dashboard">Dashboard</CNavItem> */}
+            {/* ruta de gestion de privacidad — modulo seguridad transversal SM */}
+            <CNavItem component={Link} to="/privacidad">Privacidad</CNavItem>
           </CSidebarNav>
         </CSidebar>
-
         <div className="flex-grow-1">
           <CHeader>
             <CContainer fluid>
               <span className="fw-bold">Plataforma Regional de Certificación de Competencias Digitales</span>
             </CContainer>
           </CHeader>
-
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* Ejemplo de como agregar una nueva ruta */}
-            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+            {/* pantalla de gestion de privacidad y derecho al olvido GDPR */}
+            <Route path="/privacidad" element={<GestionPrivacidad />} />
           </Routes>
         </div>
       </div>
     </BrowserRouter>
   )
 }
-
 export default App
