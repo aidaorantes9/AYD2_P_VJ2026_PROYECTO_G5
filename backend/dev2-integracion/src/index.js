@@ -10,6 +10,9 @@ const authRoutes = require('./routes/authRoutes');
 // siguiendo pues la misma logica de organizacion, se importa la ruta de integracion que se ha trabajado en la tarea 4
 const ingestionRoutes = require('./routes/ingestionRoutes');
 
+// Rutas de candidato para exportación académica
+const candidatoRoutes = require('./routes/candidatoRoutes');
+
 // Se inicializa la aplicación de Express
 const app = express();
 
@@ -31,6 +34,9 @@ app.use('/api/integracion', authRoutes);
 
 // sobre la tarea 4: 
 app.use('/api/integracion/ingesta', ingestionRoutes);
+
+// para la tarea 6 (en la tarea 5 pues se usaba el mismo endpoint)
+app.use('/api/candidato', candidatoRoutes);
 
 // Se usa el puerto definido en .env o el puerto 4002 acordado para mi persona (202101007/Kevin)
 const PORT = process.env.PORT || 4002;
