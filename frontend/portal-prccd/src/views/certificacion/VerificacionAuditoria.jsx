@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { jsPDF } from 'jspdf'
 import {
   CAlert,
   CBadge,
@@ -32,18 +33,6 @@ function textoValidacion(valor) {
   return valor ? 'Válido' : 'Inválido'
 }
 
-function escaparHtml(valor) {
-  return String(valor ?? '').replace(
-    /[&<>"']/g,
-    (caracter) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    })[caracter]
-  )
-}
 
 function VerificacionAuditoria() {
   const [codigo, setCodigo] = useState('')
@@ -124,161 +113,169 @@ function VerificacionAuditoria() {
     }
 
     const datos = certificado.datos || {}
-    const codigo = escaparHtml(certificado.codigo_verificacion)
-    const nombre = escaparHtml(
+
+    const nombre =
       datos.nombre_completo || 'Candidato certificado'
-    )
-    const universidad = escaparHtml(
+    const universidad =
       datos.universidad_origen || 'No disponible'
-    )
-    const competencia = escaparHtml(
+    const competencia =
       datos.competencia || 'Competencias Digitales'
-    )
-    const resultadoEvaluacion = escaparHtml(
+    const resultadoEvaluacion =
       datos.resultado || 'APROBADO'
-    )
-    const nota = escaparHtml(datos.nota || 'No disponible')
-    const fecha = escaparHtml(certificado.fecha_emision)
-    const hash = escaparHtml(integridad?.hash_almacenado)
+    const nota =
+      datos.nota ?? 'No disponible'
 
-    const contenido = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certificado PRCCD - ${nombre}</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 40px;
-      background: #eef2f7;
-      font-family: Arial, sans-serif;
-      color: #1f2937;
-    }
+    const documento = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+    })
 
-    .certificado {
-      max-width: 950px;
-      margin: auto;
-      padding: 60px;
-      background: white;
-      border: 12px double #1d4ed8;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
-      text-align: center;
-    }
+    const anchoPagina = documento.internal.pageSize.getWidth()
+    const altoPagina = documento.internal.pageSize.getHeight()
+    const centro = anchoPagina / 2
 
-    h1 {
-      margin: 0;
-      color: #1d4ed8;
-      font-size: 44px;
-      letter-spacing: 2px;
-    }
+    // Marco exterior e interior
+    documento.setDrawColor(29, 78, 216)
+    documento.setLineWidth(2)
+    documento.rect(8, 8, anchoPagina - 16, altoPagina - 16)
 
-    h2 {
-      margin-top: 12px;
-      color: #374151;
-      font-weight: normal;
-    }
+    documento.setLineWidth(0.5)
+    documento.rect(13, 13, anchoPagina - 26, altoPagina - 26)
 
-    .nombre {
-      margin: 35px 0 15px;
-      font-size: 36px;
-      font-weight: bold;
-      color: #111827;
-    }
+    // Encabezado
+    documento.setTextColor(29, 78, 216)
+    documento.setFont('helvetica', 'bold')
+    documento.setFontSize(30)
+    documento.text('CERTIFICADO', centro, 38, {
+      align: 'center',
+    })
 
-    .competencia {
-      font-size: 24px;
-      color: #1d4ed8;
-      font-weight: bold;
-    }
-
-    .datos {
-      margin: 35px auto;
-      max-width: 700px;
-      padding: 25px;
-      background: #f8fafc;
-      border-radius: 10px;
-      text-align: left;
-      line-height: 1.8;
-    }
-
-    .valido {
-      display: inline-block;
-      margin: 20px 0;
-      padding: 10px 24px;
-      border-radius: 20px;
-      background: #dcfce7;
-      color: #166534;
-      font-weight: bold;
-    }
-
-    .verificacion {
-      margin-top: 35px;
-      padding-top: 20px;
-      border-top: 1px solid #d1d5db;
-      font-size: 13px;
-      color: #4b5563;
-      word-break: break-all;
-    }
-
-    @media print {
-      body {
-        padding: 0;
-        background: white;
-      }
-
-      .certificado {
-        box-shadow: none;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="certificado">
-    <h1>CERTIFICADO</h1>
-    <h2>Plataforma Regional de Certificación de Competencias Digitales</h2>
-
-    <p>Se certifica que</p>
-    <div class="nombre">${nombre}</div>
-
-    <p>ha demostrado satisfactoriamente sus conocimientos en</p>
-    <div class="competencia">${competencia}</div>
-
-    <section class="datos">
-      <div><strong>Universidad:</strong> ${universidad}</div>
-      <div><strong>Resultado:</strong> ${resultadoEvaluacion}</div>
-      <div><strong>Nota:</strong> ${nota}</div>
-      <div><strong>Fecha de emisión:</strong> ${fecha}</div>
-    </section>
-
-    <div class="valido">CERTIFICADO CRIPTOGRÁFICAMENTE VÁLIDO</div>
-
-    <section class="verificacion">
-      <div><strong>Código de verificación:</strong> ${codigo}</div>
-      <div><strong>Algoritmo:</strong> SHA-256 / RSA</div>
-      <div><strong>Hash:</strong> ${hash}</div>
-    </section>
-  </main>
-</body>
-</html>`
-
-    const archivo = new Blob(
-      [contenido],
-      { type: 'text/html;charset=utf-8' }
+    documento.setTextColor(55, 65, 81)
+    documento.setFont('helvetica', 'normal')
+    documento.setFontSize(14)
+    documento.text(
+      'Plataforma Regional de Certificación de Competencias Digitales',
+      centro,
+      50,
+      { align: 'center' }
     )
 
-    const url = URL.createObjectURL(archivo)
-    const enlace = document.createElement('a')
+    documento.setFontSize(12)
+    documento.text('Se certifica que', centro, 70, {
+      align: 'center',
+    })
 
-    enlace.href = url
-    enlace.download =
-      `certificado-${certificado.codigo_verificacion}.html`
+    // Nombre del candidato
+    documento.setTextColor(17, 24, 39)
+    documento.setFont('helvetica', 'bold')
+    documento.setFontSize(25)
+    documento.text(nombre, centro, 88, {
+      align: 'center',
+    })
 
-    document.body.appendChild(enlace)
-    enlace.click()
-    enlace.remove()
+    documento.setFont('helvetica', 'normal')
+    documento.setFontSize(12)
+    documento.text(
+      'ha demostrado satisfactoriamente sus conocimientos en',
+      centro,
+      102,
+      { align: 'center' }
+    )
 
-    URL.revokeObjectURL(url)
+    documento.setTextColor(29, 78, 216)
+    documento.setFont('helvetica', 'bold')
+    documento.setFontSize(18)
+    documento.text(competencia, centro, 116, {
+      align: 'center',
+    })
+
+    // Datos del certificado
+    documento.setTextColor(31, 41, 55)
+    documento.setFontSize(11)
+
+    documento.setFont('helvetica', 'bold')
+    documento.text('Universidad:', 55, 137)
+    documento.setFont('helvetica', 'normal')
+    documento.text(String(universidad), 82, 137)
+
+    documento.setFont('helvetica', 'bold')
+    documento.text('Resultado:', 155, 137)
+    documento.setFont('helvetica', 'normal')
+    documento.text(String(resultadoEvaluacion), 180, 137)
+
+    documento.setFont('helvetica', 'bold')
+    documento.text('Nota:', 55, 149)
+    documento.setFont('helvetica', 'normal')
+    documento.text(String(nota), 70, 149)
+
+    documento.setFont('helvetica', 'bold')
+    documento.text('Fecha de emisión:', 155, 149)
+    documento.setFont('helvetica', 'normal')
+    documento.text(
+      String(certificado.fecha_emision),
+      191,
+      149
+    )
+
+    // Estado validado
+    documento.setFillColor(220, 252, 231)
+    documento.setDrawColor(22, 101, 52)
+    documento.roundedRect(
+      centro - 32,
+      160,
+      64,
+      12,
+      3,
+      3,
+      'FD'
+    )
+
+    documento.setTextColor(22, 101, 52)
+    documento.setFont('helvetica', 'bold')
+    documento.setFontSize(12)
+    documento.text(
+      'CERTIFICADO VALIDADO',
+      centro,
+      168,
+      { align: 'center' }
+    )
+
+    // Información de verificación
+    documento.setTextColor(75, 85, 99)
+    documento.setFont('helvetica', 'normal')
+    documento.setFontSize(8)
+
+    documento.text(
+      `Código de verificación: ${certificado.codigo_verificacion}`,
+      centro,
+      184,
+      { align: 'center' }
+    )
+
+    documento.text(
+      'Algoritmo criptográfico: SHA-256 / RSA',
+      centro,
+      190,
+      { align: 'center' }
+    )
+
+    documento.setFontSize(7)
+    const hashDividido = documento.splitTextToSize(
+      `Hash: ${integridad?.hash_almacenado || ''}`,
+      230
+    )
+
+    documento.text(
+      hashDividido,
+      centro,
+      196,
+      { align: 'center' }
+    )
+
+    documento.save(
+      `certificado-${certificado.codigo_verificacion}.pdf`
+    )
   }
 
   return (
@@ -420,7 +417,7 @@ function VerificacionAuditoria() {
                     color="success"
                     onClick={descargarCertificado}
                   >
-                    Descargar certificado
+                    Descargar PDF
                   </CButton>
                 </div>
               )}

@@ -8,8 +8,11 @@ import VerificacionAuditoria from './views/certificacion/VerificacionAuditoria'
 function App() {
   return (
     <BrowserRouter>
-      <div className="d-flex">
-        <CSidebar className="border-end" unfoldable>
+      <div className="d-flex min-vh-100">
+        <CSidebar
+          className="border-end flex-shrink-0"
+          style={{ width: '240px', minWidth: '240px' }}
+        >
           <CSidebarNav>
             <CNavTitle>PRCCD</CNavTitle>
             <CNavItem component={Link} to="/">Inicio</CNavItem>
@@ -20,7 +23,7 @@ function App() {
             <CNavItem component={Link} to="/privacidad">Privacidad</CNavItem>
           </CSidebarNav>
         </CSidebar>
-        <div className="flex-grow-1">
+        <div className="flex-grow-1" style={{ minWidth: 0 }}>
           <CHeader>
             <CContainer fluid>
               <span className="fw-bold">Plataforma Regional de Certificación de Competencias Digitales</span>
