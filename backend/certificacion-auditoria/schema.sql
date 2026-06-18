@@ -71,3 +71,27 @@ CREATE TABLE IF NOT EXISTS BitacoraAuditoria (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+
+-- Protección append-only de la bitácora inmutable
+DROP TRIGGER IF EXISTS trg_bitacora_bloquear_update;
+DROP TRIGGER IF EXISTS trg_bitacora_bloquear_delete;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_bitacora_bloquear_update
+BEFORE UPDATE ON BitacoraAuditoria
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La bitácora de auditoría es inmutable y no permite modificaciones';
+END$$
+
+CREATE TRIGGER trg_bitacora_bloquear_delete
+BEFORE DELETE ON BitacoraAuditoria
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La bitácora de auditoría es inmutable y no permite eliminaciones';
+END$$
+
+DELIMITER ;
