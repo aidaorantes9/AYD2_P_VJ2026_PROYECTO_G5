@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
 const verificacionRoutes = require('./routes/verificacionRoutes');
+const auditoriaRoutes = require('./routes/auditoriaRoutes');
 
 const app = express();
 const PORT = Number(process.env.PORT || 4006);
@@ -31,6 +32,7 @@ app.get('/api/salud', async (req, res) => {
 });
 
 app.use('/api/certificados', verificacionRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
