@@ -5,6 +5,9 @@ import Home from './componentes/Home'
 import GestionPrivacidad from './views/seguridad/GestionPrivacidad'
 import VerificacionAuditoria from './views/certificacion/VerificacionAuditoria'
 
+// para el login que estoy agregando yo (Kevin jaja)
+import LoginIntegracion from './pages/LoginIntegracion'
+
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +20,9 @@ function App() {
             <CNavTitle>PRCCD</CNavTitle>
             <CNavItem component={Link} to="/">Inicio</CNavItem>
             {/* ruta de gestion de privacidad — modulo seguridad transversal SM */}
+            { /* es de prueba por el momento esta linea de abajo que he agregado */ }
+            <CNavItem component={Link} to="/login">Login Integración</CNavItem>
+
             <CNavItem component={Link} to="/certificado">
               Certificados y Auditoría
             </CNavItem>
@@ -32,6 +38,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             {/* pantalla de gestion de privacidad y derecho al olvido GDPR */}
+
+            {/* pantalla de login para seleccion de universidad y protocolo */}
+            <Route path="/login-integracion" element={<LoginIntegracion />} />
+
             <Route
               path="/certificado"
               element={<VerificacionAuditoria />}
