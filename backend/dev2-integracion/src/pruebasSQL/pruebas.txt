@@ -1,0 +1,71 @@
+{
+    "nombre_archivo": "usac_candidatos.json"
+}
+
+{
+    "nombre_archivo": "ucr_candidatos.xml"
+}
+
+{
+    "nombre_archivo": "ues_candidatos.csv"
+}
+
+
+PRUEBAS SQL: 
+USE prccd;
+
+SELECT 
+    id_ingesta,
+    id_universidad,
+    formato_datos,
+    estado,
+    registros_procesados,
+    registros_rechazados,
+    fecha_ingesta
+FROM IngestaDatosAcademicos
+ORDER BY id_ingesta DESC;
+
+PARA COMPROBAR A LOS CANDIDATOS: 
+USE prccd;
+
+SELECT 
+    id_candidato,
+    CAST(nombre_cifrado AS CHAR) AS nombre,
+    CAST(email_cifrado AS CHAR) AS email,
+    genero,
+    id_externo_univ,
+    estado_gdpr
+FROM Candidato
+ORDER BY id_candidato;
+
+PARA COMPROBAR EL HISTORIAL: 
+USE prccd;
+
+SELECT 
+    h.id_historial,
+    h.id_candidato,
+    CAST(c.nombre_cifrado AS CHAR) AS candidato,
+    h.codigo_curso,
+    h.nombre_curso,
+    h.nota_final
+FROM HistorialAcademico h
+INNER JOIN Candidato c
+    ON h.id_candidato = c.id_candidato
+ORDER BY h.id_candidato, h.codigo_curso;
+
+
+### AL CORRER ESTO DE FORMA LOCAL, A MI ME TIRA: 
+### IngestaDatosAcademicos	6
+### Candidato	            6
+### HistorialAcademico	    15
+# ojo con eso 
+USE prccd; 
+
+SELECT 'IngestaDatosAcademicos' AS tabla, COUNT(*) AS registros FROM IngestaDatosAcademicos
+UNION ALL
+
+SELECT 'Candidato', COUNT(*) FROM Candidato 
+UNION ALL
+
+SELECT 'HistorialAcademico', COUNT(*) FROM HistorialAcademico
+
