@@ -1,6 +1,9 @@
 // Se importa Express para crear el servidor
 const express = require('express');
 
+// para lo del front, hay que instalar lo del cors: 
+const cors = require('cors');
+
 // Se cargan las variables de entorno desde .env
 require('dotenv').config();
 
@@ -10,8 +13,12 @@ const authRoutes = require('./routes/authRoutes');
 // siguiendo pues la misma logica de organizacion, se importa la ruta de integracion que se ha trabajado en la tarea 4
 const ingestionRoutes = require('./routes/ingestionRoutes');
 
+// Rutas de candidato para exportación académica
+const candidatoRoutes = require('./routes/candidatoRoutes');
+
 // Se inicializa la aplicación de Express
 const app = express();
+app.use(cors({origin: 'http://localhost:5173'}));// Se habilita CORS para todas las rutas
 
 // Se habilita la lectura de JSON en las peticiones
 app.use(express.json());
@@ -31,6 +38,9 @@ app.use('/api/integracion', authRoutes);
 
 // sobre la tarea 4: 
 app.use('/api/integracion/ingesta', ingestionRoutes);
+
+// para la tarea 6 (en la tarea 5 pues se usaba el mismo endpoint)
+app.use('/api/candidato', candidatoRoutes);
 
 // Se usa el puerto definido en .env o el puerto 4002 acordado para mi persona (202101007/Kevin)
 const PORT = process.env.PORT || 4002;

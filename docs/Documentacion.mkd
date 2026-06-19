@@ -214,9 +214,11 @@
 ---
 ## 3. Diagramas de CDU Expandidos
 
-### 3.1 Diagrama de Casos de Uso Expandidos
+> Cambio aplicado como corrección de feedback Fase 1: se agrega una tabla de descripción
+> textual por cada elipse de cada CDU expandido. El Curso Normal de Eventos describe
+> lo que el equipo de ingeniería implementa en Fase 2, no los include/extend del diagrama.
 
-> Diagrama de casos de uso del sistema con actores y relaciones detalladas.
+### 3.1 Diagrama de Casos de Uso Expandidos
 
 ---
 
@@ -224,28 +226,102 @@
 
 ![CDU Expandido 100](Images/CDU100V2.png)
 
-##### Descripción Textual del Caso de Uso Base
+---
+
+##### RF01 — Realizar Examen Adaptativo
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Realizar Examen Adaptativo |
+| Nombre | Realizar Examen Adaptativo |
 | Actores | Candidato |
-| Propósito | Permitir al candidato realizar una evaluación adaptativa donde la dificultad de las preguntas se ajusta en tiempo real según sus respuestas previas. |
-| Resumen | El caso de uso inicia cuando el candidato accede al sistema durante el período de certificación habilitado (primera semana de cada mes). El sistema presenta las preguntas ajustando su dificultad según las respuestas previas. Durante la evaluación se recopila evidencia antifraude y se almacenan los resultados de forma inalterable. El caso de uso finaliza cuando el candidato completa el examen y el sistema registra su calificación. |
+| Propósito | Permitir al candidato realizar una evaluación de 10 preguntas cuya dificultad se ajusta en tiempo real según sus respuestas previas. |
+| Resumen | El candidato accede al portal durante el período de certificación habilitado (primera semana de cada mes). El sistema carga la primera pregunta de nivel Intermedio desde el banco de preguntas y presenta la interfaz de evaluación. El caso de uso finaliza cuando el candidato responde las 10 preguntas y el sistema emite el dictamen. |
 
-##### Curso Normal de Eventos
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. El candidato accede a la plataforma durante el período de certificación y realiza el examen. | 2. El sistema recopila evidencia antifraude de forma concurrente durante la evaluación (capturas de pantalla, logs de tecleo, ráfagas de vídeo). |
-| | 3. El sistema almacena los resultados de forma inalterable y registra la calificación obtenida. |
-| | 4. Si las respuestas del candidato mientras se evalúa lo amerita, el sistema adecúa la dificultad de las siguientes preguntas en tiempo real. De lo contrario, continúa con el flujo normal.|
+| 1. El candidato accede al portal y selecciona iniciar evaluación. | 2. El sistema consulta la tabla `Evaluacion` y registra el inicio del examen con `estado = en_progreso` para el `id_candidato` y `id_competencia` correspondientes. |
+| 3. El candidato visualiza la primera pregunta. | 4. El sistema consulta la tabla `Pregunta` filtrando por `nivel_dificultad = 'Intermedio'` y selecciona aleatoriamente una pregunta del banco. Registra en `RespuestaEvaluacion` el `orden_secuencia = 1` y la `dificultad_presentada`. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| No aplicable | Este caso de uso no presenta cursos alternos. |
+| Si el período de certificación no está activo | El sistema consulta `PeriodoCertificacion` y retorna un mensaje indicando que no hay período habilitado actualmente. |
+
+---
+
+##### RF02 — Adecuar Dificultad
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Adecuar Dificultad |
+| Actores | Candidato, Sistema |
+| Propósito | Ajustar el nivel de dificultad de la siguiente pregunta según si el candidato respondió correcta o incorrectamente la pregunta anterior. |
+| Resumen | Después de cada respuesta del candidato, el sistema evalúa si fue correcta consultando `OpcionRespuesta.es_correcta`. Si fue correcta, la siguiente pregunta es de nivel Avanzado. Si fue incorrecta, es de nivel Básico. Esta lógica se repite hasta completar las 10 preguntas. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El candidato selecciona una opción de respuesta y confirma. | 2. El sistema consulta `OpcionRespuesta` para verificar si `es_correcta = true`. Registra el resultado en `RespuestaEvaluacion` con `es_correcta`, `tiempo_respuesta_ms` y `orden_secuencia`. |
+| | 3. Si `es_correcta = true`, el sistema selecciona la siguiente pregunta con `nivel_dificultad = 'Avanzado'`. Si `es_correcta = false`, selecciona `nivel_dificultad = 'Basico'`. La constante `TOTAL_PREGUNTAS = 10` controla el límite del ciclo. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay preguntas disponibles en el nivel requerido | El sistema selecciona del nivel más cercano disponible en el banco de preguntas. |
+
+---
+
+##### RF03 — Recopilar Evidencia
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Recopilar Evidencia |
+| Actores | Sistema |
+| Propósito | Capturar y almacenar telemetría concurrente durante la evaluación para garantizar el rastro antifraude requerido por RL02. |
+| Resumen | De forma concurrente y transparente al candidato, el sistema registra evidencia de comportamiento durante la evaluación. Esta evidencia se almacena de forma inalterable con hash SHA-256 y fecha de retención de 5 años, lista para ser consultada por CDU103. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El candidato interactúa con la interfaz de evaluación (tecleo, navegación, respuestas). | 2. El sistema inserta registros en la tabla `EvidenciaAntifraude` con `tipo_evidencia` (captura/log_tecleo/video), `uri_almacenamiento`, `hash_sha256` calculado con el módulo nativo `crypto` de Node.js, `algoritmo_cifrado = 'AES-256'`, `timestamp_captura` y `fecha_retencion_hasta` (5 años desde la captura). El campo `inmutable = true` se establece al insertar. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| No aplica | La recopilación de evidencia es transparente y no tiene cursos alternos desde la perspectiva del candidato. |
+
+---
+
+##### RF04 — Almacenar Resultados Inalterables
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Almacenar Resultados Inalterables |
+| Actores | Sistema |
+| Propósito | Persistir los resultados de cada evaluación de forma que no puedan ser modificados una vez registrados, cumpliendo con la integridad requerida por EaC05. |
+| Resumen | Al finalizar las 10 preguntas, el sistema calcula la calificación final, determina el dictamen y actualiza el registro de evaluación con estado finalizada. El resultado queda persistido en MySQL con restricciones de integridad que impiden modificación posterior. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El candidato responde la última pregunta del examen. | 2. El sistema calcula la `calificacion` sumando los puntajes de `RespuestaEvaluacion` y determina `aprobada = true` si la calificación supera el umbral mínimo. Actualiza `Evaluacion` con `estado = 'finalizada'`, `calificacion` y `aprobada`. El endpoint `POST /api/evaluacion/respuesta` registra cada respuesta individual de forma append-only. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| No aplica | Una vez finalizada la evaluación, el registro no puede ser modificado por ningún endpoint del sistema. |
+
+---
+
+##### RF05 — Adjuntar Información para Auditoría
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Adjuntar Información para Auditoría |
+| Actores | Sistema |
+| Propósito | Marcar la evidencia capturada durante la evaluación como disponible para CDU103, implementando el rol de Subject del patrón Observer. |
+| Resumen | Al finalizar la evaluación, el sistema notifica al módulo de auditoría que existe evidencia disponible vinculada al `id_evaluacion`. Esto implementa el patrón Observer donde CDU100 es el Subject y CDU103 es el Observer, conectando ambos flujos sin acoplamiento directo. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El candidato finaliza la evaluación. | 2. El sistema ejecuta la notificación Observer: los registros de `EvidenciaAntifraude` con `id_evaluacion` quedan disponibles para consulta por CDU103. El módulo de auditoría puede acceder a ellos mediante `DeteccionFraude` referenciando el mismo `id_evidencia`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| No aplica | La adjunción de evidencia es automática al finalizar la evaluación. |
 
 ---
 
@@ -253,28 +329,81 @@
 
 ![CDU Expandido 101](Images/CDU101.png)
 
-##### Descripción Textual del Caso de Uso Base
+---
+
+##### RF06 — Aprobar Certificado
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Emitir Certificado |
-| Actores | Candidato |
-| Propósito | Permitir al candidato que aprobó la evaluación recibir su certificado digital con validez jurídica transfronteriza. |
-| Resumen | El caso de uso inicia cuando el candidato ha aprobado su evaluación. El sistema genera el certificado digital, verifica el cumplimiento de las leyes de protección de datos y lo almacena en la bitácora inmutable. El caso de uso finaliza cuando el candidato recibe su certificado digital verificable criptográficamente. |
+| Nombre | Aprobar Certificado |
+| Actores | Sistema |
+| Propósito | Verificar que el candidato ha cumplido con los requisitos de aprobación antes de proceder a la emisión del certificado. |
+| Resumen | El sistema consulta el resultado de la evaluación del candidato. Si `aprobada = true` en la tabla `Evaluacion`, habilita el flujo de emisión de certificado. Si no aprobó, el proceso se detiene y se notifica al candidato. |
 
-##### Curso Normal de Eventos
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. El candidato completa y aprueba la evaluación realizada previamente. | 2. El sistema procede a emitir el certificado digital. |
-| | 3. El sistema verifica el cumplimiento de las leyes de protección de datos aplicables. |
-| | 4. El sistema almacena el certificado en la bitácora inmutable. |
+| 1. El candidato solicita ver el resultado de su evaluación. | 2. El sistema consulta `Evaluacion` por `id_candidato` y verifica `aprobada`. Si `aprobada = true`, retorna el resultado mediante `GET /api/evaluacion/{id_candidato}/resultado` con `calificacion`, `estado` y `aprobada = true`, habilitando el flujo de emisión. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| No aplicable | Este caso de uso no presenta cursos alternos. |
+| Si `aprobada = false` | El sistema retorna el resultado de reprobado y no genera certificado. El candidato puede volver a intentarlo en el siguiente período de certificación. |
+
+---
+
+##### RF07 — Emitir Certificado
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Emitir Certificado |
+| Actores | Sistema, Candidato |
+| Propósito | Generar el certificado digital del candidato aprobado con código de verificación único, hash criptográfico y firma electrónica, cumpliendo con RT05 y RL04. |
+| Resumen | El sistema genera el certificado digital usando el módulo `crypto` de Node.js para calcular el `hash_criptografico` SHA-256 sobre los datos del certificado y produce la `firma_electronica`. El resultado se persiste en la tabla `Certificado` con `codigo_verificacion` único y `tipo_credencial = 'PKI'`. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El candidato solicita la descarga de su certificado tras aprobar. | 2. El sistema genera el `codigo_verificacion` único (UUID), calcula el `hash_criptografico` con `crypto.createHash('sha256')` sobre los datos del candidato, evaluación y timestamp. Inserta en `Certificado` con `tipo_credencial = 'PKI'` y `firma_electronica`. Retorna el certificado listo para descarga. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si el candidato no ha aprobado la evaluación | El sistema retorna un error 403 indicando que no cumple los requisitos para recibir certificado. |
+
+---
+
+##### RF08 — Verificar Cumplimiento de Leyes de Protección de Datos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Verificar Cumplimiento de Leyes de Protección de Datos |
+| Actores | Sistema |
+| Propósito | Validar que la emisión del certificado cumple con el GDPR y legislaciones locales, garantizando cifrado de datos sensibles y derecho al olvido (RL01, RL02). |
+| Resumen | Antes de emitir el certificado, el sistema verifica que los datos del candidato están cifrados con AES-256-CBC en la tabla `CandidatoSeguridad` y que su `estado_gdpr = 'activo'`. El módulo de seguridad transversal (puerto 4005) expone los endpoints de cifrado y anonimización que se invocan en este flujo. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema inicia la verificación de cumplimiento como parte del flujo de emisión. | 2. El sistema consulta `CandidatoSeguridad` verificando que `nombre_cifrado` y `email_cifrado` están almacenados como `VARBINARY` cifrados con `crypto.createCipheriv('aes-256-cbc', KEY, IV)`. Verifica que `estado_gdpr = 'activo'`. Si el candidato ejerció el derecho al olvido (`estado_gdpr = 'olvidado'`), el sistema detiene la emisión. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si `estado_gdpr = 'olvidado'` | El sistema no emite el certificado y notifica que los datos del candidato han sido anonimizados conforme al GDPR. |
+
+---
+
+##### RF09 — Almacenar en Bitácora
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Almacenar en Bitácora |
+| Actores | Sistema |
+| Propósito | Registrar cada evento relacionado con un certificado en la bitácora inmutable, encadenando hashes para garantizar integridad y cumplir con RL05. |
+| Resumen | Al emitir el certificado, el sistema registra el evento en `BitacoraAuditoria`, calculando el `hash_actual` sobre los datos del evento y almacenando el `hash_anterior` del último registro. Esta cadena de hashes hace que cualquier alteración retroactiva sea detectable. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema completa la emisión del certificado. | 2. El sistema consulta el último registro de `BitacoraAuditoria` para obtener su `hash_actual` como `hash_anterior` del nuevo evento. Calcula el nuevo `hash_actual` con `crypto.createHash('sha256')` sobre los datos del evento actual. Inserta en `BitacoraAuditoria` con `accion`, `hash_anterior`, `hash_actual`, `id_certificado` y `timestamp`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| No aplica | El registro en bitácora es obligatorio y se ejecuta siempre que se emite un certificado. |
 
 ---
 
@@ -282,51 +411,138 @@
 
 ![CDU Expandido 102](Images/CDU102V2.png)
 
-##### Descripción Textual del Caso de Uso Base 
+---
+
+##### RF10 — Proporcionar Protocolos de Autenticación
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Unificar de Sistemas de Autenticación |
+| Nombre | Proporcionar Protocolos de Autenticación |
 | Actores | Universidades |
-| Propósito | Permitir que las universidades participantes puedan conectarse a la plataforma utilizando diferentes protocolos de autenticación, de forma que el acceso quede unificado dentro del sistema. |
-| Resumen | El caso de uso inicia cuando una universidad solicita conectarse a la plataforma. El sistema identifica el protocolo de autenticación utilizado por la universidad y lo integra mediante un mecanismo común de acceso. Como parte del proceso, se unifican los sistemas de autenticación para permitir una comunicación segura entre la universidad y la plataforma. El caso de uso finaliza cuando la universidad queda habilitada para autenticarse correctamente. |
+| Propósito | Permitir que las universidades se conecten a la plataforma usando su propio protocolo institucional sin necesidad de modificarlo, cumpliendo con RT06. |
+| Resumen | Cada universidad envía sus credenciales usando su protocolo nativo: USAC usa LDAP, UCR usa SAML, UES usa OAuth2. El sistema recibe la solicitud y la redirige al adaptador correspondiente según la universidad de origen. |
 
-##### Curso Normal de Eventos
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. La universidad proporciona su protocolo de autenticación. | 2. El sistema recibe los protocolos de autenticación y los unifica dentro del esquema de autenticación federada. |
+| 1. La universidad envía una solicitud de autenticación usando su protocolo institucional. | 2. El sistema recibe la solicitud en `POST /api/auth/login` e identifica la universidad por el campo `universidad` del body. El `AdapterFactory` selecciona el adaptador correspondiente: `LdapAdapter`, `SamlAdapter` u `OAuth2Adapter` según la universidad. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| No aplicable | Este caso de uso no presenta cursos alternos. |
+| Si la universidad no está registrada | El sistema retorna error 400 indicando universidad no soportada. |
 
 ---
 
-##### Descripción Textual del Caso de Uso Base
+##### RF11 — Unificar Sistemas de Autenticación
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Ingerir Datos |
+| Nombre | Unificar Sistemas de Autenticación |
+| Actores | Sistema |
+| Propósito | Adaptar los distintos protocolos de autenticación (LDAP, SAML, OAuth2) a una interfaz común mediante el patrón Adapter, sin modificar los sistemas universitarios. |
+| Resumen | El módulo de integración implementa `BaseAuthAdapter` como clase base con el método `autenticar()`. Cada adaptador concreto (`LdapAdapter`, `SamlAdapter`, `OAuth2Adapter`) extiende esta clase y simula la autenticación con su protocolo correspondiente. El `AdapterFactory` centraliza la selección del adaptador. |
+
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. La universidad envía sus credenciales de autenticación. | 2. El `AdapterFactory` instancia el adaptador correcto según la universidad. El adaptador ejecuta `autenticar(credenciales)` y retorna un objeto unificado con `{ autenticado, universidad, protocolo, mensaje }`. El `authController` retorna la respuesta estandarizada al cliente. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si las credenciales son inválidas | El adaptador retorna `autenticado: false` y el controlador responde con error 401. |
+
+---
+
+##### RF12 — Proporcionar Datos Académicos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Proporcionar Datos Académicos |
 | Actores | Universidades |
-| Propósito | Permitir el intercambio de datos académicos entre las universidades y la plataforma, incluyendo la recepción, procesamiento y envío de información académica. |
-| Resumen | El caso de uso inicia cuando una universidad necesita enviar o consultar datos académicos dentro de la plataforma. El sistema ingiere los datos académicos recibidos y los procesa para que puedan ser utilizados por los módulos correspondientes. De manera opcional, la universidad puede exportar datos académicos o importar información mediante archivos planos. El caso de uso finaliza cuando los datos han sido procesados correctamente. |
+| Propósito | Permitir que las universidades envíen sus datos académicos hacia la plataforma en el formato que utilizan actualmente (JSON, XML o CSV). |
+| Resumen | La universidad sube un archivo con datos académicos de sus candidatos al endpoint de ingesta. El sistema acepta los tres formatos definidos en RT07 y los procesa mediante la cadena de filtros. Los archivos de prueba para USAC (JSON), UCR (XML) y UES (CSV) están disponibles en `backend/dev2-integracion/archivos_prueba/`. |
 
-##### Curso Normal de Eventos
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. La universidad envía datos académicos hacia la plataforma. | 2. El sistema recibe la información e ingiere los datos para procesarlos y tenerlos disponibles para uso dentro de la plataforma. |
-| | 3. El sistema válida el tipo de archivo que se va a procesar posteriormente. |
+| 1. La universidad sube un archivo de datos académicos mediante `POST /api/ingestion/upload`. | 2. El sistema recibe el archivo multipart y lo pasa al primer filtro de la cadena `IngestionChain`. El archivo puede ser `usac_candidatos.json`, `ucr_candidatos.xml` o `ues_candidatos.csv` según la universidad. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| En el paso 2 | El sistema puede permitir exportar datos académicos en distintos tipos de formato. |
-| En el paso 2 | El sistema puede permitir importar datos académicos en distintos tipos de formato, como archivos planos. |
+| Si el archivo está vacío o dañado | El sistema retorna error 400 desde el filtro de validación antes de procesar. |
+
+---
+
+##### RF13 — Validar Tipo de Archivo
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Validar Tipo de Archivo |
+| Actores | Sistema |
+| Propósito | Verificar que el archivo recibido corresponde a un formato soportado (JSON, XML o CSV) antes de procesarlo, implementado como primer eslabón de la cadena Chain of Responsibility. |
+| Resumen | El filtro `ExtensionFilter` verifica la extensión del archivo recibido. Si la extensión no es `.json`, `.xml` o `.csv`, rechaza el archivo y detiene la cadena. Si es válida, pasa al siguiente filtro. Este filtro corresponde al include "Validar tipo de archivo" agregado en la corrección T0.2 del CDU102. |
+
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema recibe el archivo de datos académicos. | 2. `ExtensionFilter` extrae la extensión del nombre del archivo. Si no está en `['.json', '.xml', '.csv']`, retorna error `{ exito: false, error: 'Formato no soportado' }` y detiene la cadena. Si es válida, llama a `siguiente.procesar(contexto)` para continuar. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si el archivo tiene extensión no soportada | `ExtensionFilter` detiene la cadena y retorna error al controlador sin procesar el archivo. |
+
+---
+
+##### RF14 — Ingerir Datos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Ingerir Datos |
+| Actores | Sistema |
+| Propósito | Recibir, normalizar y persistir los datos académicos enviados por las universidades mediante la cadena Chain of Responsibility completa. |
+| Resumen | La cadena `IngestionChain` ejecuta los filtros en secuencia: `ExtensionFilter` → `FileReaderFilter` → `ParserFilter` → `CamposRequeridosFilter` → `NormalizacionFilter` → `PersistenciaFilter`. Cada filtro transforma el contexto y lo pasa al siguiente. Al finalizar, los datos están persistidos en las tablas `Candidato` e `HistorialAcademico`. |
+
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. La universidad sube el archivo de datos académicos. | 2. `FileReaderFilter` lee el contenido del archivo. `ParserFilter` lo parsea según el formato usando `JSON.parse`, `xml2js` o `papaparse`. `CamposRequeridosFilter` verifica campos obligatorios. `NormalizacionFilter` estandariza los datos al esquema interno. `PersistenciaFilter` inserta en `Candidato` e `HistorialAcademico` con `id_candidato`, `nombre_cifrado`, `carrera`, `codigo_curso` y `nota_final`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si un filtro falla | El filtro retorna `{ exito: false, error }` y detiene la cadena sin persistir datos parciales. |
+
+---
+
+##### RF15 — Exportar Datos Académicos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Exportar Datos Académicos |
+| Actores | Universidades, Sistema |
+| Propósito | Permitir la exportación de datos académicos almacenados en la plataforma en el formato solicitado por la universidad. |
+| Resumen | El sistema consulta los datos académicos del candidato desde `HistorialAcademico` y los serializa en el formato solicitado (JSON, XML o CSV) para ser descargados por la universidad. |
+
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. La universidad solicita la exportación de datos académicos de un candidato. | 2. El sistema consulta `HistorialAcademico` por `id_candidato` y serializa el resultado en el formato solicitado usando `JSON.stringify`, `xml2js.Builder` o `papaparse.unparse`. Retorna el archivo para descarga mediante `GET /api/ingestion/exportar`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no existen datos del candidato | El sistema retorna error 404 indicando que no hay historial académico registrado. |
+
+---
+
+##### RF16 — Importar Archivos Planos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Importar Archivos Planos |
+| Actores | Universidades |
+| Propósito | Permitir la importación de datos académicos desde archivos planos CSV generados por sistemas legacy de las universidades. |
+| Resumen | El archivo `ues_candidatos.csv` es el caso de uso concreto de este RF. El `ParserFilter` detecta el formato CSV y usa `papaparse` para parsear el archivo plano. El resultado se normaliza e ingresa al mismo flujo de la cadena de filtros que los demás formatos. |
+
+| Acción de la Universidad | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. La universidad sube un archivo CSV generado por su sistema legacy. | 2. El `ParserFilter` identifica el formato CSV y ejecuta `Papa.parse(contenido, { header: true })` para convertir el archivo plano en un array de objetos. El resultado continúa por `CamposRequeridosFilter` → `NormalizacionFilter` → `PersistenciaFilter` igual que los demás formatos. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si el CSV no tiene encabezados | `CamposRequeridosFilter` detecta campos faltantes y detiene la cadena retornando error descriptivo. |
 
 ---
 
@@ -334,28 +550,100 @@
 
 ![CDU Expandido 103](Images/CDU103V2.png)
 
-##### Descripción Textual del Caso de Uso Base
+---
+
+##### RF17 — Auditoría de Certificaciones
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Verificar Auditoría de Certificaciones |
+| Nombre | Auditoría de Certificaciones |
 | Actores | Dirección Financiera, Ministerios Gubernamentales |
-| Propósito | Permitir a las entidades autorizadas verificar el rastro de auditoría inmutable de cada certificado emitido, respaldado por firmas electrónicas avanzadas. |
-| Resumen | El caso de uso inicia cuando la Dirección Financiera o un Ministerio Gubernamental solicita verificar la trazabilidad de una certificación. El sistema valida el rastro de auditoría inmutable y las firmas electrónicas del certificado. El caso de uso finaliza cuando se confirma la integridad del certificado o se detecta una anomalía. |
+| Propósito | Permitir a las entidades autorizadas verificar la trazabilidad completa de los certificados emitidos, cumpliendo con RL04. |
+| Resumen | La entidad auditora solicita la auditoría de un certificado por su `codigo_verificacion`. El sistema ejecuta la verificación de rastro inmutable, firmas electrónicas y detección de fraude, retornando un resultado consolidado de integridad. |
 
-##### Curso Normal de Eventos
-
-| Acción del Stakeholder | Respuesta del Proceso del Negocio |
+| Acción de la Entidad Auditora | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. La entidad autorizada solicita verificar la auditoría de una certificación para garantizar su integridad. | 2. El sistema valida si existe el rastro de auditoría inmutable del certificado. |
-| | 3. El sistema valida que la auditoría inmutable del certificado sea respaldada por firmas electrónicas avanzadas. |
+| 1. La entidad auditora solicita verificar la auditoría de un certificado. | 2. El sistema consulta `Certificado` por `codigo_verificacion`, obtiene su `BitacoraAuditoria` completa y ejecuta los procesos de validación de rastro, firmas y detección de fraude. Retorna un objeto `VerificacionAuditoria` con `resultado`, `rastro_validado` y `firmas_validadas`. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| En el paso 2 | Si durante la validación del rastro de auditoría se encuentra alteración en datos, el sistema detecta fraude académico. |
-| En el paso 3 | Si no se logran validar las firmas electrónicas que respalden la auditoría inmutable, se detecta fraude académico. |
+| Si el certificado no existe | El sistema retorna error 404 indicando que el código de verificación no corresponde a ningún certificado emitido. |
+
+---
+
+##### RF18 — Validar Rastro de Auditoría Inmutable
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Validar Rastro de Auditoría Inmutable |
+| Actores | Sistema |
+| Propósito | Verificar que la cadena de hashes de la bitácora no ha sido alterada desde la emisión del certificado, detectando cualquier modificación retroactiva. |
+| Resumen | El sistema recorre todos los registros de `BitacoraAuditoria` asociados al certificado en orden cronológico. Para cada registro, recalcula el hash con los datos del evento y lo compara con el `hash_actual` almacenado. Si algún hash no coincide, el rastro está comprometido. |
+
+| Acción de la Entidad Auditora | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema inicia la validación del rastro como parte del proceso de auditoría. | 2. El sistema consulta todos los registros de `BitacoraAuditoria` por `id_certificado` ordenados por `timestamp`. Para cada registro recalcula `crypto.createHash('sha256')` sobre los datos del evento y compara con `hash_actual`. Si todos coinciden, `rastro_validado = true`. Si alguno falla, `rastro_validado = false` y registra la posición de la alteración. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si se detecta alteración en el rastro | El sistema marca `resultado = 'alterado'` en `VerificacionAuditoria` y genera alerta de fraude académico. |
+
+---
+
+##### RF19 — Validar Firmas Electrónicas
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Validar Firmas Electrónicas |
+| Actores | Sistema |
+| Propósito | Comprobar que la firma electrónica del certificado es válida y corresponde al emisor original, garantizando autenticidad mediante PKI. |
+| Resumen | El sistema verifica la `firma_electronica` almacenada en `Certificado` recalculando el hash sobre los datos originales del certificado y comparándolo con la firma. Si la verificación falla, significa que el certificado fue alterado después de su emisión. |
+
+| Acción de la Entidad Auditora | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema inicia la validación de firmas como parte del proceso de auditoría. | 2. El sistema recupera `Certificado.firma_electronica` y `Certificado.hash_criptografico`. Recalcula el hash sobre `{ id_candidato, id_evaluacion, codigo_verificacion, fecha_emision }` con `crypto.createHash('sha256')`. Compara el hash recalculado con `hash_criptografico`. Si coinciden, `firmas_validadas = true`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si la firma no coincide | El sistema establece `firmas_validadas = false` y `resultado = 'alterado'` en `VerificacionAuditoria`. |
+
+---
+
+##### RF20 — Detectar Alteración de Datos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Detectar Alteración de Datos |
+| Actores | Sistema |
+| Propósito | Identificar y registrar cualquier modificación no autorizada en los datos de un certificado o su bitácora. |
+| Resumen | Si durante la validación del rastro (RF18) o de las firmas (RF19) se detecta inconsistencia, el sistema registra la alteración en `VerificacionAuditoria` con `resultado = 'alterado'` y genera el correspondiente registro en `DeteccionFraude`. |
+
+| Acción de la Entidad Auditora | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema detecta inconsistencia en el rastro o las firmas durante la auditoría. | 2. El sistema inserta en `VerificacionAuditoria` con `resultado = 'alterado'`, `rastro_validado` y `firmas_validadas` correspondientes. Inserta en `DeteccionFraude` referenciando la `EvidenciaAntifraude` del `id_evaluacion` y el tipo de fraude detectado. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay alteración | El sistema inserta en `VerificacionAuditoria` con `resultado = 'integro'` y finaliza el proceso de auditoría exitosamente. |
+
+---
+
+##### RF21 — Detectar Fraude Académico
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Detectar Fraude Académico |
+| Actores | Sistema, Dirección Financiera, Ministerios Gubernamentales |
+| Propósito | Analizar la evidencia antifraude adjuntada desde CDU100 para identificar indicios de comportamiento sospechoso durante la evaluación, implementando el patrón Observer. |
+| Resumen | El sistema consulta `EvidenciaAntifraude` vinculada al `id_evaluacion` del certificado auditado. Analiza los registros de telemetría (capturas, logs, video) en busca de patrones sospechosos y registra los hallazgos en `DeteccionFraude`. Este es el rol Observer del patrón, donde CDU100 fue el Subject que adjuntó la evidencia. |
+
+| Acción de la Entidad Auditora | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema ejecuta la detección de fraude como parte del proceso de auditoría. | 2. El sistema consulta `EvidenciaAntifraude` por `id_evaluacion` con `inmutable = true`. Analiza los registros disponibles y para cada indicio detectado inserta en `DeteccionFraude` con `id_evidencia`, `tipo_fraude`, `descripcion` y `fecha_deteccion`. El resultado se incluye en `VerificacionAuditoria`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay evidencia disponible | El sistema registra que no se encontró evidencia antifraude para la evaluación y continúa con resultado de auditoría sin detección de fraude. |
 
 ---
 
@@ -363,35 +651,90 @@
 
 ![CDU Expandido 104](Images/CDU104.jpeg)
 
-##### Descripción Textual del Caso de Uso Base
+---
+
+##### RF22 — Visualizar Métricas
 
 | Campo | Detalle |
 | --- | --- |
-| Nombre del CDU Base | Visualizar Métricas |
+| Nombre | Visualizar Métricas |
 | Actores | Alta Gerencia SICA, Ministerios Gubernamentales |
-| Propósito | Permitir a la alta gerencia y ministerios gubernamentales consultar métricas regionales sobre competencias digitales mediante dashboards analíticos, utilizando datos agregados, anonimizados y segmentados. |
-| Resumen | El caso de uso inicia cuando la Alta Gerencia SICA o un Ministerio Gubernamental accede a la plataforma para consultar métricas. El sistema agrega y anonimiza los datos antes de exponerlos, genera el dashboard analítico y segmenta la información por país, carrera universitaria y género. El caso de uso finaliza cuando el actor visualiza las métricas regionales de competencias digitales. |
+| Propósito | Permitir a la alta gerencia y ministerios consultar el estado de las competencias digitales de la región mediante dashboards analíticos con filtros interactivos. |
+| Resumen | El actor accede al dashboard del portal y selecciona filtros de segmentación. El sistema consulta `MetricaAgregada` con `anonimizada = true` y retorna los datos al dashboard para su visualización mediante gráficas Recharts. |
 
-##### Curso Normal de Eventos
-
-| Acción del Actor | Respuesta del Sistema |
+| Acción del Actor | Respuesta del Sistema (implementación Fase 2) |
 | --- | --- |
-| 1. El actor accede a la sección de visualización de métricas. | 2. El sistema ejecuta los procesos de agregación y anonimización de datos. |
-| | 3. El sistema genera el dashboard analítico con las métricas regionales. |
-| | 4. El sistema segmenta la información por país, carrera universitaria y género. |
+| 1. El actor accede a la sección de dashboard analítico en el portal React. | 2. El Dashboard Controller ejecuta `GET /api/metricas` al backend de Allan (puerto 4004). El Dashboard Model procesa la respuesta y la pasa a la Dashboard View que renderiza las gráficas con Recharts. Todo el flujo sigue el patrón MVC implementado por Nufio en `frontend/portal-prccd/`. |
 
-##### Cursos Alternos
-
-| Paso | Descripción |
+| Cursos Alternos | Descripción |
 | --- | --- |
-| No aplicable | Este caso de uso no presenta cursos alternos. |
+| Si el endpoint de métricas no responde | El dashboard muestra un mensaje de error y permite reintentar la consulta. |
+
 ---
+
+##### RF23 — Agregar y Anonimizar Datos
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Agregar y Anonimizar Datos |
+| Actores | Sistema |
+| Propósito | Ejecutar procesos de agregación y anonimización sobre los datos operativos antes de exponerlos en interfaces gerenciales, cumpliendo con RL06. |
+| Resumen | El backend de métricas consulta `Evaluacion`, `Candidato` y `Certificado` y agrega los resultados por país, carrera y género. Los datos individuales nunca se exponen directamente. La tabla `MetricaAgregada` tiene `anonimizada = true` por defecto, y el endpoint solo retorna datos de esta tabla, nunca de tablas transaccionales directas. |
+
+| Acción del Actor | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El sistema ejecuta la agregación como parte del flujo de visualización. | 2. El backend consulta `MetricaAgregada` filtrando por `anonimizada = true`. Los campos retornados son `pais`, `carrera_segmento`, `genero_segmento`, `total_evaluaciones`, `total_aprobados` y `tasa_aprobacion`. Ningún campo de identificación personal (`nombre`, `email`, `id_candidato`) se incluye en la respuesta. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| No aplica | La anonimización es una restricción de diseño de la tabla MetricaAgregada, no un proceso condicional. |
+
+---
+
+##### RF24 — Generar Dashboard Analítico
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Generar Dashboard Analítico |
+| Actores | Sistema, Alta Gerencia SICA, Ministerios Gubernamentales |
+| Propósito | Construir y presentar el dashboard con indicadores y gráficas de competencias digitales regionales usando el patrón MVC. |
+| Resumen | La Vista del dashboard (componente React con Recharts) recibe los datos del Controlador y los renderiza como gráficas de barras y líneas. El Modelo contiene la lógica de transformación de los datos de métricas para adaptarlos al formato requerido por Recharts. |
+
+| Acción del Actor | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El actor visualiza el dashboard en el portal. | 2. El Dashboard View renderiza `BarChart` y `LineChart` de Recharts con los datos retornados por el Modelo. Los indicadores muestran `total_evaluaciones`, `total_aprobados` y `tasa_aprobacion` por segmento. El Controlador gestiona los filtros interactivos actualizando el Modelo sin recargar la página. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay datos de métricas disponibles | El dashboard muestra un estado vacío con mensaje indicando que aún no hay métricas calculadas para el período seleccionado. |
+
+---
+
+##### RF25 — Segmentar Información
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Segmentar Información |
+| Actores | Alta Gerencia SICA, Ministerios Gubernamentales |
+| Propósito | Permitir la segmentación de las métricas por país, carrera universitaria y género para el análisis regional diferenciado, cumpliendo con EaC10. |
+| Resumen | El dashboard expone filtros de selección de país, carrera y género. Al aplicar filtros, el Controlador ejecuta una nueva consulta a `GET /api/metricas?pais=GT&carrera=sistemas&genero=F` y el Modelo actualiza los datos de la Vista con los resultados segmentados. |
+
+| Acción del Actor | Respuesta del Sistema (implementación Fase 2) |
+| --- | --- |
+| 1. El actor selecciona filtros de país, carrera universitaria y/o género en el dashboard. | 2. El Dashboard Controller ejecuta `GET /api/metricas` con los parámetros de filtro correspondientes. El backend consulta `MetricaAgregada` filtrando por `id_pais`, `carrera_segmento` y `genero_segmento` según los parámetros recibidos. El Dashboard Model actualiza los datos y la Vista re-renderiza las gráficas con los datos segmentados. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay métricas para la combinación de filtros seleccionada | El sistema retorna un array vacío y el dashboard muestra mensaje indicando que no hay datos para ese segmento. |
+
+---
+
 ### 3.2 Detalle de Drivers por CDU
- 
+
 > Para cada CDU se detallan los drivers RF, EaC y de Restricción asociados.
- 
+
 **CDU100 - Gestión de Evaluaciones**
- 
+
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
 | RF | RF01 | Realizar Examen Adaptativo |
@@ -400,18 +743,19 @@
 | RF | RF04 | Almacenar Resultados Inalterables |
 | RF | RF05 | Adjuntar Información para Auditoría |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
-| Restricción | RE02 | Uso Obligatorio de Open Source |
+| Restricción | RE02 | Plazo de Entrega |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
-| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
-| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
-| Calidad | EaC01 | Atributo de Rendimiento |
-| Calidad | EaC02 | Atributo de Escalabilidad |
-| Calidad | EaC03 | Atributo de Disponibilidad |
- 
+| Restricción | RT02 | Arquitectura Preparada para Migración Cloud |
+| Restricción | RL03 | Retención de Evidencia por 5 Años |
+| Calidad | EaC01 | Desempeño |
+| Calidad | EaC02 | Escalabilidad |
+| Calidad | EaC03 | Disponibilidad |
+| Calidad | EaC04 | Seguridad en Tránsito |
+
 ---
- 
+
 **CDU101 - Emisión de Certificaciones**
- 
+
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
 | RF | RF06 | Aprobar Certificado |
@@ -419,17 +763,19 @@
 | RF | RF08 | Verificar Cumplimiento de Leyes de Protección de Datos |
 | RF | RF09 | Almacenar en Bitácora |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
-| Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
-| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
 | Restricción | RT05 | Certificación Criptográfica de Credenciales |
-| Restricción | RL01 | Cumplimiento GDPR |
-| Restricción | RL03 | Validez Jurídica Transfronteriza de Certificados |
- 
+| Restricción | RL01 | Cumplimiento GDPR — Cifrado AES-256 |
+| Restricción | RL02 | Derecho al Olvido |
+| Restricción | RL04 | Validez Jurídica Transfronteriza |
+| Calidad | EaC05 | Integridad de Bitácora |
+| Calidad | EaC06 | Seguridad en Verificación Criptográfica |
+| Calidad | EaC09 | Privacidad y Derecho al Olvido |
+
 ---
- 
+
 **CDU102 - Integración de Protocolos Dispares**
- 
+
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
 | RF | RF10 | Proporcionar Protocolos de Autenticación |
@@ -440,16 +786,17 @@
 | RF | RF15 | Exportar Datos Académicos |
 | RF | RF16 | Importar Archivos Planos |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
-| Restricción | RE02 | Uso Obligatorio de Open Source |
-| Restricción | RT01 | Despliegue On-Premise Obligatorio |
-| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
-| Restricción | RT03 | Interoperabilidad con Protocolos Heterogéneos |
-| Restricción | RT04 | Soporte de Múltiples Formatos de Datos |
- 
+| Restricción | RE03 | No modificar sistemas universitarios |
+| Restricción | RT03 | Stack Open Source |
+| Restricción | RT06 | Autenticación Federada LDAP/SAML/OAuth2 |
+| Restricción | RT07 | Soporte JSON/XML/CSV |
+| Calidad | EaC07 | Interoperabilidad |
+| Calidad | EaC08 | Modificabilidad del Pipeline |
+
 ---
- 
+
 **CDU103 - Auditoría de Certificaciones**
- 
+
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
 | RF | RF17 | Auditoría de Certificaciones |
@@ -458,17 +805,16 @@
 | RF | RF20 | Detectar Alteración de Datos |
 | RF | RF21 | Detectar Fraude Académico |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
-| Restricción | RE02 | Uso Obligatorio de Open Source |
-| Restricción | RT01 | Despliegue On-Premise Obligatorio |
-| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
 | Restricción | RT05 | Certificación Criptográfica de Credenciales |
-| Restricción | RL02 | Retención de Evidencia por Cumplimiento Legal |
-| Restricción | RL04 | Rastro de Auditoría Inmutable con Firma Electrónica |
- 
+| Restricción | RL03 | Retención de Evidencia por 5 Años |
+| Restricción | RL05 | Rastro de Auditoría Inmutable con Hash Encadenado |
+| Calidad | EaC05 | Integridad |
+| Calidad | EaC06 | Seguridad en Verificación Criptográfica |
+
 ---
- 
+
 **CDU104 - Visualización de Competencias**
- 
+
 | Tipo de Driver | ID | Nombre |
 |---|---|---|
 | RF | RF22 | Visualizar Métricas |
@@ -476,13 +822,12 @@
 | RF | RF24 | Generar Dashboard Analítico |
 | RF | RF25 | Segmentar Información |
 | Restricción | RE01 | Presupuesto Máximo del Piloto |
-| Restricción | RE02 | Uso Obligatorio de Open Source |
 | Restricción | RT01 | Despliegue On-Premise Obligatorio |
-| Restricción | RT02 | Arquitectura Preparada para la migración Cloud |
+| Restricción | RT03 | Stack Open Source |
 | Restricción | RL01 | Cumplimiento GDPR |
-| Restricción | RL05 | Anonimización de Datos en Dashboards Analíticos |
-| Calidad | EaC04 | Atributo de Usabilidad |
- 
+| Restricción | RL06 | Anonimización Obligatoria en Dashboards |
+| Calidad | EaC10 | Usabilidad del Dashboard |
+
 ---
 
 ## 4. Matrices de Trazabilidad

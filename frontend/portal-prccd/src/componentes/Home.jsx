@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom'
 import { CContainer, CRow, CCol, CCard, CCardBody, CCardTitle, CCardText, CButton, CBadge } from '@coreui/react'
 
 const modulos = [
-  { nombre: 'Login', ruta: '/login', responsable: 'Kevin (202101007)', estado: 'pendiente' },
+  { nombre: 'Login', ruta: '/login', responsable: 'Kevin (202101007)', estado: 'listo' },
   { nombre: 'Examen Adaptativo', ruta: '/examen', responsable: 'Lizz (201708997)', estado: 'pendiente' },
-  { nombre: 'Certificado y Auditoría', ruta: '/certificado', responsable: 'Ludwing (201907608)', estado: 'pendiente' },
+  { nombre: 'Certificado y Auditoría', ruta: '/certificado', responsable: 'Ludwing (201907608)', estado: 'listo' },
   { nombre: 'Antifraude', ruta: '/antifraude', responsable: 'Allan (202010046)', estado: 'pendiente' },
   { nombre: 'Dashboard Analítico', ruta: '/dashboard', responsable: 'Nufio (201901444)', estado: 'pendiente' },
   { nombre: 'Privacidad', ruta: '/privacidad', responsable: 'Alejandra / SM (202100239)', estado: 'pendiente' },

@@ -1,0 +1,17 @@
+{
+  "name": "certificacion-auditoria",
+  "version": "1.0.0",
+  "description": "Módulo de emisión de certificados y auditoría inmutable de la PRCCD",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.5"
+  }
+}
