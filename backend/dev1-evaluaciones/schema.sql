@@ -1,20 +1,4 @@
-cat > backend/sm-seguridad/schema.sql << 'EOF'
-CREATE DATABASE IF NOT EXISTS prccd;
 USE prccd;
-
-CREATE TABLE IF NOT EXISTS CandidatoSeguridad (
-    id             BIGINT         NOT NULL AUTO_INCREMENT,
-    nombre_cifrado VARBINARY(255) NOT NULL,
-    email_cifrado  VARBINARY(255) NOT NULL,
-    estado_gdpr    ENUM('activo', 'anonimizado', 'olvidado') NOT NULL DEFAULT 'activo',
-    PRIMARY KEY (id)
-);
-EOF
-
-
-
--- Motor de Evaluaciones
-
 
 CREATE TABLE IF NOT EXISTS PeriodoCertificacion (
   id_periodo        INT AUTO_INCREMENT PRIMARY KEY,
@@ -71,15 +55,14 @@ CREATE TABLE IF NOT EXISTS Evaluacion (
 );
 
 CREATE TABLE IF NOT EXISTS RespuestaEvaluacion (
-  id_respuesta          INT AUTO_INCREMENT PRIMARY KEY,
-  id_evaluacion         INT NOT NULL,
-  id_pregunta           INT NOT NULL,
+  id_respuesta           INT AUTO_INCREMENT PRIMARY KEY,
+  id_evaluacion          INT NOT NULL,
+  id_pregunta            INT NOT NULL,
   id_opcion_seleccionada INT,
-  dificultad_presentada ENUM('Básico','Intermedio','Avanzado') NOT NULL,
-  es_correcta           BOOLEAN DEFAULT FALSE,
-  tiempo_respuesta_ms   INT DEFAULT NULL,
-  orden_secuencia       INT NOT NULL,
+  dificultad_presentada  ENUM('Básico','Intermedio','Avanzado') NOT NULL,
+  es_correcta            BOOLEAN DEFAULT FALSE,
+  tiempo_respuesta_ms    INT DEFAULT NULL,
+  orden_secuencia        INT NOT NULL,
   FOREIGN KEY (id_evaluacion) REFERENCES Evaluacion(id_evaluacion),
   FOREIGN KEY (id_pregunta)   REFERENCES Pregunta(id_pregunta)
 );
-
