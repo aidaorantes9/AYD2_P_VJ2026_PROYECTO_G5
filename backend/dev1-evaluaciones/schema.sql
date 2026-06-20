@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS RespuestaEvaluacion (
   id_evaluacion         INT NOT NULL,
   id_pregunta           INT NOT NULL,
   id_opcion_seleccionada INT,
-  dificultad_presentada ENUM('Básico','Intermedio','Avanzado') NOT NULL,
+  dificultad_presentada ENUM('Basico', 'Intermedio', 'Avanzado') NOT NULL,
   es_correcta           BOOLEAN DEFAULT FALSE,
   tiempo_respuesta_ms   INT DEFAULT NULL,
   orden_secuencia       INT NOT NULL,
