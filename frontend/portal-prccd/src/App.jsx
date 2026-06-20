@@ -7,9 +7,11 @@ import Sidebar from './componentes/Sidebar'
 
 // Vistas
 import Home from './views/Home'
+import LoginIntegracion from './pages/LoginIntegracion'
 import GestionPrivacidad from './views/seguridad/GestionPrivacidad'
 import VerificacionAuditoria from './views/certificacion/VerificacionAuditoria'
 import Dashboard from './views/dashboard/Dashboard'
+import Examen from './pages/Examen'
 
 function App() {
   return (
@@ -24,9 +26,11 @@ function App() {
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/login" element={<LoginIntegracion />} />
               <Route path="/certificado" element={<VerificacionAuditoria />} />
               <Route path="/privacidad" element={<GestionPrivacidad />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/examen" element={<Examen />} />
             </Routes>
           </div>
         </div>
