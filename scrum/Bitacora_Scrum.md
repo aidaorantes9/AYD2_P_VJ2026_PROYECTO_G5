@@ -17,133 +17,70 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 
 ### 1.2 Sprint Backlog
 
-> Tabla formal de los elementos seleccionados para este Sprint, indicando qué observación
-> o feedback de la Fase 1 resuelve cada tarea.
-
 #### 1.2.1 Correcciones de Fase 1 (realizadas previo al inicio del Sprint — estado: Done)
-
-> El enunciado establece que los ajustes derivados del feedback de la Fase 1 deben
-> realizarse **antes o durante** la codificación. Estas correcciones se completaron
-> antes del Sprint Planning de hoy, por lo que ingresan al tablero directamente en
-> la columna **Done**.
 
 | ID | Responsable | Tarea | Feedback recibido (Fase 1) | Estado |
 |----|---|---|---|---|
-| T0.1 | Kevin (202101007) | Actualizar diagrama CDU100: eliminar extend "Detectar existencia de fraude", cambiar "Adecuar dificultad" de extend a include, agregar include "Adjuntar información para auditoría" | CDU100: la detección de fraude no corresponde a este flujo, solo se almacena evidencia | Done |
-| T0.2 | Kevin (202101007) | Actualizar diagrama CDU102: agregar include "Validar tipo de archivo" antes de "Ingerir Datos" | CDU102: faltaba paso explícito de validación de tipo de archivo | Done |
-| T0.3 | Kevin (202101007) | Actualizar diagrama CDU103: renombrar "Verificar Auditoría de Certificaciones" a "Auditoría de Certificaciones" | CDU103: nombre redundante, indicación del auxiliar | Done |
-| T0.4 | Alejandra (202100239) | Actualizar secciones 3.1 y 3.2 de Docs/Documentacion.mkd para mantener congruencia con los 3 diagramas corregidos | Congruencia interna del documento | Done |
-| T0.5 | Alejandra (202100239) | Expandir RF de 6 a 25 (uno por cada elipse CDU), actualizar sección 2.1, sección 3.2 (drivers por CDU), y convertir matrices 4.1 y 4.3 de imágenes a tablas Markdown | Feedback: los RF deben corresponder a cada caso de uso identificado en los diagramas expandidos | Done |
-| T0.6 | Nufio (201901444) | Actualizar diagrama de bloques: simplificar a representación con iconos más general, ya que el anterior era demasiado específico y se asemejaba a un diagrama de arquitectura detallada | Feedback: el diagrama de bloques debe ser más abstracto y representativo del sistema a nivel general | Done |
+| T0.1 | Kevin (202101007) | Actualizar diagrama CDU100 | CDU100: la detección de fraude no corresponde a este flujo | Done |
+| T0.2 | Kevin (202101007) | Actualizar diagrama CDU102 | CDU102: faltaba paso explícito de validación de tipo de archivo | Done |
+| T0.3 | Kevin (202101007) | Actualizar diagrama CDU103 | CDU103: nombre redundante, indicación del auxiliar | Done |
+| T0.4 | Alejandra (202100239) | Actualizar secciones 3.1 y 3.2 de Docs/Documentacion.mkd | Congruencia interna del documento | Done |
+| T0.5 | Alejandra (202100239) | Expandir RF de 6 a 25 y actualizar matrices | Feedback: los RF deben corresponder a cada caso de uso | Done |
+| T0.6 | Nufio (201901444) | Actualizar diagrama de bloques | Feedback: el diagrama de bloques debe ser más abstracto | Done |
+| T0.7 | Alejandra (202100239) | Actualizar RF, EaC y Restricciones con estructura del metodo de diseno centrado en arquitectura | Feedback: los drivers deben derivarse de los CDU y seguir la estructura formal | Done |
+| T0.8 | Alejandra (202100239) | Agregar tabla de descripcion textual por cada elipse de CDU100 al CDU104 (25 tablas) | Feedback: debe haber una tabla de descripcion textual por cada elipse, no una por CDU | Done |
 
-#### 1.2.2 Sprint Backlog — Desarrollo del MVP (To Do)
+#### 1.2.2 Sprint Backlog — Desarrollo del MVP
 
-| ID | Responsable | Tarea | Deriva de Fase 1 / Feedback | Patrón / Driver |
+| ID | Responsable | Tarea | Driver | Patrón |
 |----|---|---|---|---|
-| T1 | Lizz (201708997) | Diseñar y crear tablas del motor de evaluaciones + banco de preguntas | RF01 — Realizar Examen Adaptativo | — |
-| T2 | Lizz (201708997) | Implementar algoritmo de examen adaptativo | RF01 — Realizar Examen Adaptativo / RF02 — Adecuar Dificultad | — |
-| T3 | Lizz (201708997) | Endpoint registrar respuesta y calcular dictamen | RF04 — Almacenar Resultados Inalterables | — |
-| T4 | Lizz (201708997) | Pantalla de examen (frontend) | CDU100 / RF01, RF02, RF03, RF04 | — |
-| T5 | Kevin (202101007) | Diseñar y crear tablas de integración + HistorialAcademico | RF10 — Proporcionar Protocolos de Autenticación / Refactorización (tabla nueva, feedback Fase 1) | — |
-| T6 | Kevin (202101007) | Implementar adaptadores LDAP/SAML/OAuth2 | RF10 — Proporcionar Protocolos de Autenticación / RF11 — Unificar Sistemas de Autenticación | Adapter |
-| T7 | Kevin (202101007) | Implementar cadena de filtros de ingesta: `ValidarTipoArchivo` → `ValidarFormato` → `NormalizarDatos` → `Transformador` (JSON/XML/CSV) | RF13 — Validar Tipo de Archivo / RF14 — Ingerir Datos + CDU102 corregido (T0.2) | Chain of Responsibility |
-| T8 | Kevin (202101007) | Persistir Candidato + HistorialAcademico | RF12 — Proporcionar Datos Académicos / RF14 — Ingerir Datos / RT04 | — |
-| T9 | Kevin (202101007) | Pantalla de login (frontend) | CDU102 / RF10, RF11 | — |
-| T10 | Ludwing (201907608) | Diseñar y crear tablas de certificación y auditoría | RF06 — Aprobar Certificado / RF07 — Emitir Certificado / RT05 | — |
-| T11 | Ludwing (201907608) | Emisión de certificado con hash criptográfico | RF06 — Aprobar Certificado / RF07 — Emitir Certificado | — |
-| T12 | Ludwing (201907608) | Implementar cadena de bitácora inmutable | RF09 — Almacenar en Bitácora | — |
-| T13 | Ludwing (201907608) | Endpoint de verificación de auditoría + detección de fraude académico, consultando `EvidenciaAntifraude` (registrada por Allan (202010046) en T16) | RF17 — Auditoría de Certificaciones / RF18 — Validar Rastro Inmutable / RF19 — Validar Firmas / RF20 — Detectar Alteración / RF21 — Detectar Fraude + CDU103 corregido (T0.1, T0.3) | Observer (Observer) |
-| T14 | Ludwing (201907608) | Pantalla de descarga de certificado (frontend) | CDU101 / RF06, RF07, RF08 | — |
-| T15 | Allan (202010046) | Diseñar y crear tablas de antifraude y métricas | RF03 — Recopilar Evidencia / RF22 — Visualizar Métricas / RL02 | — |
-| T16 | Allan (202010046) | Simular y persistir evidencia antifraude en `EvidenciaAntifraude` (sin lógica de detección, eso corresponde a CDU103/Ludwing (201907608) según corrección T0.1) | RF03 — Recopilar Evidencia / RF05 — Adjuntar Información para Auditoría + CDU100 corregido (T0.1) | Observer (Subject) |
-| T17 | Allan (202010046) | Endpoint de métricas agregadas y anonimizadas | RF23 — Agregar y Anonimizar Datos / RF24 — Generar Dashboard Analítico / RF25 — Segmentar Información | — |
-| T18 | Allan (202010046) | Implementar lado Observer (Subject → notify) | RF05 — Adjuntar Información para Auditoría / Patrón Observer | Observer |
-| T19 | Allan (202010046) | Documentar contrato de endpoint de métricas para Nufio (201901444) | RF24 — Generar Dashboard Analítico / CDU104 | — |
-| T20 | Nufio (201901444) | Definir estructura de navegación del portal React | CDU100-104 (frontend) / RF01, RF06, RF10, RF17, RF22 | — |
-| T21 | Nufio (201901444) | Implementar Dashboard View (gráficas) | RF24 — Generar Dashboard Analítico | MVC |
-| T22 | Nufio (201901444) | Implementar Dashboard Controller y Model | RF25 — Segmentar Información / RF23 — Agregar y Anonimizar Datos | MVC |
-| T23 | Nufio (201901444) | Ensamblar pantallas de Lizz (201708997)/2/3 en el portal | Integración general CDU100-104 | — |
-| T24 | SM | Diseñar y crear tabla CandidatoSeguridad | RF08 — Verificar Cumplimiento de Leyes de Protección de Datos / RL01, RL02 | — |
-| T25 | SM | Implementar cifrado/descifrado AES (VARBINARY) | RF08 — Verificar Cumplimiento de Leyes de Protección de Datos / RL02 | — |
-| T26 | SM | Implementar lógica de derecho al olvido (estado_gdpr) | RF08 — Verificar Cumplimiento de Leyes de Protección de Datos / RL01 | — |
-| T27 | SM | Pantalla "Gestión de privacidad" (frontend mínimo) | RF08 — Verificar Cumplimiento de Leyes de Protección de Datos / RL01 | — |
+| T1 | Lizz (201708997) | Crear tablas motor de evaluaciones + banco de preguntas | RF01 | — |
+| T2 | Lizz (201708997) | Implementar algoritmo de examen adaptativo | RF01, RF02 | — |
+| T3 | Lizz (201708997) | Endpoint registrar respuesta y calcular dictamen | RF04 | — |
+| T4 | Lizz (201708997) | Pantalla de examen (frontend) | CDU100 | — |
+| T5 | Kevin (202101007) | Crear tablas integración + HistorialAcademico | RF10 | — |
+| T6 | Kevin (202101007) | Implementar adaptadores LDAP/SAML/OAuth2 | RF10, RF11 | Adapter |
+| T7 | Kevin (202101007) | Implementar cadena de filtros de ingesta | RF13, RF14 | Chain of Responsibility |
+| T8 | Kevin (202101007) | Persistir Candidato + HistorialAcademico | RF12, RF14 | — |
+| T9 | Kevin (202101007) | Pantalla de login (frontend) | CDU102 | — |
+| T10 | Ludwing (201907608) | Crear tablas certificación y auditoría | RF06, RF07 | — |
+| T11 | Ludwing (201907608) | Emisión de certificado con hash criptográfico | RF06, RF07 | — |
+| T12 | Ludwing (201907608) | Implementar cadena de bitácora inmutable | RF09 | — |
+| T13 | Ludwing (201907608) | Endpoint verificación auditoría + detección fraude | RF17-RF21 | Observer |
+| T14 | Ludwing (201907608) | Pantalla descarga de certificado (frontend) | CDU101 | — |
+| T15 | Allan (202010046) | Crear tablas antifraude y métricas | RF03, RF22 | — |
+| T16 | Allan (202010046) | Simular y persistir evidencia antifraude | RF03, RF05 | Observer (Subject) |
+| T17 | Allan (202010046) | Endpoint métricas agregadas y anonimizadas | RF23, RF24, RF25 | — |
+| T18 | Allan (202010046) | Implementar lado Observer (Subject → notify) | RF05 | Observer |
+| T19 | Allan (202010046) | Documentar contrato endpoint métricas para Nufio | RF24 | — |
+| T20 | Nufio (201901444) | Definir estructura navegación portal React | CDU100-104 | — |
+| T21 | Nufio (201901444) | Implementar Dashboard View (gráficas) | RF24 | MVC |
+| T22 | Nufio (201901444) | Implementar Dashboard Controller y Model | RF25, RF23 | MVC |
+| T23 | Nufio (201901444) | Ensamblar pantallas en el portal | Integración | — |
+| T24 | SM | Crear tabla CandidatoSeguridad | RF08, RL01, RL02 | — |
+| T25 | SM | Implementar cifrado/descifrado AES (VARBINARY) | RF08, RL02 | — |
+| T26 | SM | Implementar derecho al olvido (estado_gdpr) | RF08, RL01 | — |
+| T27 | SM | Pantalla gestión de privacidad (frontend) | RF08, RL01 | — |
 | T28 | SM | Gestionar tablero Kanban diario | Gestión ágil | — |
 | T29 | SM | Coordinar Daily Standups y documentación SCRUM | Gestión ágil | — |
 | T30 | SM | Consolidar documentación SCRUM final | Gestión ágil | — |
 
 ### 1.3 Acuerdos de Sprint Planning (lunes 15/06)
 
-> IDs y contratos fijos acordados entre el equipo para permitir trabajo en paralelo sin
-> dependencias bloqueantes.
-
-- `id_candidato = 1` → candidato ficticio usado por Lizz (201708997), Kevin (202101007), Ludwing (201907608), Allan (202010046), SM.
-- `id_evaluacion = 1`, `aprobada = true` → usado por Lizz (201708997) y Ludwing (201907608) para emitir certificado.
-- **Formato del endpoint de evaluación (Lizz (201708997) → Nufio (201901444)):** `GET /api/evaluacion/{id_candidato}/resultado`
-  ```json
-  {
-    "id_evaluacion": 1,
-    "id_candidato": 1,
-    "calificacion": 80.00,
-    "estado": "finalizada",
-    "aprobada": true
-  }
-  ```
-- **Formato del endpoint de métricas (Allan (202010046) → Nufio (201901444)):** `GET /api/metricas`
-  ```json
-  {
-    "anonimizada": true,
-    "fecha_calculo": "2026-06-19",
-    "metricas": [
-      {
-        "id_pais": 1,
-        "pais": "Guatemala",
-        "carrera_segmento": "Ingeniería en Sistemas",
-        "genero_segmento": "F",
-        "total_evaluaciones": 120,
-        "total_aprobados": 95,
-        "tasa_aprobacion": 79.16
-      }
-    ]
-  }
-  ```
-- **Contrato `EvidenciaAntifraude` (Allan (202010046) → Ludwing (201907608)):** acorde a la corrección T0.1 (CDU100 →
-  include "Adjuntar información para auditoría"), Allan (202010046) inserta en su seed los siguientes
-  registros en `EvidenciaAntifraude` con `id_evaluacion=1`. Ludwing (201907608) inserta los mismos
-  registros en su propio seed y programa `AuditoriaReportes.update()` (Patrón 4 — Observer)
-  contra ellos. El viernes ambos leen de la misma tabla en la BD compartida.
-  ```sql
-  INSERT INTO EvidenciaAntifraude (
-    id_evidencia, id_evaluacion, tipo_evidencia,
-    uri_almacenamiento, hash_sha256, algoritmo_cifrado,
-    timestamp_captura, fecha_retencion_hasta, inmutable
-  )
-  VALUES (
-    1, 1, 'captura',
-    '/evidencias/eval1_captura.png',
-    'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
-    'AES-256',
-    '2026-06-15 21:00:00',
-    '2031-06-15',
-    true
-  );
-  ```
-  Campos acordados: `tipo_evidencia = 'captura'`, `hash_sha256` de 64 caracteres,
-  `algoritmo_cifrado = 'AES-256'`, `fecha_retencion_hasta = '2031-06-15'` (5 años),
-  `inmutable = true`.
+- `id_candidato = 1` → Ana López, USAC-2024-001
+- `id_evaluacion = 1`, `aprobada = true`, `calificacion = 80.00`
+- Endpoint evaluación: `GET /api/evaluacion/{id_candidato}/resultado`
+- Endpoint métricas: `GET /api/metricas`
+- Evidencia antifraude: tabla compartida `EvidenciaAntifraude`, `id_evidencia = 1`
+- `TOTAL_PREGUNTAS = 10` — constante configurable
 
 ### 1.4 Captura del Tablero Kanban — Inicio del Sprint
 
-> Captura de pantalla del tablero inmediatamente antes de iniciar el desarrollo (todas las
-> tarjetas en *To Do*).
-
-![Kanban inicial](Images/kanban_inicio_sprint.png)
+![Kanban inicial](../docs/Images/kanban_inicio_sprint.png)
 
 ---
 
 ## 2. Daily Standup — Refinamiento Arquitectónico Diario
-
-> Registro diario obligatorio por cada integrante. Cada persona responde con rigurosidad
-> técnica las 3 preguntas, indicando trazabilidad con drivers, EaC o restricciones.
 
 ### Martes 16/06/2026
 
@@ -202,7 +139,7 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 #### Geovanni Nufio — Dev5 Dashboard y Portal
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Cree el proyecto React con Vite + CoreUI (T20), configure el docker-compose con MySQL 8 y el servicio frontend (T22/T23) y defini la estructura de navegacion del portal. Resultado: proyecto funcional en frontend/portal-prccd/ con puertos establecidos.
+   Cree el proyecto React con Vite + CoreUI (T20), configure el docker-compose con MySQL 8 y el servicio frontend y defini la estructura de navegacion del portal. Resultado: proyecto funcional en frontend/portal-prccd/ con puertos establecidos.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
    Implementar el Dashboard View con graficas usando patron MVC Vista (T21) y el Dashboard Controller y Model (T22), trazables con RF24 y RF25.
@@ -228,62 +165,80 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 ### Miércoles 17/06/2026
 
 #### Lizz Castellanos — Dev1 Motor de Evaluaciones
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Implemente los endpoints de registro de respuestas de los candidatos (T3) y la pantalla de examen en React (T4), completando el flujo de evaluacion adaptativa. Resultado: modulo dev1-evaluaciones funcional con interfaz de examen operativa.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Realizar merge de las tareas completadas a develop y verificar que el endpoint `GET /api/evaluacion/{id_candidato}/resultado` responde correctamente para que Nufio pueda consumirlo, trazable con RF04 y el contrato de integracion del Sprint Planning.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Kevin Santos — Dev2 Integracion e Ingesta
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Concluyo la ultima tarea del modulo: pantalla de login de prueba (T9), completando la integracion de autenticacion federada con los adaptadores LDAP/SAML/OAuth2. Resultado: modulo dev2-integracion completo con todos los endpoints y frontend operativos.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Verificar que todo el modulo esta en orden y realizar pruebas de los endpoints de autenticacion e ingesta, trazable con RF10, RF11, RF14 y EaC07.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Ludwing Lopez — Dev3 Certificacion y Auditoria
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Termino todas las tareas del modulo de certificacion y auditoria y realizo merge a develop. Resultado: endpoints de emision de certificado con hash criptografico, bitacora inmutable y verificacion de auditoria operativos en puerto 4003.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Colaborar en la integracion del modulo al proyecto completo, verificando que los endpoints son consumibles por el frontend de Nufio, trazable con RF06, RF07, RF09 y EaC05.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Problemas con la integracion al ensamblar el modulo con el resto del proyecto, en proceso de resolucion.
 
 ---
 
 #### Allan Sltan — Dev4 Antifraude y Metricas
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Implemente el endpoint `GET /api/metricas` y realizo merge a develop (T17). Resultado: endpoint de metricas funcional en puerto 4004 retornando datos segmentados por pais, carrera y genero con `anonimizada = true`.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Implementar encriptacion de los datos sensibles con SHA-256 sobre la evidencia antifraude en `EvidenciaAntifraude`, trazable con RF03, RL03 y EaC04.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Geovanni Nufio — Dev5 Dashboard y Portal
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Implemento el dashboard analitico con graficas Recharts usando datos de prueba (T21/T22), aplicando el patron MVC. Resultado: dashboard funcional mostrando metricas por pais, carrera y genero.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Continuar con la integracion del portal conectando el dashboard al endpoint real `GET /api/metricas` de Allan, trazable con RF24, RF25 y EaC10.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Debe probar que el dashboard funciona correctamente con el endpoint real de Allan antes de dar la tarea por completada.
 
 ---
 
 #### Alejandra Mansilla — Scrum Master Seguridad Transversal
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Implemente la pantalla React de gestion de privacidad con CoreUI y boton "Solicitar olvido" integrada al portal (T27). Aplique dos correcciones de feedback de Fase 1: actualice RF, EaC y Restricciones con la estructura del metodo de diseno centrado en arquitectura (T0.7), y agregue 25 tablas de descripcion textual por elipse en CDU100-CDU104 (T0.8). Coordine con Nufio y Allan el plan de integracion del viernes.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Consolidar el schema_completo.sql en backend/shared/ en el orden correcto de FK (Kevin → Lizz → Allan → Ludwing → Alejandra), trazable con RT04 y los acuerdos del Sprint Planning.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Se identifico que el flujo de datos hacia `MetricaAgregada` no estaba definido explicitamente; se resolvio coordinando con Nufio y Allan que el seed popula la tabla con datos ficticios anonimizados para el MVP.
 
 ---
 
@@ -413,71 +368,81 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 
 ## 3. Sprint Retrospective e Impacto Estructural
 
-> Al finalizar la iteración, cada integrante responde de forma honesta.
-
 ### Lizz Castellanos — Dev1 Motor de Evaluaciones
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  El algoritmo de examen adaptativo con la logica de subir a Avanzado o bajar a Basico segun la respuesta anterior funciono correctamente, validando que el diseño de `RespuestaEvaluacion` con `dificultad_presentada` y `es_correcta` era suficiente para implementar el flujo sin cambios al DER.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  No se anticipo que el banco de preguntas necesitaba datos suficientes en los tres niveles de dificultad para que el algoritmo adaptativo funcionara correctamente en todas las combinaciones posibles.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Poblar el seed con preguntas balanceadas por nivel desde el inicio del sprint para evitar errores en tiempo de ejecucion del algoritmo adaptativo.
 
 ---
 
 ### Kevin Santos — Dev2 Integracion e Ingesta
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  Los patrones Adapter y Chain of Responsibility se implementaron correctamente — cada adaptador extiende `BaseAuthAdapter` de forma independiente y la cadena de filtros procesa JSON, XML y CSV sin modificar los filtros existentes.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  El DER presentaba confusiones en el formato de datos de origen de cada universidad, lo que requirio ajustes en la normalizacion durante la implementacion del `NormalizacionFilter`.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Mejorar la coordinacion entre integrantes desde el inicio del sprint para alinear formatos de datos y evitar inconsistencias al integrar los modulos.
 
 ---
 
 ### Ludwing Lopez — Dev3 Certificacion y Auditoria
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  La separacion del sistema por capas demostro ser una decision solida — el modulo de certificacion opera de forma independiente sin afectar los demas modulos, validando la arquitectura Multi-tier definida en Fase 1.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  El manejo de las llaves PEM para las firmas electronicas y el levantamiento de Docker generaron fricciones no anticipadas en la implementacion, requiriendo tiempo adicional de configuracion.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Documentar mejor los endpoints del modulo y estandarizar el manejo de llaves criptograficas para garantizar mayor seguridad y facilitar la integracion con otros modulos.
 
 ---
 
 ### Allan Sltan — Dev4 Antifraude y Metricas
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  El patron Observer fue un acierto para el dashboard — al separar la logica de notificacion del Subject del consumo en el Observer, Nufio puede consumir el endpoint de metricas sin acoplarse a la implementacion interna del modulo antifraude.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  Algunos campos de la tabla `MetricaAgregada` no coincidian con el formato esperado por el endpoint, lo que requirio correcciones durante la implementacion para alinear la respuesta con el contrato acordado con Nufio.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Continuar usando patrones de diseno que se adapten al flujo completo del sistema para facilitar la integracion entre modulos en sprints futuros.
 
 ---
 
 ### Geovanni Nufio — Dev5 Dashboard y Portal
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  El entorno en Docker ayudo a separar cada capa del sistema y simplifico el proceso de integracion, validando que la arquitectura Multi-tier es portable y facilita el trabajo colaborativo.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  Las versiones de React y CoreUI no eran compatibles entre si, lo que genero fallas en los componentes de la interfaz y requirio tiempo adicional para resolver los conflictos de dependencias.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Verificar la compatibilidad de librerias antes de iniciar el desarrollo en futuros proyectos para evitar bloqueos de integracion durante el sprint.
 
 ---
 
 ### Alejandra Mansilla — Scrum Master Seguridad Transversal
 
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código real?**
-  -
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas, cuellos de botella o requirieron refactorización de emergencia?**
-  -
-- **¿Qué mejoras técnicas concretas se proponen para la mantenibilidad futura del ecosistema?**
-  -
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito?**
+  El cifrado AES-256-CBC con el modulo nativo `crypto` de Node funciono exactamente como se diseño en Fase 1, validando que la restriccion RL01 era implementable sin eliminar historial de evaluaciones ni certificados.
+
+- **¿Qué supuestos teóricos demostraron fallas o requirieron refactorización?**
+  No se anticipo que cada modulo necesitaria CORS configurado individualmente, lo que genero un bloqueo en la integracion del frontend con los backends al momento de probar.
+
+- **¿Qué mejoras técnicas concretas se proponen?**
+  Centralizar las variables de entorno en un solo archivo compartido para evitar inconsistencias de configuracion entre modulos al integrar.
 
 ---
 
@@ -485,35 +450,33 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 
 ### 4.1 Captura del Tablero Kanban — Cierre del Sprint
 
-> Captura de pantalla del tablero en su estado final (todas las tareas en *Done* o
-> debidamente justificadas en *Blocked*).
-
-![Kanban final](Images/kanban_cierre_sprint.png)
+![Kanban final](../docs/Images/trello_final.png)
 
 ### 4.2 Burndown Chart / Resumen de Tareas
 
-| Día | Tareas pendientes | Tareas completadas | Justificación (si aplica) |
+> Resumen consolidado de tareas completadas vs pendientes por dia del sprint.
+
+| Día | Tareas completadas | Tareas pendientes | Notas |
 |---|---|---|---|
-| Lunes 15/06 | 38 | 0 | Sprint Planning, todo en To Do (5 correcciones Done + 33 en To Do) |
-| Martes 16/06 | | | |
-| Miércoles 17/06 | | | |
-| Jueves 18/06 | | | |
-| Viernes 19/06 | | | |
+| Lunes 15/06 | 6 (T0.1-T0.6) | 30 | Sprint Planning. Correcciones de Fase 1 ingresaron directo a Done. |
+| Martes 16/06 | 7 | 23 | T24, T25, T26 (SM), T1 (Lizz), T5 (Kevin), T15 (Allan), T10 (Ludwing) |
+| Miércoles 17/06 | 18 | 5 | T27, T0.7, T0.8 (SM), T3, T4 (Lizz), T6, T7, T8, T9 (Kevin), T11, T12, T13, T14 (Ludwing), T16, T17 (Allan), T21, T22 (Nufio) |
+| Jueves 18/06 | — | — | Integracion y pruebas finales |
+| Viernes 19/06 | — | — | Cierre del sprint y entrega |
 
 ---
 
 ## 5. Aplicación de Feedback de la Fase 1
 
-> Resumen de los ajustes arquitectónicos realizados durante esta fase como resultado de
-> la retroalimentación recibida en la calificación del DDA.
-
 | Observación recibida (Fase 1) | Ajuste aplicado en Fase 2 | Responsable |
 |---|---|---|
-| Diferenciación Adapter vs Facade poco clara | Facade (`FachadaIntegracion`) ahora expone interfaz de alto nivel separada de los adaptadores LDAP/SAML/OAuth2 | Kevin (202101007) / SM |
+| Diferenciación Adapter vs Facade poco clara | Facade ahora expone interfaz de alto nivel separada de los adaptadores LDAP/SAML/OAuth2 | Kevin (202101007) / SM |
 | Pipes and Filters no es estrictamente GoF | Sustituido por Chain of Responsibility en el pipeline de ingesta | Kevin (202101007) |
-| Falta entidad para historial académico de candidatos | Se agrega tabla `HistorialAcademico` al DER | Kevin (202101007) |
-| CDU100: "Detectar existencia de fraude" no corresponde a este flujo — en Realizar Examen Adaptativo solo se almacena evidencia, la detección ocurre en otro proceso | Se elimina el extend "Detectar existencia de fraude" de CDU100. Se agrega include "Adjuntar información para auditoría" que conecta CDU100 → CDU103. "Adecuar dificultad" pasa de extend a include (siempre se ejecuta). | Kevin (202101007) |
-| CDU102: faltaba un paso explícito de validación de tipo de archivo antes de ingerir datos | Se agrega include "Validar tipo de archivo" como nuevo paso previo a "Ingerir Datos". Se implementa como filtro `ValidarTipoArchivo`, primer eslabón de la cadena de Chain of Responsibility. | Kevin (202101007) |
-| CDU103: el nombre "Verificar Auditoría de Certificaciones" era redundante, por indicación del auxiliar | Se renombra a "Auditoría de Certificaciones". Aquí se centraliza la detección de fraude académico, recibiendo la evidencia adjuntada desde CDU100. | Kevin (202101007) |
-| Los RF debían corresponder a cada elipse (caso de uso) de los diagramas CDU expandidos, no agruparse en 6 RF de alto nivel | Se expanden de 6 a 25 RF, uno por cada elipse identificada en los diagramas CDU100-CDU104. Se actualizan las secciones 2.1, 3.2, 4.1 y 4.3 del Documentacion.mkd. Las matrices de trazabilidad se convierten de imágenes a tablas Markdown. | Alejandra / SM (202100239) |
-| El diagrama de bloques era demasiado específico y se asemejaba a un diagrama de arquitectura detallada | Se actualiza a una representación más general con iconos, manteniendo la visión de alto nivel de las capas del sistema sin exponer detalles de implementación. | Alejandra / SM (202100239) |
+| Falta entidad para historial académico | Se agrega tabla `HistorialAcademico` al DER | Kevin (202101007) |
+| CDU100: deteccion de fraude no corresponde a este flujo | Se elimina extend, se agrega include "Adjuntar informacion para auditoria", "Adecuar dificultad" pasa a include | Kevin (202101007) |
+| CDU102: faltaba validacion de tipo de archivo | Se agrega include "Validar tipo de archivo" como primer eslabon de Chain of Responsibility | Kevin (202101007) |
+| CDU103: nombre redundante | Se renombra a "Auditoria de Certificaciones" | Kevin (202101007) |
+| Los RF debian corresponder a cada elipse de los CDU expandidos | Se expanden de 6 a 25 RF. Se actualizan matrices y secciones del DDA. | Alejandra / SM (202100239) |
+| El diagrama de bloques era demasiado especifico | Se actualiza a representacion mas general con iconos | Alejandra / SM (202100239) |
+| Los RF, EaC y Restricciones no seguian la estructura del metodo de diseno centrado en arquitectura | Se actualizan los 25 RF con descripcion tecnica, se amplian los EaC de 4 a 10 con formato completo, y se reestructuran las restricciones en 4 categorias | Alejandra / SM (202100239) |
+| Las tablas de descripcion textual tenian una sola tabla por CDU | Se agregan 25 tablas de descripcion textual, una por cada elipse de CDU100-CDU104, con implementacion tecnica real de Fase 2 | Alejandra / SM (202100239) |
