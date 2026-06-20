@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Pregunta (
   id_pregunta       INT AUTO_INCREMENT PRIMARY KEY,
   id_competencia    INT NOT NULL,
   enunciado         TEXT NOT NULL,
-  nivel_dificultad  ENUM('Básico','Intermedio','Avanzado') NOT NULL,
+  nivel_dificultad  ENUM('Basico', 'Intermedio', 'Avanzado') NOT NULL,
   activa            BOOLEAN DEFAULT TRUE,
   FOREIGN KEY (id_competencia) REFERENCES Competencia(id_competencia)
 );

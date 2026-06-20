@@ -43,7 +43,7 @@ INSERT INTO OpcionRespuesta (id_pregunta, texto_opcion, es_correcta) VALUES
 (7, 'Un tipo de archivo de imagen', FALSE),
 (7, 'Una función matemática', FALSE),
 (7, 'Un protocolo de comunicación', FALSE),
-(7, 'Una estructura de datos donde cada nodo tiene como máximo dos hijos', TRUE);
+(7, 'Una estructura de datos donde cada nodo tiene como máximo dos hijos', TRUE),
 
 -- Pregunta 8: correcta en posición 2
 (8, 'El algoritmo siempre tarda lo mismo sin importar la entrada', FALSE),
