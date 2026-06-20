@@ -7,7 +7,7 @@ const verificacionRoutes = require('./routes/verificacionRoutes');
 const auditoriaRoutes = require('./routes/auditoriaRoutes');
 
 const app = express();
-const PORT = Number(process.env.PORT || 4006);
+const PORT = Number(process.env.PORT || 4003);
 
 app.use(express.json());
 

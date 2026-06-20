@@ -9,6 +9,6 @@ RUN npm ci --omit=dev
 COPY src ./src
 COPY schema.sql ./schema.sql
 
-EXPOSE 4006
+EXPOSE 4003
 
 CMD ["npm", "start"]

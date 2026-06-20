@@ -23,7 +23,7 @@ import {
 
 const API_URL =
   import.meta.env.VITE_CERTIFICACION_API_URL ||
-  'http://localhost:4006'
+  'http://localhost:4003'
 
 function colorValidacion(valor) {
   return valor ? 'success' : 'danger'
