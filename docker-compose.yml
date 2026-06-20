@@ -12,7 +12,8 @@ services:
       - prccd_mysql_data:/var/lib/mysql
       - ./backend/dev2-integracion/schema.sql:/docker-entrypoint-initdb.d/01-integracion.sql:ro
       - ./backend/certificacion-auditoria/schema.sql:/docker-entrypoint-initdb.d/02-certificacion.sql:ro
-      - ./backend/dev1-evaluaciones/schema.sql:/docker-entrypoint-initdb.d/03-evaluaciones.sql:ro      
+      - ./backend/dev1-evaluaciones/schema.sql:/docker-entrypoint-initdb.d/03-evaluaciones.sql:ro    
+      - ./backend/dev1-evaluaciones/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql:ro  
     healthcheck:
       test:
         [
