@@ -3,6 +3,8 @@ import { CContainer, CRow, CCol, CCard, CCardBody, CCardTitle, CCardText, CBadge
 
 const modulos = [
   { nombre: 'Login', ruta: '/login', responsable: 'Kevin (202101007)', estado: 'listo' },
+  { nombre: 'Ingesta de Datos', ruta: '/ingesta', responsable: 'Cualquiera', estado: 'listo' }, 
+  // esto es algo nuevo que ando poniendo porque no estaba y tiene que estar va 
   { nombre: 'Examen Adaptativo', ruta: '/examen', responsable: 'Lizz (201708997)', estado: 'listo' },
   { nombre: 'Certificado y Auditoría', ruta: '/certificado', responsable: 'Ludwing (201907608)', estado: 'listo' },
   { nombre: 'Antifraude', ruta: '/antifraude', responsable: 'Allan (202010046)', estado: 'pendiente' },

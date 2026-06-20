@@ -3,7 +3,12 @@ import { CSidebar, CSidebarNav, CNavTitle } from '@coreui/react'
 
 const items = [
   { label: 'Inicio', to: '/' },
+  { label: 'Login', to: '/login' }, // este creo que deberia quitarse pero puesss va 
+  { label: 'Ingesta de Datos', to: '/ingesta' },
+  { label: 'Examen Adaptativo', to: '/examen' },
   { label: 'Certificados y Auditoría', to: '/certificado' },
+  { label: 'Antifraude', to: '/antifraude' },
+  { label: 'Dashboard', to: '/dashboard' },
   { label: 'Privacidad', to: '/privacidad' },
 ]
 

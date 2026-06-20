@@ -6,7 +6,7 @@ async function procesarArchivo(req, res) {
     
     try {
     
-        const { nombre_archivo } = req.body;
+        const { nombre_archivo, contenido_archivo, id_universidad } = req.body;
 
         // Se valida que el cliente indique qué archivo se desea procesar
         if (!nombre_archivo) {
@@ -20,7 +20,9 @@ async function procesarArchivo(req, res) {
 
         // Contexto inicial que será compartido por todos los filtros
         const contextoInicial = {
-            nombreArchivo: nombre_archivo
+            nombreArchivo: nombre_archivo,
+            contenidoArchivo: contenido_archivo,
+            idUniversidad: id_universidad
         };
 
         // Se ejecuta la cadena completa de ingesta.

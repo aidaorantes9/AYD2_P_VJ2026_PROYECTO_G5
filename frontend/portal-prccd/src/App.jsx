@@ -12,6 +12,7 @@ import GestionPrivacidad from './views/seguridad/GestionPrivacidad'
 import VerificacionAuditoria from './views/certificacion/VerificacionAuditoria'
 import Dashboard from './views/dashboard/Dashboard'
 import Examen from './pages/Examen'
+import PanelIngestionDatos from './views/integracion/PanelIngestionDatos'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/privacidad" element={<GestionPrivacidad />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/examen" element={<Examen />} />
+              <Route path="/ingesta" element={<PanelIngestionDatos />} />
             </Routes>
           </div>
         </div>

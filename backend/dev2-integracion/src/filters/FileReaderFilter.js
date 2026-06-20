@@ -5,6 +5,12 @@ const BaseFilter = require('./BaseFilter');
 // esto es exclusiva y unicamente para: leer el archivo desde la carpeta archivos_prueba 
 class FileReaderFilter extends BaseFilter {
     async handle(context) {
+
+        if (context.contenidoArchivo) {
+            context.rutaArchivo = 'archivo recibido desde frontend';
+            return this.next(context);
+        }
+
         const rutaArchivo = path.join(
             __dirname,
             '../../archivos_prueba',
