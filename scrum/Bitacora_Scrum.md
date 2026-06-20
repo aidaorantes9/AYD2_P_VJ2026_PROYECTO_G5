@@ -1,8 +1,11 @@
 # Bitácora de Trabajo Arquitectónico — Fase 2 (Sprint MVP)
 
 **Proyecto:** Plataforma Regional de Certificación de Competencias Digitales (PRCCD)
+
 **Grupo:** 5 — AYD2 Sección P
+
 **Sprint:** Único (lunes 15/06 — viernes 19/06/2026)
+
 **Scrum Master:** Aída Alejandra Mansilla Orantes (202100239)
 
 ---
@@ -245,124 +248,80 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 ### Jueves 18/06/2026
 
 #### Lizz Castellanos — Dev1 Motor de Evaluaciones
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Realice el merge del modulo dev1-evaluaciones a develop, incluyendo los endpoints de registro de respuestas y la pantalla de examen en React (T3, T4). Resultado: modulo completo y disponible en develop para la integracion del viernes.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Verificar que el endpoint `GET /api/evaluacion/{id_candidato}/resultado` responde correctamente con los datos acordados y apoyar en la integracion del portal, trazable con RF04 y el contrato de integracion del Sprint Planning.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Kevin Santos — Dev2 Integracion e Ingesta
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Verifico que todo el modulo dev2-integracion esta en orden y realizo pruebas de los endpoints de autenticacion con los tres adaptadores LDAP/SAML/OAuth2 y la cadena de ingesta JSON/XML/CSV. Resultado: modulo validado y listo para integracion.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Apoyar en la integracion general del sistema, verificando que los datos de `Candidato` e `HistorialAcademico` son accesibles desde la base de datos compartida, trazable con RF10, RF14 y EaC07.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Ludwing Lopez — Dev3 Certificacion y Auditoria
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Colaboro en la integracion del modulo de certificacion y auditoria al proyecto completo, resolviendo los problemas de integracion identificados el dia anterior. Resultado: modulo dev3-certificacion integrado con el portal de Nufio.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Verificar que la pantalla de descarga de certificado consume correctamente el endpoint de emision y que la bitacora inmutable registra cada evento, trazable con RF07, RF09 y EaC05.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Los problemas de integracion del dia anterior fueron resueltos durante la jornada.
 
 ---
 
 #### Allan Sltan — Dev4 Antifraude y Metricas
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Implemento la encriptacion de datos sensibles con SHA-256 sobre la evidencia antifraude almacenada en `EvidenciaAntifraude` (T16). Resultado: evidencia antifraude persistida con `hash_sha256` calculado correctamente para cumplir con RL03.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Verificar que el endpoint `GET /api/metricas` retorna los datos correctamente para que Nufio pueda conectar el dashboard, trazable con RF23, RF24, RF25 y RL06.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos.
 
 ---
 
 #### Geovanni Nufio — Dev5 Dashboard y Portal
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Continuo con la integracion del portal conectando el dashboard al endpoint real `GET /api/metricas` de Allan. Resultado: dashboard funcional con datos reales retornados por el backend de antifraude en puerto 4004.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Ensamblar todas las pantallas de los modulos en el portal (T23) y actualizar el docker-compose para orquestar todos los backends con sus Dockerfiles, trazable con RF24, EaC10 y los acuerdos de integracion del Sprint Planning.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Las versiones de React y CoreUI presentaron incompatibilidades que requirieron ajustes en los componentes del portal.
 
 ---
 
 #### Alejandra Mansilla — Scrum Master Seguridad Transversal
+
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
+   Consolide el schema_completo.sql en backend/shared/ con las tablas de todos los modulos en el orden correcto de FK: Kevin → Lizz → Allan → Ludwing → Alejandra. Coordine con Nufio el plan de Dockerfiles y docker-compose para la integracion del viernes.
+
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
+   Apoyar en la integracion final del sistema, verificar que el modulo de seguridad es consumible desde el portal y consolidar la documentacion SCRUM final (T30), trazable con RF08, RL01 y los acuerdos del Sprint Planning.
+
 3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-### Viernes 19/06/2026
-
-#### Lizz Castellanos — Dev1 Motor de Evaluaciones
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-#### Kevin Santos — Dev2 Integracion e Ingesta
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-#### Ludwing Lopez — Dev3 Certificacion y Auditoria
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-#### Allan Sltan — Dev4 Antifraude y Metricas
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-#### Geovanni Nufio — Dev5 Dashboard y Portal
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
-
----
-
-#### Alejandra Mansilla — Scrum Master Seguridad Transversal
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   -
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   -
-3. **¿Existen impedimentos técnicos o de integración?**
-   -
+   Sin impedimentos tecnicos. La integracion de los 5 backends requiere coordinacion activa para resolver incompatibilidades de CORS y versiones de librerias entre modulos.
 
 ---
 
@@ -461,8 +420,16 @@ de certificado inmutable y dashboard analítico con métricas anonimizadas.
 | Lunes 15/06 | 6 (T0.1-T0.6) | 30 | Sprint Planning. Correcciones de Fase 1 ingresaron directo a Done. |
 | Martes 16/06 | 7 | 23 | T24, T25, T26 (SM), T1 (Lizz), T5 (Kevin), T15 (Allan), T10 (Ludwing) |
 | Miércoles 17/06 | 18 | 5 | T27, T0.7, T0.8 (SM), T3, T4 (Lizz), T6, T7, T8, T9 (Kevin), T11, T12, T13, T14 (Ludwing), T16, T17 (Allan), T21, T22 (Nufio) |
-| Jueves 18/06 | — | — | Integracion y pruebas finales |
-| Viernes 19/06 | — | — | Cierre del sprint y entrega |
+| Jueves 18/06 | 3 | 2 | Integracion y pruebas finales, T18, T19, T23 (Nufio/Allan) |
+| Viernes 19/06 | 2 | 0 | Cierre del sprint, T28, T29, T30 (SM) |
+
+![Burndown Chart](../docs/Images/burndown_chart.png)
+
+### 4.3 Grabaciones de Reuniones
+
+> Enlace al repositorio de grabaciones de las reuniones del equipo durante el sprint.
+
+[Grabaciones del Sprint — Google Drive](https://drive.google.com/drive/folders/1-SWEBBs9clUGlC0Eym9vq7eZlRAcfWYR)
 
 ---
 
