@@ -21,8 +21,12 @@ async function getMetricas(req, res) {
     };
 
     res.json(response);
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener métricas" });
+  } catch (err) {
+    console.error("❌ ERROR MÉTRICAS:", err)
+    res.status(500).json({
+      message: "Error al obtener métricas",
+      error: err.message
+    })
   }
 }
 
