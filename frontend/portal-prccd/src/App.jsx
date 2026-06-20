@@ -13,6 +13,7 @@ import VerificacionAuditoria from './views/certificacion/VerificacionAuditoria'
 import Dashboard from './views/dashboard/Dashboard'
 import Examen from './pages/Examen'
 import PanelIngestionDatos from './views/integracion/PanelIngestionDatos'
+import AuditoriaReportes from './views/certificacion/AuditoriaReportes'
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/examen" element={<Examen />} />
               <Route path="/ingesta" element={<PanelIngestionDatos />} />
+              <Route path="/antifraude" element={<AuditoriaReportes />} /> 
             </Routes>
           </div>
         </div>
