@@ -1,44 +1,64 @@
---datos prueba
+USE prccd;
 
+DELETE FROM OpcionRespuesta;
 
--- Candidato de prueba (Acuerdo 1 — todos usan el mismo)
-INSERT INTO Candidato (id_candidato, nombre_cifrado, email_cifrado, genero, id_externo_univ, fecha_registro, estado_gdpr)
-VALUES (1, 'Ana Lopez', 'ana.lopez@usac.edu.gt', 'F', 'USAC-2024-001', '2026-06-15', 'activo')
-ON DUPLICATE KEY UPDATE id_candidato = id_candidato;
-
--- Período de certificación
-INSERT INTO PeriodoCertificacion (id_periodo, nombre, fecha_inicio, fecha_fin, activo)
-VALUES (1, 'Junio 2026', '2026-06-01', '2026-06-30', TRUE);
-
--- Competencia de prueba
-INSERT INTO Competencia (id_competencia, nombre, descripcion)
-VALUES (1, 'Fundamentos de Programación', 'Evaluación de conocimientos básicos de programación');
-
--- Inscripción de Ana al período
-INSERT INTO InscripcionPeriodo (id_candidato, id_periodo)
-VALUES (1, 1);
-
--- Preguntas de prueba (10 preguntas según Acuerdo 6)
-INSERT INTO Pregunta (id_pregunta, id_competencia, enunciado, nivel_dificultad) VALUES
-(1,  1, '¿Qué es una variable?',                       'Básico'),
-(2,  1, '¿Qué es un bucle for?',                       'Básico'),
-(3,  1, '¿Qué es una función?',                        'Básico'),
-(4,  1, '¿Qué es herencia en POO?',                    'Intermedio'),
-(5,  1, '¿Qué es una interfaz?',                       'Intermedio'),
-(6,  1, '¿Cuál es la diferencia entre stack y queue?', 'Intermedio'),
-(7,  1, '¿Qué es un árbol binario?',                   'Avanzado'),
-(8,  1, '¿Qué es complejidad algorítmica O(n)?',       'Avanzado'),
-(9,  1, '¿Qué es programación funcional?',             'Avanzado'),
-(10, 1, '¿Qué es un patrón de diseño?',                'Avanzado');
-
--- Opciones para pregunta 1 (las demás las agregas igual)
+-- Pregunta 1: correcta en posición 1
 INSERT INTO OpcionRespuesta (id_pregunta, texto_opcion, es_correcta) VALUES
-(1, 'Un espacio en memoria que guarda un valor',      TRUE),
-(1, 'Un tipo de función',                             FALSE),
-(1, 'Un operador matemático',                         FALSE),
-(1, 'Un archivo del sistema',                         FALSE);
+(1, 'Un espacio en memoria que guarda un valor', TRUE),
+(1, 'Un tipo de función', FALSE),
+(1, 'Un operador matemático', FALSE),
+(1, 'Un archivo del sistema', FALSE),
 
--- Evaluación aprobada (Acuerdo 2 — obligatorio)
-INSERT INTO Evaluacion (id_evaluacion, id_candidato, id_competencia, id_periodo, calificacion, estado, aprobada)
-VALUES (1, 1, 1, 1, 80.00, 'finalizada', TRUE)
-ON DUPLICATE KEY UPDATE id_evaluacion = id_evaluacion;
+-- Pregunta 2: correcta en posición 3
+(2, 'Una variable que guarda texto', FALSE),
+(2, 'Un tipo de base de datos', FALSE),
+(2, 'Una estructura que repite un bloque de código un número determinado de veces', TRUE),
+(2, 'Un método para borrar archivos', FALSE),
+
+-- Pregunta 3: correcta en posición 4
+(3, 'Un tipo de variable', FALSE),
+(3, 'Un archivo de configuración', FALSE),
+(3, 'Una base de datos', FALSE),
+(3, 'Un bloque de código reutilizable que realiza una tarea específica', TRUE),
+
+-- Pregunta 4: correcta en posición 2
+(4, 'Un tipo de bucle', FALSE),
+(4, 'Mecanismo donde una clase hija adquiere propiedades y métodos de una clase padre', TRUE),
+(4, 'Una forma de borrar variables', FALSE),
+(4, 'Un protocolo de red', FALSE),
+
+-- Pregunta 5: correcta en posición 1
+(5, 'Un contrato que define métodos que una clase debe implementar', TRUE),
+(5, 'Una variable global', FALSE),
+(5, 'Un tipo de base de datos', FALSE),
+(5, 'Un archivo de imagen', FALSE),
+
+-- Pregunta 6: correcta en posición 3
+(6, 'No hay ninguna diferencia', FALSE),
+(6, 'Stack es más rápido que queue siempre', FALSE),
+(6, 'Stack es LIFO y queue es FIFO', TRUE),
+(6, 'Que solo funciona con números', FALSE),
+
+-- Pregunta 7: correcta en posición 4
+(7, 'Un tipo de archivo de imagen', FALSE),
+(7, 'Una función matemática', FALSE),
+(7, 'Un protocolo de comunicación', FALSE),
+(7, 'Una estructura de datos donde cada nodo tiene como máximo dos hijos', TRUE);
+
+-- Pregunta 8: correcta en posición 2
+(8, 'El algoritmo siempre tarda lo mismo sin importar la entrada', FALSE),
+(8, 'El tiempo de ejecución crece de forma lineal con el tamaño de la entrada', TRUE),
+(8, 'El algoritmo es imposible de ejecutar', FALSE),
+(8, 'Es un tipo de variable', FALSE),
+
+-- Pregunta 9: correcta en posición 1
+(9, 'Paradigma que trata la computación como evaluación de funciones matemáticas', TRUE),
+(9, 'Un lenguaje de programación específico', FALSE),
+(9, 'Una forma de diseñar bases de datos', FALSE),
+(9, 'Un tipo de bucle infinito', FALSE),
+
+-- Pregunta 10: correcta en posición 3
+(10, 'Un tipo de base de datos', FALSE),
+(10, 'Un lenguaje de programación', FALSE),
+(10, 'Una solución reutilizable a un problema común en el diseño de software', TRUE),
+(10, 'Un protocolo de red', FALSE);
