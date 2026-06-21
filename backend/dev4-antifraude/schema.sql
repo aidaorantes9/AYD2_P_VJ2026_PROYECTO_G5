@@ -60,24 +60,36 @@ CREATE TABLE DeteccionFraude (
 
 ) ENGINE=InnoDB;
 
-CREATE TABLE MetricaAgregada (
-    id_metrica          BIGINT UNSIGNED        NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    id_competencia      BIGINT UNSIGNED        DEFAULT NULL,
-    id_pais             BIGINT UNSIGNED        DEFAULT NULL,
-    id_periodo          BIGINT UNSIGNED        DEFAULT NULL,
-    carrera_segmento    VARCHAR(120)           DEFAULT NOT NULL,
-    genero_segmento     VARCHAR(20)            DEFAULT NOT NULL,
-    total_evaluaciones  INT                    DEFAULT NOT NULL,
-    total_aprobados     INT                    DEFAULT NOT NULL,
-    tasa_aprobacion     DECIMAL(5,2)           DEFAULT NOT NULL,
-    anonimizada         TINYINT(1)             NOT NULL DEFAULT 1,
-    fecha_calculo       TIMESTAMP              DEFAULT NOT NULL,
+
+CREATE TABLE IF NOT EXISTS MetricaAgregada (
+    id_metrica          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+
+    id_competencia      INT DEFAULT NULL,
+    id_pais             INT DEFAULT NULL, 
+    id_carrera          INT DEFAULT NULL, 
+    id_periodo          INT DEFAULT NULL,
+
+    carrera_segmento    VARCHAR(120) NOT NULL,
+    genero_segmento     VARCHAR(20) NOT NULL,
+
+    total_evaluaciones  INT NOT NULL,
+    total_aprobados     INT NOT NULL,
+    tasa_aprobacion     DECIMAL(5,2) NOT NULL,
+
+    anonimizada         TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_calculo       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_metrica_competencia
+        FOREIGN KEY (id_competencia)
+        REFERENCES Competencia(id_competencia)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
 
     CONSTRAINT fk_metrica_periodo
         FOREIGN KEY (id_periodo)
         REFERENCES PeriodoCertificacion(id_periodo)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
+        ON DELETE SET NULL,
 
     CONSTRAINT fk_metrica_pais
         FOREIGN KEY (id_pais)

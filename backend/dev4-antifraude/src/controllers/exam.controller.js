@@ -4,19 +4,19 @@ const multer = require("multer")
 const crypto = require("crypto")
 const pool = require("./../db")
 
-// 📁 BASE UNIFICADA DE UPLOADS
+// BASE UNIFICADA DE UPLOADS
 const UPLOADS = path.resolve(__dirname, "../uploads")
 
 const SCREENSHOTS_DIR = path.join(UPLOADS, "screenshots")
 const KEYSTROKES_DIR = path.join(UPLOADS, "keystrokes")
 const VIDEOS_DIR = path.join(UPLOADS, "videos")
 
-// 🔐 SHA256 helper
+// SHA256 helper
 function sha256(content) {
   return crypto.createHash("sha256").update(content).digest("hex")
 }
 
-// 📅 Fecha de retención = hoy + 5 años
+// Fecha de retención = hoy + 5 años
 function fechaRetencion() {
   const fecha = new Date()
   fecha.setFullYear(fecha.getFullYear() + 5)
@@ -24,7 +24,7 @@ function fechaRetencion() {
 }
 
 /* =========================
-   📸 SCREENSHOTS
+   SCREENSHOTS
 ========================= */
 exports.saveScreenshot = async (req, res) => {
   try {
@@ -47,11 +47,12 @@ exports.saveScreenshot = async (req, res) => {
 
     await fs.writeFile(filePath, base64, "base64")
 
-    // Hash del archivo REAL almacenado
+    // Hash del archivo real almacenado
     const fileBuffer = await fs.readFile(filePath)
     const hash = sha256(fileBuffer)
 
     const timestampCaptura = new Date()
+
     await pool.query(
       `
       INSERT INTO EvidenciaAntifraude (
@@ -79,21 +80,21 @@ exports.saveScreenshot = async (req, res) => {
         new Date()
       ]
     )
-    console.log("📸 screenshot guardado + BD")
+
+    console.log("Screenshot guardado + BD")
 
     res.json({
       ok: true,
       file: fileName
     })
-
   } catch (err) {
-    console.error("❌ screenshot error:", err)
+    console.error("Screenshot error:", err)
     res.status(500).json({ error: err.message })
   }
 }
 
 /* =========================
-   ⌨️ KEYSTROKES
+   KEYSTROKES
 ========================= */
 exports.saveKeystrokes = async (req, res) => {
   try {
@@ -112,7 +113,7 @@ exports.saveKeystrokes = async (req, res) => {
 
     await fs.writeFile(filePath, content)
 
-    // Hash del archivo REAL almacenado
+    // Hash del archivo real almacenado
     const fileBuffer = await fs.readFile(filePath)
     const hash = sha256(fileBuffer)
 
@@ -146,21 +147,20 @@ exports.saveKeystrokes = async (req, res) => {
       ]
     )
 
-    console.log("⌨️ keystrokes guardados + BD")
+    console.log("Keystrokes guardados + BD")
 
     res.json({
       ok: true,
       file: fileName
     })
-
   } catch (err) {
-    console.error("❌ keystrokes error:", err)
+    console.error("Keystrokes error:", err)
     res.status(500).json({ error: err.message })
   }
 }
 
 /* =========================
-   🎥 VIDEO
+   VIDEO
 ========================= */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -185,7 +185,7 @@ exports.saveVideo = async (req, res) => {
 
     const filePath = path.join(VIDEOS_DIR, req.file.filename)
 
-    // Hash del archivo REAL almacenado
+    // Hash del archivo real almacenado
     const fileBuffer = await fs.readFile(filePath)
     const hash = sha256(fileBuffer)
 
@@ -219,15 +219,14 @@ exports.saveVideo = async (req, res) => {
       ]
     )
 
-    console.log("🎥 video guardado + BD")
+    console.log("Video guardado + BD")
 
     res.json({
       ok: true,
       file: req.file.filename
     })
-
   } catch (err) {
-    console.error("❌ video error:", err)
+    console.error("Video error:", err)
     res.status(500).json({ error: err.message })
   }
 }

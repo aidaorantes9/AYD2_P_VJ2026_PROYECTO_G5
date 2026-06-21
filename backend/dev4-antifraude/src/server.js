@@ -9,15 +9,15 @@ const app = express()
 app.use(cors())
 app.use(express.json({ limit: "50mb" }))
 
-// 📦 ROUTES
+// ROUTES
 const examRoutes = require("./routes/exam.routes")
 const metricasRoutes = require("./routes/metricas.routes")
 
-// 🔗 PREFIXES (IMPORTANTE PARA EVITAR CONFLICTOS)
+// PREFIXES (IMPORTANTE PARA EVITAR CONFLICTOS)
 app.use("/api/exam", examRoutes)
 app.use("/api/metricas", metricasRoutes)
 
-// 🚀 PORT UNICO
+// PUERTO ÚNICO
 const PORT = process.env.PORT || 4004
 
 app.listen(PORT, () => {
