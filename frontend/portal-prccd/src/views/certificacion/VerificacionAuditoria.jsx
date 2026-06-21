@@ -1,599 +1,358 @@
-import { useState } from 'react'
-import { jsPDF } from 'jspdf'
+import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import {
   CAlert,
-  CBadge,
   CButton,
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CContainer,
-  CForm,
-  CFormInput,
-  CRow,
   CSpinner,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
 } from '@coreui/react'
 
-const API_URL =
+import CertificadoVisual, {
+  descargarCertificadoPdf,
+} from './CertificadoVisual'
+
+const API_BASE =
   import.meta.env.VITE_CERTIFICACION_API_URL ||
   'http://localhost:4003'
 
-function colorValidacion(valor) {
-  return valor ? 'success' : 'danger'
-}
+export default function VerificacionAuditoria() {
+  const navigate = useNavigate()
+  const certificadoRef = useRef(null)
 
-function textoValidacion(valor) {
-  return valor ? 'Válido' : 'Inválido'
-}
-
-
-function VerificacionAuditoria() {
   const [codigo, setCodigo] = useState('')
   const [resultado, setResultado] = useState(null)
-  const [mensaje, setMensaje] = useState(null)
   const [cargando, setCargando] = useState(false)
+  const [descargando, setDescargando] = useState(false)
+  const [error, setError] = useState('')
 
-  async function consultarCertificado(evento) {
+  async function verificar(evento) {
     evento.preventDefault()
 
     const codigoLimpio = codigo.trim()
 
     if (!codigoLimpio) {
-      setMensaje({
-        tipo: 'warning',
-        texto: 'Ingresa un código de verificación.',
-      })
+      setError('Ingrese un código de verificación')
       return
     }
 
     setCargando(true)
-    setMensaje(null)
-    setResultado(null)
+    setError('')
 
     try {
       const respuesta = await fetch(
-        `${API_URL}/api/auditoria/verificar/${encodeURIComponent(codigoLimpio)}`
+        `${API_BASE}/api/auditoria/verificar/${encodeURIComponent(
+          codigoLimpio
+        )}`
       )
 
       const datos = await respuesta.json()
 
-      if (respuesta.status === 404) {
-        setMensaje({
-          tipo: 'warning',
-          texto: datos.error || 'Certificado no encontrado.',
-        })
-        return
-      }
-
-      if (!respuesta.ok && respuesta.status !== 422) {
-        setMensaje({
-          tipo: 'danger',
-          texto: datos.error || 'No fue posible consultar el certificado.',
-        })
-        return
+      if (!respuesta.ok || !datos.valido) {
+        throw new Error(
+          datos.error ||
+            datos.mensaje ||
+            'El certificado no es válido'
+        )
       }
 
       setResultado(datos)
-
-      setMensaje({
-        tipo: datos.valido ? 'success' : 'danger',
-        texto: datos.mensaje,
-      })
-    } catch {
-      setMensaje({
-        tipo: 'danger',
-        texto: 'No se pudo conectar con el servicio de certificación y auditoría.',
-      })
+    } catch (err) {
+      setResultado(null)
+      setError(err.message)
     } finally {
       setCargando(false)
     }
   }
 
-  function limpiarConsulta() {
-    setCodigo('')
-    setResultado(null)
-    setMensaje(null)
+  async function descargar() {
+    try {
+      setDescargando(true)
+      setError('')
+
+      await descargarCertificadoPdf(
+        certificadoRef.current,
+        resultado.certificado.codigo_verificacion
+      )
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setDescargando(false)
+    }
   }
 
-  const certificado = resultado?.certificado
-  const integridad = resultado?.integridad_certificado
-  const eventos = resultado?.eventos || []
-  const anomalias = resultado?.anomalias || []
+  function limpiar() {
+    setCodigo('')
+    setResultado(null)
+    setError('')
+  }
 
-  function descargarCertificado() {
-    if (!resultado?.valido || !certificado) {
-      return
-    }
-
+  if (resultado) {
+    const certificado = resultado.certificado
     const datos = certificado.datos || {}
 
-    const nombre =
-      datos.nombre_completo || 'Candidato certificado'
-    const universidad =
-      datos.universidad_origen || 'No disponible'
-    const competencia =
-      datos.competencia || 'Competencias Digitales'
-    const resultadoEvaluacion =
-      datos.resultado || 'APROBADO'
-    const nota =
-      datos.nota ?? 'No disponible'
+    const aprobado =
+      String(datos.resultado || '').toUpperCase() ===
+      'APROBADO'
 
-    const documento = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4',
-    })
+    return (
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '40px auto',
+          padding: '20px',
+          textAlign: 'center',
+        }}
+      >
+        <div
+          style={{
+            padding: '14px',
+            border: '2px solid #4b5563',
+            borderRadius: '6px',
+            backgroundColor: '#edf1f7',
+            fontSize: '22px',
+            fontWeight: '800',
+          }}
+        >
+          Resultado de la evaluación
+        </div>
 
-    const anchoPagina = documento.internal.pageSize.getWidth()
-    const altoPagina = documento.internal.pageSize.getHeight()
-    const centro = anchoPagina / 2
+        <div
+          style={{
+            width: '350px',
+            maxWidth: '90%',
+            margin: '24px auto',
+            padding: '20px',
+            border: `3px solid ${
+              aprobado ? '#159447' : '#dc2626'
+            }`,
+            borderRadius: '9px',
+            backgroundColor: aprobado
+              ? '#dcfce7'
+              : '#fee2e2',
+            color: aprobado
+              ? '#15803d'
+              : '#b91c1c',
+            fontSize: '31px',
+            fontWeight: '900',
+          }}
+        >
+          {datos.resultado || 'APROBADO'}
+        </div>
 
-    // Marco exterior e interior
-    documento.setDrawColor(29, 78, 216)
-    documento.setLineWidth(2)
-    documento.rect(8, 8, anchoPagina - 16, altoPagina - 16)
+        <h4
+          style={{
+            margin: '28px 0',
+            fontWeight: '800',
+          }}
+        >
+          ¡Felicidades! Ha obtenido la certificación
+          regional de competencias digitales.
+        </h4>
 
-    documento.setLineWidth(0.5)
-    documento.rect(13, 13, anchoPagina - 26, altoPagina - 26)
+        <div
+          style={{
+            padding: '14px',
+            border: '1px solid #cbd5e1',
+            borderRadius: '5px',
+            backgroundColor: '#f8fafc',
+            fontWeight: '700',
+            overflowWrap: 'anywhere',
+          }}
+        >
+          Certificado:{' '}
+          {certificado.codigo_verificacion}
+        </div>
 
-    // Encabezado
-    documento.setTextColor(29, 78, 216)
-    documento.setFont('helvetica', 'bold')
-    documento.setFontSize(30)
-    documento.text('CERTIFICADO', centro, 38, {
-      align: 'center',
-    })
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '28px',
+            marginTop: '36px',
+          }}
+        >
+          <CButton
+            color="primary"
+            size="lg"
+            disabled={descargando}
+            onClick={descargar}
+          >
+            {descargando ? (
+              <>
+                <CSpinner
+                  size="sm"
+                  className="me-2"
+                />
+                Generando PDF...
+              </>
+            ) : (
+              'Descargar certificado digital'
+            )}
+          </CButton>
 
-    documento.setTextColor(55, 65, 81)
-    documento.setFont('helvetica', 'normal')
-    documento.setFontSize(14)
-    documento.text(
-      'Plataforma Regional de Certificación de Competencias Digitales',
-      centro,
-      50,
-      { align: 'center' }
-    )
+          <CButton
+            color="success"
+            size="lg"
+            onClick={() =>
+              navigate(
+                `/certificado/ver/${certificado.codigo_verificacion}`,
+                {
+                  state: {
+                    resultado,
+                  },
+                }
+              )
+            }
+          >
+            Verificar autenticidad
+          </CButton>
+        </div>
 
-    documento.setFontSize(12)
-    documento.text('Se certifica que', centro, 70, {
-      align: 'center',
-    })
+        <div
+          style={{
+            marginTop: '35px',
+            padding: '13px',
+            border: '2px solid #c47818',
+            borderRadius: '5px',
+            backgroundColor: '#fff4ca',
+            color: '#a85d10',
+            fontWeight: '800',
+          }}
+        >
+          Aviso de privacidad y validez
+        </div>
 
-    // Nombre del candidato
-    documento.setTextColor(17, 24, 39)
-    documento.setFont('helvetica', 'bold')
-    documento.setFontSize(25)
-    documento.text(nombre, centro, 88, {
-      align: 'center',
-    })
+        <p
+          style={{
+            marginTop: '25px',
+            color: '#6b7280',
+          }}
+        >
+          El documento incorpora firma electrónica,
+          código de verificación y rastro de auditoría.
+          La descarga y el tratamiento de datos se realizan
+          conforme al GDPR y a las políticas regionales
+          aplicables.
+        </p>
 
-    documento.setFont('helvetica', 'normal')
-    documento.setFontSize(12)
-    documento.text(
-      'ha demostrado satisfactoriamente sus conocimientos en',
-      centro,
-      102,
-      { align: 'center' }
-    )
+        {error && (
+          <CAlert color="danger">{error}</CAlert>
+        )}
 
-    documento.setTextColor(29, 78, 216)
-    documento.setFont('helvetica', 'bold')
-    documento.setFontSize(18)
-    documento.text(competencia, centro, 116, {
-      align: 'center',
-    })
+        <CButton
+          color="secondary"
+          variant="outline"
+          onClick={limpiar}
+        >
+          Consultar otro certificado
+        </CButton>
 
-    // Datos del certificado
-    documento.setTextColor(31, 41, 55)
-    documento.setFontSize(11)
-
-    documento.setFont('helvetica', 'bold')
-    documento.text('Universidad:', 55, 137)
-    documento.setFont('helvetica', 'normal')
-    documento.text(String(universidad), 82, 137)
-
-    documento.setFont('helvetica', 'bold')
-    documento.text('Resultado:', 155, 137)
-    documento.setFont('helvetica', 'normal')
-    documento.text(String(resultadoEvaluacion), 180, 137)
-
-    documento.setFont('helvetica', 'bold')
-    documento.text('Nota:', 55, 149)
-    documento.setFont('helvetica', 'normal')
-    documento.text(String(nota), 70, 149)
-
-    documento.setFont('helvetica', 'bold')
-    documento.text('Fecha de emisión:', 155, 149)
-    documento.setFont('helvetica', 'normal')
-    documento.text(
-      String(certificado.fecha_emision),
-      191,
-      149
-    )
-
-    // Estado validado
-    documento.setFillColor(220, 252, 231)
-    documento.setDrawColor(22, 101, 52)
-    documento.roundedRect(
-      centro - 32,
-      160,
-      64,
-      12,
-      3,
-      3,
-      'FD'
-    )
-
-    documento.setTextColor(22, 101, 52)
-    documento.setFont('helvetica', 'bold')
-    documento.setFontSize(12)
-    documento.text(
-      'CERTIFICADO VALIDADO',
-      centro,
-      168,
-      { align: 'center' }
-    )
-
-    // Información de verificación
-    documento.setTextColor(75, 85, 99)
-    documento.setFont('helvetica', 'normal')
-    documento.setFontSize(8)
-
-    documento.text(
-      `Código de verificación: ${certificado.codigo_verificacion}`,
-      centro,
-      184,
-      { align: 'center' }
-    )
-
-    documento.text(
-      'Algoritmo criptográfico: SHA-256 / RSA',
-      centro,
-      190,
-      { align: 'center' }
-    )
-
-    documento.setFontSize(7)
-    const hashDividido = documento.splitTextToSize(
-      `Hash: ${integridad?.hash_almacenado || ''}`,
-      230
-    )
-
-    documento.text(
-      hashDividido,
-      centro,
-      196,
-      { align: 'center' }
-    )
-
-    documento.save(
-      `certificado-${certificado.codigo_verificacion}.pdf`
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: '-12000px',
+            top: 0,
+            width: '1120px',
+            pointerEvents: 'none',
+          }}
+        >
+          <CertificadoVisual
+            ref={certificadoRef}
+            resultado={resultado}
+          />
+        </div>
+      </div>
     )
   }
 
   return (
-    <CContainer className="py-4">
-      <div className="mb-4 text-start">
-        <h2 className="mb-2">Verificación de certificados</h2>
-        <p className="text-body-secondary">
-          Consulta la autenticidad del certificado, su firma electrónica
-          y el rastro inmutable de auditoría.
-        </p>
-      </div>
+    <div
+      style={{
+        maxWidth: '1080px',
+        margin: '30px auto',
+        padding: '0 20px',
+      }}
+    >
+      <h2>Verificación de certificados</h2>
 
-      <CCard className="mb-4">
-        <CCardHeader>
-          <strong>Código de verificación</strong>
-        </CCardHeader>
+      <p className="text-muted">
+        Consulte la autenticidad del certificado, su firma
+        electrónica y el rastro inmutable de auditoría.
+      </p>
 
-        <CCardBody>
-          <CForm onSubmit={consultarCertificado}>
-            <CRow className="g-3 align-items-end">
-              <CCol md={9}>
-                <CFormInput
-                  label="Identificador del certificado"
-                  placeholder="Ej. 8274e38d-2ca2-44d3-a569-bdec6012da54"
-                  value={codigo}
-                  onChange={(evento) => setCodigo(evento.target.value)}
-                  disabled={cargando}
+      <form
+        onSubmit={verificar}
+        style={{
+          padding: '20px',
+          border: '1px solid #cbd5e1',
+          borderRadius: '6px',
+          backgroundColor: '#f8fafc',
+        }}
+      >
+        <label
+          htmlFor="codigo-certificado"
+          style={{
+            display: 'block',
+            fontWeight: '700',
+            marginBottom: '8px',
+          }}
+        >
+          Código de verificación
+        </label>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+          }}
+        >
+          <input
+            id="codigo-certificado"
+            type="text"
+            value={codigo}
+            onChange={(event) =>
+              setCodigo(event.target.value)
+            }
+            placeholder="Ingrese el identificador del certificado"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: '11px',
+              border: '2px solid #8b5cf6',
+              borderRadius: '6px',
+            }}
+          />
+
+          <CButton
+            type="submit"
+            color="primary"
+            disabled={cargando}
+            style={{
+              minWidth: '235px',
+            }}
+          >
+            {cargando ? (
+              <>
+                <CSpinner
+                  size="sm"
+                  className="me-2"
                 />
-              </CCol>
+                Verificando...
+              </>
+            ) : (
+              'Verificar'
+            )}
+          </CButton>
+        </div>
+      </form>
 
-              <CCol md={3} className="d-grid">
-                <CButton
-                  color="primary"
-                  type="submit"
-                  disabled={cargando}
-                >
-                  {cargando && (
-                    <CSpinner size="sm" className="me-2" />
-                  )}
-                  Verificar
-                </CButton>
-              </CCol>
-            </CRow>
-          </CForm>
-
-          {(resultado || mensaje) && (
-            <div className="mt-3">
-              <CButton
-                color="secondary"
-                variant="outline"
-                size="sm"
-                onClick={limpiarConsulta}
-                disabled={cargando}
-              >
-                Limpiar consulta
-              </CButton>
-            </div>
-          )}
-        </CCardBody>
-      </CCard>
-
-      {mensaje && (
-        <CAlert color={mensaje.tipo}>
-          {mensaje.texto}
+      {error && (
+        <CAlert color="danger" className="mt-3">
+          {error}
         </CAlert>
       )}
-
-      {resultado && (
-        <>
-          <CCard className="mb-4">
-            <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Resultado general</strong>
-
-              <CBadge color={resultado.valido ? 'success' : 'danger'}>
-                {resultado.valido
-                  ? 'CERTIFICADO VÁLIDO'
-                  : 'POSIBLE FRAUDE'}
-              </CBadge>
-            </CCardHeader>
-
-            <CCardBody className="text-start">
-              <CRow className="g-3">
-                <CCol md={6}>
-                  <strong>Código:</strong>
-                  <div className="text-break">
-                    {certificado?.codigo_verificacion}
-                  </div>
-                </CCol>
-
-                <CCol md={3}>
-                  <strong>Estado:</strong>
-                  <div>
-                    <CBadge
-                      color={
-                        certificado?.estado === 'emitido'
-                          ? 'success'
-                          : 'danger'
-                      }
-                    >
-                      {certificado?.estado}
-                    </CBadge>
-                  </div>
-                </CCol>
-
-                <CCol md={3}>
-                  <strong>Fecha de emisión:</strong>
-                  <div>{certificado?.fecha_emision}</div>
-                </CCol>
-              </CRow>
-
-              {certificado?.datos && (
-                <CRow className="g-3 mt-1">
-                  <CCol md={6}>
-                    <strong>Candidato:</strong>
-                    <div>
-                      {certificado.datos.nombre_completo || 'No disponible'}
-                    </div>
-                  </CCol>
-
-                  <CCol md={3}>
-                    <strong>Universidad:</strong>
-                    <div>
-                      {certificado.datos.universidad_origen || 'No disponible'}
-                    </div>
-                  </CCol>
-
-                  <CCol md={3}>
-                    <strong>Resultado:</strong>
-                    <div>
-                      {certificado.datos.resultado || 'No disponible'}
-                    </div>
-                  </CCol>
-                </CRow>
-              )}
-
-              {resultado.valido && (
-                <div className="mt-4">
-                  <CButton
-                    color="success"
-                    onClick={descargarCertificado}
-                  >
-                    Descargar PDF
-                  </CButton>
-                </div>
-              )}
-            </CCardBody>
-          </CCard>
-
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Validación criptográfica</strong>
-            </CCardHeader>
-
-            <CCardBody className="text-start">
-              <CRow className="g-3">
-                <CCol md={4}>
-                  Hash del certificado:{' '}
-                  <CBadge color={colorValidacion(integridad?.hash_valido)}>
-                    {textoValidacion(integridad?.hash_valido)}
-                  </CBadge>
-                </CCol>
-
-                <CCol md={4}>
-                  Firma electrónica:{' '}
-                  <CBadge color={colorValidacion(integridad?.firma_valida)}>
-                    {textoValidacion(integridad?.firma_valida)}
-                  </CBadge>
-                </CCol>
-
-                <CCol md={4}>
-                  Vigencia:{' '}
-                  <CBadge
-                    color={colorValidacion(
-                      integridad?.certificado_vigente
-                    )}
-                  >
-                    {integridad?.certificado_vigente
-                      ? 'Vigente'
-                      : 'No vigente'}
-                  </CBadge>
-                </CCol>
-              </CRow>
-
-              <hr />
-
-              <div className="mb-2">
-                <strong>Hash almacenado</strong>
-                <div
-                  className="text-break font-monospace small"
-                  style={{ wordBreak: 'break-all' }}
-                >
-                  {integridad?.hash_almacenado}
-                </div>
-              </div>
-
-              <div>
-                <strong>Hash calculado</strong>
-                <div
-                  className="text-break font-monospace small"
-                  style={{ wordBreak: 'break-all' }}
-                >
-                  {integridad?.hash_calculado}
-                </div>
-              </div>
-            </CCardBody>
-          </CCard>
-
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>
-                Rastro de auditoría ({resultado.total_eventos})
-              </strong>
-            </CCardHeader>
-
-            <CCardBody>
-              {eventos.length === 0 ? (
-                <CAlert color="warning" className="mb-0">
-                  El certificado no posee eventos de auditoría.
-                </CAlert>
-              ) : (
-                <div className="table-responsive">
-                  <CTable striped hover align="middle">
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>Evento</CTableHeaderCell>
-                        <CTableHeaderCell>Tipo</CTableHeaderCell>
-                        <CTableHeaderCell>Fecha</CTableHeaderCell>
-                        <CTableHeaderCell>Enlace</CTableHeaderCell>
-                        <CTableHeaderCell>Hash</CTableHeaderCell>
-                        <CTableHeaderCell>Firma</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-
-                    <CTableBody>
-                      {eventos.map((evento) => (
-                        <CTableRow key={evento.id_evento}>
-                          <CTableDataCell>
-                            {evento.id_evento}
-                          </CTableDataCell>
-
-                          <CTableDataCell>
-                            {evento.tipo_evento}
-                          </CTableDataCell>
-
-                          <CTableDataCell>
-                            {evento.fecha_evento}
-                          </CTableDataCell>
-
-                          <CTableDataCell>
-                            <CBadge
-                              color={colorValidacion(
-                                evento.enlace_valido
-                              )}
-                            >
-                              {textoValidacion(
-                                evento.enlace_valido
-                              )}
-                            </CBadge>
-                          </CTableDataCell>
-
-                          <CTableDataCell>
-                            <CBadge
-                              color={colorValidacion(
-                                evento.hash_valido
-                              )}
-                            >
-                              {textoValidacion(
-                                evento.hash_valido
-                              )}
-                            </CBadge>
-                          </CTableDataCell>
-
-                          <CTableDataCell>
-                            <CBadge
-                              color={colorValidacion(
-                                evento.firma_valida
-                              )}
-                            >
-                              {textoValidacion(
-                                evento.firma_valida
-                              )}
-                            </CBadge>
-                          </CTableDataCell>
-                        </CTableRow>
-                      ))}
-                    </CTableBody>
-                  </CTable>
-                </div>
-              )}
-            </CCardBody>
-          </CCard>
-
-          {anomalias.length > 0 && (
-            <CCard className="border-danger">
-              <CCardHeader className="text-danger">
-                <strong>Anomalías detectadas</strong>
-              </CCardHeader>
-
-              <CCardBody className="text-start">
-                {anomalias.map((anomalia, indice) => (
-                  <CAlert
-                    color="danger"
-                    key={`${anomalia.tipo}-${indice}`}
-                  >
-                    <strong>{anomalia.tipo}</strong>
-                    {anomalia.id_evento && (
-                      <> — Evento {anomalia.id_evento}</>
-                    )}
-                    <div>{anomalia.detalle}</div>
-                  </CAlert>
-                ))}
-              </CCardBody>
-            </CCard>
-          )}
-        </>
-      )}
-    </CContainer>
+    </div>
   )
 }
-
-export default VerificacionAuditoria

@@ -67,7 +67,7 @@ function Dashboard() {
             </div>
           </div>
           <CBadge color="light" className="border text-body px-2 py-1">
-            CDU104 | RF06 | EaC04
+            CDU104 | RF22-RF25 | EaC10
           </CBadge>
         </CCardBody>
       </CCard>
@@ -142,7 +142,7 @@ function Dashboard() {
       <CRow className="g-3 mb-3">
         <CCol md={6}>
           <CCard className="h-100">
-            <CCardHeader className="fw-semibold">Competencias por pias</CCardHeader>
+            <CCardHeader className="fw-semibold">Competencias por país</CCardHeader>
             <CCardBody>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={evaluaciones_por_pais}>

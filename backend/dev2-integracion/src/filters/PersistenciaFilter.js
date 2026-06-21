@@ -4,8 +4,10 @@ const BaseFilter = require('./BaseFilter');
 // Se importa el pool de MySQL para poder ejecutar consultas a la base de datos
 const pool = require('../db');
 
+const { cifrar } = require('../utils/cryptoDatos');
+
 // Este filtro toma los datos ya normalizados y los guarda en la base de datos
-class PersistenceFilter extends BaseFilter {
+class PersistenciaFilter extends BaseFilter {
     async handle(context) {
         // Se obtiene una conexión individual para manejar una transacción
         const connection = await pool.getConnection();
@@ -201,9 +203,9 @@ class PersistenceFilter extends BaseFilter {
     }
 
     async guardarCandidato(connection, candidato, idPais, idCarrera, idUniversidad, idIngesta) {
-        // Se convierten los datos sensibles a Buffer para guardarlos en campos VARBINARY.
-        const nombreCifrado = Buffer.from(candidato.nombre_completo, 'utf8');
-        const emailCifrado = Buffer.from(candidato.email || '', 'utf8');
+        // Se convierten los datos sensibles 
+        const nombreCifrado = cifrar(candidato.nombre_completo);
+        const emailCifrado = cifrar(candidato.email || '');
 
         // Se inserta el candidato o se actualiza si ya existe el id_candidato.
         await connection.query(
@@ -281,4 +283,4 @@ class PersistenceFilter extends BaseFilter {
     }
 }
 
-module.exports = PersistenceFilter;
+module.exports = PersistenciaFilter;

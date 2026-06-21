@@ -47,17 +47,57 @@ router.get('/candidato/:id', async (req, res) => {
 });
 
 // cambia el estado del candidato a olvidado para cumplir con el derecho al olvido del GDPR
-router.post('/anonimizar/:id', async (req, res) => {
+router.post('/olvidar/:id', async (req, res) => {
   try {
-    const [result] = await pool.execute(
-      "UPDATE CandidatoSeguridad SET estado_gdpr = 'olvidado' WHERE id = ?",
-      [req.params.id]
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        error: 'El id del candidato no es válido',
+      });
+    }
+
+    const [candidatos] = await pool.execute(
+      'SELECT estado_gdpr FROM CandidatoSeguridad WHERE id = ?',
+      [id]
     );
-    // si no encuentra el candidato retornar 404
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Candidato no encontrado' });
-    res.json({ mensaje: `Candidato ${req.params.id} marcado como olvidado (GDPR)` });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    if (candidatos.length === 0) {
+      return res.status(404).json({
+        error: 'Candidato no encontrado',
+      });
+    }
+
+    if (candidatos[0].estado_gdpr === 'olvidado') {
+      return res.json({
+        mensaje: `El candidato ${id} ya había ejercido el derecho al olvido`,
+      });
+    }
+
+    const nombreAnonimizado = cifrar(`CANDIDATO_OLVIDADO_${id}`);
+    const emailAnonimizado = cifrar(`olvidado_${id}@anonimo.local`);
+
+    await pool.execute(
+      `
+      UPDATE CandidatoSeguridad
+      SET
+        nombre_cifrado = ?,
+        email_cifrado = ?,
+        estado_gdpr = 'olvidado'
+      WHERE id = ?
+      `,
+      [nombreAnonimizado, emailAnonimizado, id]
+    );
+
+    return res.json({
+      mensaje: `Derecho al olvido aplicado al candidato ${id}`,
+    });
+  } catch (error) {
+    console.error('Error aplicando derecho al olvido:', error);
+
+    return res.status(500).json({
+      error: 'No fue posible procesar el derecho al olvido',
+    });
   }
 });
 

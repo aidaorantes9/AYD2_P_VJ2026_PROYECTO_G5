@@ -1,4 +1,3 @@
-cat > backend/sm-seguridad/schema.sql << 'EOF'
 CREATE DATABASE IF NOT EXISTS prccd;
 USE prccd;
 
@@ -9,5 +8,4 @@ CREATE TABLE IF NOT EXISTS CandidatoSeguridad (
     estado_gdpr    ENUM('activo', 'anonimizado', 'olvidado') NOT NULL DEFAULT 'activo',
     PRIMARY KEY (id)
 );
-EOF
 

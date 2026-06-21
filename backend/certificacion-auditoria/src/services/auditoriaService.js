@@ -135,7 +135,9 @@ async function validarRastroAuditoria(codigoVerificacion) {
     eventosValidados.push({
       id_evento: evento.id_evento,
       tipo_evento: evento.tipo_evento,
+      actor: evento.actor,
       fecha_evento: evento.fecha_evento,
+      resultado_validacion: evento.resultado_validacion,
       hash_anterior: evento.hash_anterior,
       hash_evento: evento.hash_evento,
       enlace_valido: enlaceValido,

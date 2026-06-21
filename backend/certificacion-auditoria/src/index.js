@@ -5,6 +5,7 @@ const cors = require('cors');
 const pool = require('./db');
 const verificacionRoutes = require('./routes/verificacionRoutes');
 const auditoriaRoutes = require('./routes/auditoriaRoutes');
+const emisionRoutes = require('./routes/emisionRoutes');
 
 const app = express();
 const PORT = Number(process.env.PORT || 4003);
@@ -31,6 +32,7 @@ app.get('/api/salud', async (req, res) => {
   }
 });
 
+app.use('/api/certificados', emisionRoutes);
 app.use('/api/certificados', verificacionRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
 

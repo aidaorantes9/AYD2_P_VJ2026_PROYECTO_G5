@@ -1,8 +1,4 @@
-// pantalla de gestion de privacidad — Pantalla gestión de privacidad (React)
-// permite ver los datos de un candidato ficticio y solicitar el olvido (GDPR)
-// usa CoreUI for React para mantener el mismo estilo visual que el resto del portal
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CCard,
   CCardBody,
@@ -13,138 +9,193 @@ import {
   CSpinner,
 } from '@coreui/react'
 
-// candidato ficticio con los datos acordados en el sprint planning
-// id_candidato = 1, Ana Lopez, estado_gdpr = activo
-const CANDIDATO_FICTICIO = {
-  id: 1,
-  nombre: 'Ana Lopez',
-  email: 'ana.lopez@usac.edu.gt',
-  universidad: 'USAC',
-  estado_gdpr: 'activo',
-}
+const API_BASE =
+  import.meta.env.VITE_SEGURIDAD_API_URL ||
+  'http://localhost:4005'
 
-// devuelve el color del badge segun el estado gdpr del candidato
+const ID_CANDIDATO = 1
+
 function colorEstado(estado) {
   if (estado === 'activo') return 'success'
   if (estado === 'anonimizado') return 'warning'
   if (estado === 'olvidado') return 'danger'
+
   return 'secondary'
 }
 
 export default function GestionPrivacidad() {
-  // candidato que se muestra en pantalla
-  const [candidato, setCandidato] = useState(CANDIDATO_FICTICIO)
-
-  // controla si se esta esperando respuesta del endpoint
+  const [candidato, setCandidato] = useState(null)
   const [cargando, setCargando] = useState(false)
-
-  // mensaje de exito o error que se muestra despues de la accion
+  const [cargandoDatos, setCargandoDatos] = useState(true)
   const [mensaje, setMensaje] = useState(null)
 
-  // dispara el endpoint POST /api/seguridad/anonimizar/{id}
-  // cambia estado_gdpr de activo a olvidado en la base de datos
+  useEffect(() => {
+    async function cargarCandidato() {
+      try {
+        const respuesta = await fetch(
+          `${API_BASE}/api/seguridad/candidato/${ID_CANDIDATO}`
+        )
+
+        const datos = await respuesta.json()
+
+        if (!respuesta.ok) {
+          throw new Error(
+            datos.error || 'No se pudo consultar el candidato'
+          )
+        }
+
+        setCandidato(datos)
+      } catch (error) {
+        setMensaje({
+          tipo: 'danger',
+          texto: error.message,
+        })
+      } finally {
+        setCargandoDatos(false)
+      }
+    }
+
+    cargarCandidato()
+  }, [])
+
   async function solicitarOlvido() {
     setCargando(true)
     setMensaje(null)
 
     try {
       const respuesta = await fetch(
-        `http://localhost:4005/api/seguridad/anonimizar/${candidato.id}`,
-        { method: 'POST' }
+        `${API_BASE}/api/seguridad/olvidar/${candidato.id}`,
+        {
+          method: 'POST',
+        }
       )
 
       const datos = await respuesta.json()
 
-      if (respuesta.ok) {
-        // actualizar el estado del candidato en pantalla
-        setCandidato((prev) => ({ ...prev, estado_gdpr: 'olvidado' }))
-        setMensaje({ tipo: 'success', texto: datos.mensaje })
-      } else {
-        setMensaje({ tipo: 'danger', texto: datos.error || 'Error al procesar la solicitud' })
+      if (!respuesta.ok) {
+        throw new Error(
+          datos.error || 'Error al procesar la solicitud'
+        )
       }
+
+      setCandidato((anterior) => ({
+        ...anterior,
+        nombre: null,
+        email: null,
+        estado_gdpr: 'olvidado',
+      }))
+
+      setMensaje({
+        tipo: 'success',
+        texto: datos.mensaje,
+      })
     } catch (error) {
-      // error de red o endpoint caido
-      setMensaje({ tipo: 'danger', texto: 'No se pudo conectar con el servidor de seguridad' })
+      setMensaje({
+        tipo: 'danger',
+        texto: error.message,
+      })
     } finally {
       setCargando(false)
     }
   }
 
-  return (
-    <div className="p-4" style={{ maxWidth: 600, margin: '0 auto' }}>
+  if (cargandoDatos) {
+    return (
+      <div className="p-4 text-center">
+        <CSpinner />
+        <p className="mt-2">Consultando datos de privacidad...</p>
+      </div>
+    )
+  }
 
-      {/* titulo de la seccion */}
+  return (
+    <div
+      className="p-4"
+      style={{
+        maxWidth: 600,
+        margin: '0 auto',
+      }}
+    >
       <h4 className="mb-4">Gestión de Privacidad</h4>
+
       <p className="text-medium-emphasis mb-4">
-        Desde aqui puedes consultar el estado de privacidad de tu cuenta y ejercer
-        tu derecho al olvido conforme al GDPR y legislaciones locales de proteccion
-        de datos personales.
+        Consulta el estado de privacidad de tu cuenta y ejerce
+        el derecho al olvido.
       </p>
 
-      {/* tarjeta con los datos del candidato */}
-      <CCard className="mb-4">
-        <CCardHeader>
-          <strong>Datos del candidato</strong>
-        </CCardHeader>
-        <CCardBody>
+      {candidato && (
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Datos del candidato</strong>
+          </CCardHeader>
 
-          {/* nombre */}
-          <div className="mb-2">
-            <span className="text-medium-emphasis">Nombre: </span>
-            <strong>{candidato.nombre}</strong>
-          </div>
+          <CCardBody>
+            <div className="mb-2">
+              <span className="text-medium-emphasis">
+                Nombre:{' '}
+              </span>
 
-          {/* email */}
-          <div className="mb-2">
-            <span className="text-medium-emphasis">Correo: </span>
-            <strong>{candidato.email}</strong>
-          </div>
+              <strong>
+                {candidato.nombre || 'Dato anonimizado'}
+              </strong>
+            </div>
 
-          {/* universidad */}
-          <div className="mb-2">
-            <span className="text-medium-emphasis">Universidad: </span>
-            <strong>{candidato.universidad}</strong>
-          </div>
+            <div className="mb-2">
+              <span className="text-medium-emphasis">
+                Correo:{' '}
+              </span>
 
-          {/* estado gdpr con badge de color segun el estado actual */}
-          <div className="mb-3">
-            <span className="text-medium-emphasis">Estado GDPR: </span>
-            <CBadge color={colorEstado(candidato.estado_gdpr)} className="ms-1">
-              {candidato.estado_gdpr}
-            </CBadge>
-          </div>
+              <strong>
+                {candidato.email || 'Dato anonimizado'}
+              </strong>
+            </div>
 
-          {/* boton solicitar olvido — solo visible si el candidato esta activo */}
-          {candidato.estado_gdpr === 'activo' && (
-            <CButton
-              color="danger"
-              onClick={solicitarOlvido}
-              disabled={cargando}
-            >
-              {/* muestra spinner mientras espera respuesta del endpoint */}
-              {cargando && <CSpinner size="sm" className="me-2" />}
-              Solicitar olvido
-            </CButton>
-          )}
+            <div className="mb-3">
+              <span className="text-medium-emphasis">
+                Estado GDPR:{' '}
+              </span>
 
-          {/* mensaje informativo cuando el candidato ya fue olvidado */}
-          {candidato.estado_gdpr === 'olvidado' && (
-            <p className="text-medium-emphasis mt-2 mb-0">
-              Tu solicitud de olvido fue procesada. Tus datos personales han sido
-              anonimizados conforme al GDPR.
-            </p>
-          )}
+              <CBadge
+                color={colorEstado(candidato.estado_gdpr)}
+                className="ms-1"
+              >
+                {candidato.estado_gdpr}
+              </CBadge>
+            </div>
 
-        </CCardBody>
-      </CCard>
+            {candidato.estado_gdpr === 'activo' && (
+              <CButton
+                color="danger"
+                onClick={solicitarOlvido}
+                disabled={cargando}
+              >
+                {cargando && (
+                  <CSpinner size="sm" className="me-2" />
+                )}
 
-      {/* alerta de resultado — exito o error */}
+                Solicitar olvido
+              </CButton>
+            )}
+
+            {candidato.estado_gdpr === 'olvidado' && (
+              <p className="text-medium-emphasis mt-2 mb-0">
+                La solicitud fue procesada y los datos personales
+                ya no están disponibles.
+              </p>
+            )}
+          </CCardBody>
+        </CCard>
+      )}
+
       {mensaje && (
-        <CAlert color={mensaje.tipo} dismissible onClose={() => setMensaje(null)}>
+        <CAlert
+          color={mensaje.tipo}
+          dismissible
+          onClose={() => setMensaje(null)}
+        >
           {mensaje.texto}
         </CAlert>
       )}
-
     </div>
   )
 }

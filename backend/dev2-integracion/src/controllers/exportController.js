@@ -1,6 +1,8 @@
 // Se importa la conexión a MySQL
 const pool = require('../db');
 
+const { descifrar } = require('../utils/cryptoDatos');
+
 // Se usa papaparse para generar respuestas en formato CSV
 const Papa = require('papaparse');
 
@@ -56,7 +58,7 @@ async function exportarCandidato(req, res) {
             `
             SELECT
                 c.id_candidato,
-                CAST(c.nombre_cifrado AS CHAR) AS nombre_completo,
+                c.nombre_cifrado,
                 u.nombre AS universidad_origen,
                 ca.nombre AS carrera
             FROM Candidato c
@@ -82,6 +84,8 @@ async function exportarCandidato(req, res) {
 
         const candidato = candidatos[0];
 
+        const nombreCompleto = descifrar(candidato.nombre_cifrado);
+
         // Se consulta el historial académico del candidato.
         const [cursos] = await pool.query(
             `
@@ -100,7 +104,7 @@ async function exportarCandidato(req, res) {
         const expediente = {
 
             id_candidato: candidato.id_candidato,
-            nombre_completo: candidato.nombre_completo,
+            nombre_completo: nombreCompleto,
             universidad_origen: candidato.universidad_origen,
             carrera: candidato.carrera,
             cursos_aprobados: cursos.map((curso) => ({
