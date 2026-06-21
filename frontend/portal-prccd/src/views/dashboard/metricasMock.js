@@ -1,40 +1,81 @@
-export const mockMetricas = {
-  anonimizada: true,
-  fecha_calculo: '2026-06-19',
-  metricas: [
-    {
-      id_pais: 1,
-      pais: 'Guatemala',
-      carrera_segmento: 'Ingenieria en Sistemas',
-      genero_segmento: 'F',
-      total_evaluaciones: 120,
-      total_aprobados: 95,
-      tasa_aprobacion: 79.16,
-    },
-  ],
-  kpis: {
-    evaluaciones_realizadas: 18420,
-    certificados_emitidos: 13765,
-    cumplimiento_sla: 99.7,
-    alertas_fraude_pct: 1.8,
-  },
-  evaluaciones_por_pais: [
-    { pais: 'GT', total: 4800 },
-    { pais: 'CR', total: 4100 },
-    { pais: 'SV', total: 3600 },
-    { pais: 'HN', total: 3100 },
-    { pais: 'PA', total: 2400 },
-  ],
-  tendencia_alertas_fraude: [
-    { mes: 'Ene', alertas: 1.1 },
-    { mes: 'Feb', alertas: 1.3 },
-    { mes: 'Mar', alertas: 1.0 },
-    { mes: 'Abr', alertas: 2.1 },
-    { mes: 'May', alertas: 1.9 },
-    { mes: 'Jun', alertas: 2.6 },
-  ],
-}
+const API_BASE =
+  import.meta.env.VITE_ANTIFRAUDE_API_URL ||
+  'http://localhost:4004'
 
-export async function fetchMetricas(filtros = {}) {
-  return Promise.resolve(mockMetricas)
+export async function fetchMetricas(
+  filtros = {}
+) {
+  const parametros =
+    new URLSearchParams()
+
+  if (
+    filtros.pais &&
+    filtros.pais !== 'Todos'
+  ) {
+    parametros.set(
+      'pais',
+      filtros.pais
+    )
+  }
+
+  if (
+    filtros.carrera &&
+    filtros.carrera !== 'Todas'
+  ) {
+    parametros.set(
+      'carrera',
+      filtros.carrera
+    )
+  }
+
+  if (
+    filtros.genero &&
+    filtros.genero !== 'Todos'
+  ) {
+    parametros.set(
+      'genero',
+      filtros.genero
+    )
+  }
+
+  if (
+    filtros.anio &&
+    filtros.anio !== 'Todos'
+  ) {
+    parametros.set(
+      'anio',
+      filtros.anio
+    )
+  }
+
+  const query =
+    parametros.toString()
+
+  const url = query
+    ? `${API_BASE}/api/metricas?${query}`
+    : `${API_BASE}/api/metricas`
+
+  const respuesta =
+    await fetch(url)
+
+  const datos =
+    await respuesta.json()
+
+  if (!respuesta.ok) {
+    throw new Error(
+      datos.message ||
+        datos.error ||
+        'No fue posible consultar las métricas'
+    )
+  }
+
+  if (
+    datos.anonimizada !== true
+  ) {
+    throw new Error(
+      'El servicio respondió con datos no anonimizados'
+    )
+  }
+
+  return datos
 }

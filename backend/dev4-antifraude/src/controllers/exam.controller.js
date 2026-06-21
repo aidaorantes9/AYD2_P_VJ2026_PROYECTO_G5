@@ -1,232 +1,654 @@
-const fs = require("fs-extra")
-const path = require("path")
-const multer = require("multer")
-const crypto = require("crypto")
-const pool = require("./../db")
+const fs = require('fs-extra')
+const path = require('path')
+const multer = require('multer')
+const crypto = require('crypto')
+const pool = require('../db')
 
-// BASE UNIFICADA DE UPLOADS
-const UPLOADS = path.resolve(__dirname, "../uploads")
+const UPLOADS = path.resolve(__dirname, '../uploads')
 
-const SCREENSHOTS_DIR = path.join(UPLOADS, "screenshots")
-const KEYSTROKES_DIR = path.join(UPLOADS, "keystrokes")
-const VIDEOS_DIR = path.join(UPLOADS, "videos")
+const SCREENSHOTS_DIR = path.join(
+  UPLOADS,
+  'screenshots'
+)
 
-// SHA256 helper
+const KEYSTROKES_DIR = path.join(
+  UPLOADS,
+  'keystrokes'
+)
+
+const VIDEOS_DIR = path.join(
+  UPLOADS,
+  'videos'
+)
+
+fs.ensureDirSync(SCREENSHOTS_DIR)
+fs.ensureDirSync(KEYSTROKES_DIR)
+fs.ensureDirSync(VIDEOS_DIR)
+
 function sha256(content) {
-  return crypto.createHash("sha256").update(content).digest("hex")
+  return crypto
+    .createHash('sha256')
+    .update(content)
+    .digest('hex')
 }
 
-// Fecha de retención = hoy + 5 años
 function fechaRetencion() {
   const fecha = new Date()
-  fecha.setFullYear(fecha.getFullYear() + 5)
-  return fecha.toISOString().split("T")[0]
+  fecha.setFullYear(
+    fecha.getFullYear() + 5
+  )
+
+  return fecha
+    .toISOString()
+    .split('T')[0]
 }
 
-/* =========================
-   SCREENSHOTS
-========================= */
-exports.saveScreenshot = async (req, res) => {
+function obtenerIdEvaluacion(valor) {
+  const idEvaluacion = Number(valor)
+
+  if (
+    !Number.isInteger(idEvaluacion) ||
+    idEvaluacion <= 0
+  ) {
+    return null
+  }
+
+  return idEvaluacion
+}
+
+async function validarEvaluacion(
+  idEvaluacion
+) {
+  const [evaluaciones] =
+    await pool.query(
+      `
+      SELECT id_evaluacion
+      FROM Evaluacion
+      WHERE id_evaluacion = ?
+      `,
+      [idEvaluacion]
+    )
+
+  return evaluaciones.length > 0
+}
+
+/*
+ * POST /api/exam/screenshots
+ */
+async function saveScreenshot(req, res) {
   try {
-    const { image, id_evaluacion = 1 } = req.body
+    const {
+      image,
+      id_evaluacion,
+    } = req.body
+
+    const idEvaluacion =
+      obtenerIdEvaluacion(
+        id_evaluacion
+      )
+
+    if (!idEvaluacion) {
+      return res.status(400).json({
+        error:
+          'id_evaluacion inválido',
+      })
+    }
+
+    if (
+      !(await validarEvaluacion(
+        idEvaluacion
+      ))
+    ) {
+      return res.status(404).json({
+        error:
+          'La evaluación no existe',
+      })
+    }
 
     if (!image) {
-      return res.status(400).json({ error: "image vacío" })
+      return res.status(400).json({
+        error: 'image vacío',
+      })
     }
 
-    const base64 = image.split(",")[1]
+    const partes =
+      String(image).split(',')
+
+    const base64 =
+      partes.length > 1
+        ? partes[1]
+        : partes[0]
 
     if (!base64) {
-      return res.status(400).json({ error: "base64 inválido" })
+      return res.status(400).json({
+        error: 'base64 inválido',
+      })
     }
 
-    await fs.ensureDir(SCREENSHOTS_DIR)
+    const fileName =
+      `shot-${idEvaluacion}-${Date.now()}.png`
 
-    const fileName = `shot-${Date.now()}.png`
-    const filePath = path.join(SCREENSHOTS_DIR, fileName)
-
-    await fs.writeFile(filePath, base64, "base64")
-
-    // Hash del archivo real almacenado
-    const fileBuffer = await fs.readFile(filePath)
-    const hash = sha256(fileBuffer)
-
-    const timestampCaptura = new Date()
-
-    await pool.query(
-      `
-      INSERT INTO EvidenciaAntifraude (
-        id_evaluacion,
-        tipo_evidencia,
-        uri_almacenamiento,
-        hash_sha256,
-        algoritmo_cifrado,
-        timestamp_captura,
-        fecha_retencion_hasta,
-        inmutable,
-        creado_en
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        1,
-        "captura",
-        filePath,
-        hash,
-        "HASH_SHA256",
-        timestampCaptura,
-        fechaRetencion(),
-        1,
-        new Date()
-      ]
+    const filePath = path.join(
+      SCREENSHOTS_DIR,
+      fileName
     )
 
-    console.log("Screenshot guardado + BD")
+    await fs.writeFile(
+      filePath,
+      base64,
+      'base64'
+    )
 
-    res.json({
+    const fileBuffer =
+      await fs.readFile(filePath)
+
+    const hash =
+      sha256(fileBuffer)
+
+    const timestampCaptura =
+      new Date()
+
+    const [resultado] =
+      await pool.query(
+        `
+        INSERT INTO EvidenciaAntifraude (
+          id_evaluacion,
+          tipo_evidencia,
+          uri_almacenamiento,
+          hash_sha256,
+          algoritmo_cifrado,
+          timestamp_captura,
+          fecha_retencion_hasta,
+          inmutable,
+          creado_en
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          idEvaluacion,
+          'captura',
+          filePath,
+          hash,
+          'HASH_SHA256',
+          timestampCaptura,
+          fechaRetencion(),
+          1,
+          new Date(),
+        ]
+      )
+
+    return res.status(201).json({
       ok: true,
-      file: fileName
+      id_evidencia:
+        resultado.insertId,
+      id_evaluacion:
+        idEvaluacion,
+      tipo_evidencia:
+        'captura',
+      file: fileName,
+      hash_sha256: hash,
     })
-  } catch (err) {
-    console.error("Screenshot error:", err)
-    res.status(500).json({ error: err.message })
+  } catch (error) {
+    console.error(
+      'Screenshot error:',
+      error
+    )
+
+    return res.status(500).json({
+      error: error.message,
+    })
   }
 }
 
-/* =========================
-   KEYSTROKES
-========================= */
-exports.saveKeystrokes = async (req, res) => {
+/*
+ * POST /api/exam/keystrokes
+ */
+async function saveKeystrokes(
+  req,
+  res
+) {
   try {
-    const { logs, id_evaluacion = 1 } = req.body
+    const {
+      logs,
+      id_evaluacion,
+    } = req.body
 
-    if (!logs || !Array.isArray(logs)) {
-      return res.status(400).json({ error: "logs inválidos" })
+    const idEvaluacion =
+      obtenerIdEvaluacion(
+        id_evaluacion
+      )
+
+    if (!idEvaluacion) {
+      return res.status(400).json({
+        error:
+          'id_evaluacion inválido',
+      })
     }
 
-    await fs.ensureDir(KEYSTROKES_DIR)
+    if (
+      !(await validarEvaluacion(
+        idEvaluacion
+      ))
+    ) {
+      return res.status(404).json({
+        error:
+          'La evaluación no existe',
+      })
+    }
 
-    const fileName = `keys-${Date.now()}.json`
-    const filePath = path.join(KEYSTROKES_DIR, fileName)
+    if (
+      !Array.isArray(logs)
+    ) {
+      return res.status(400).json({
+        error: 'logs inválidos',
+      })
+    }
 
-    const content = JSON.stringify(logs, null, 2)
+    const fileName =
+      `keys-${idEvaluacion}-${Date.now()}.json`
 
-    await fs.writeFile(filePath, content)
-
-    // Hash del archivo real almacenado
-    const fileBuffer = await fs.readFile(filePath)
-    const hash = sha256(fileBuffer)
-
-    const timestampCaptura = new Date()
-
-    await pool.query(
-      `
-      INSERT INTO EvidenciaAntifraude (
-        id_evaluacion,
-        tipo_evidencia,
-        uri_almacenamiento,
-        hash_sha256,
-        algoritmo_cifrado,
-        timestamp_captura,
-        fecha_retencion_hasta,
-        inmutable,
-        creado_en
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        1,
-        "log_tecleo",
-        filePath,
-        hash,
-        "HASH_SHA256",
-        timestampCaptura,
-        fechaRetencion(),
-        1,
-        new Date()
-      ]
+    const filePath = path.join(
+      KEYSTROKES_DIR,
+      fileName
     )
 
-    console.log("Keystrokes guardados + BD")
+    const content =
+      JSON.stringify(
+        logs,
+        null,
+        2
+      )
 
-    res.json({
+    await fs.writeFile(
+      filePath,
+      content,
+      'utf8'
+    )
+
+    const fileBuffer =
+      await fs.readFile(filePath)
+
+    const hash =
+      sha256(fileBuffer)
+
+    const [resultado] =
+      await pool.query(
+        `
+        INSERT INTO EvidenciaAntifraude (
+          id_evaluacion,
+          tipo_evidencia,
+          uri_almacenamiento,
+          hash_sha256,
+          algoritmo_cifrado,
+          timestamp_captura,
+          fecha_retencion_hasta,
+          inmutable,
+          creado_en
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          idEvaluacion,
+          'log_tecleo',
+          filePath,
+          hash,
+          'HASH_SHA256',
+          new Date(),
+          fechaRetencion(),
+          1,
+          new Date(),
+        ]
+      )
+
+    return res.status(201).json({
       ok: true,
-      file: fileName
+      id_evidencia:
+        resultado.insertId,
+      id_evaluacion:
+        idEvaluacion,
+      tipo_evidencia:
+        'log_tecleo',
+      file: fileName,
+      hash_sha256: hash,
     })
-  } catch (err) {
-    console.error("Keystrokes error:", err)
-    res.status(500).json({ error: err.message })
+  } catch (error) {
+    console.error(
+      'Keystrokes error:',
+      error
+    )
+
+    return res.status(500).json({
+      error: error.message,
+    })
   }
 }
 
-/* =========================
-   VIDEO
-========================= */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, VIDEOS_DIR)
-  },
-  filename: (req, file, cb) => {
-    cb(null, `video-${Date.now()}.webm`)
-  }
-})
+const storage =
+  multer.diskStorage({
+    destination: (
+      req,
+      file,
+      callback
+    ) => {
+      fs.ensureDirSync(
+        VIDEOS_DIR
+      )
 
-const upload = multer({ storage })
+      callback(
+        null,
+        VIDEOS_DIR
+      )
+    },
 
-exports.uploadMiddleware = upload.single("video")
+    filename: (
+      req,
+      file,
+      callback
+    ) => {
+      callback(
+        null,
+        `video-${Date.now()}.webm`
+      )
+    },
+  })
 
-exports.saveVideo = async (req, res) => {
+const upload =
+  multer({
+    storage,
+  })
+
+const uploadMiddleware =
+  upload.single('video')
+
+/*
+ * POST /api/exam/video-inicial
+ */
+async function saveVideo(req, res) {
   try {
+    const idEvaluacion =
+      obtenerIdEvaluacion(
+        req.body.id_evaluacion
+      )
+
+    if (!idEvaluacion) {
+      if (req.file?.path) {
+        await fs.remove(
+          req.file.path
+        )
+      }
+
+      return res.status(400).json({
+        error:
+          'id_evaluacion inválido',
+      })
+    }
+
+    if (
+      !(await validarEvaluacion(
+        idEvaluacion
+      ))
+    ) {
+      if (req.file?.path) {
+        await fs.remove(
+          req.file.path
+        )
+      }
+
+      return res.status(404).json({
+        error:
+          'La evaluación no existe',
+      })
+    }
+
     if (!req.file) {
-      return res.status(400).json({ error: "video vacío" })
+      return res.status(400).json({
+        error: 'video vacío',
+      })
     }
 
-    await fs.ensureDir(VIDEOS_DIR)
+    const filePath =
+      req.file.path
 
-    const filePath = path.join(VIDEOS_DIR, req.file.filename)
+    const fileBuffer =
+      await fs.readFile(filePath)
 
-    // Hash del archivo real almacenado
-    const fileBuffer = await fs.readFile(filePath)
-    const hash = sha256(fileBuffer)
+    const hash =
+      sha256(fileBuffer)
 
-    const timestampCaptura = new Date()
-
-    await pool.query(
-      `
-      INSERT INTO EvidenciaAntifraude (
-        id_evaluacion,
-        tipo_evidencia,
-        uri_almacenamiento,
-        hash_sha256,
-        algoritmo_cifrado,
-        timestamp_captura,
-        fecha_retencion_hasta,
-        inmutable,
-        creado_en
+    const [resultado] =
+      await pool.query(
+        `
+        INSERT INTO EvidenciaAntifraude (
+          id_evaluacion,
+          tipo_evidencia,
+          uri_almacenamiento,
+          hash_sha256,
+          algoritmo_cifrado,
+          timestamp_captura,
+          fecha_retencion_hasta,
+          inmutable,
+          creado_en
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          idEvaluacion,
+          'video',
+          filePath,
+          hash,
+          'HASH_SHA256',
+          new Date(),
+          fechaRetencion(),
+          1,
+          new Date(),
+        ]
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        1,
-        "video",
-        filePath,
-        hash,
-        "HASH_SHA256",
-        timestampCaptura,
-        fechaRetencion(),
-        1,
-        new Date()
-      ]
+
+    return res.status(201).json({
+      ok: true,
+      id_evidencia:
+        resultado.insertId,
+      id_evaluacion:
+        idEvaluacion,
+      tipo_evidencia:
+        'video',
+      file:
+        req.file.filename,
+      hash_sha256: hash,
+    })
+  } catch (error) {
+    console.error(
+      'Video error:',
+      error
     )
 
-    console.log("Video guardado + BD")
-
-    res.json({
-      ok: true,
-      file: req.file.filename
+    return res.status(500).json({
+      error: error.message,
     })
-  } catch (err) {
-    console.error("Video error:", err)
-    res.status(500).json({ error: err.message })
   }
+}
+
+/*
+ * GET /api/exam/evidencias/:id_evaluacion
+ */
+async function getEvidencias(
+  req,
+  res
+) {
+  try {
+    const idEvaluacion =
+      obtenerIdEvaluacion(
+        req.params.id_evaluacion
+      )
+
+    if (!idEvaluacion) {
+      return res.status(400).json({
+        error:
+          'id_evaluacion inválido',
+      })
+    }
+
+    if (
+      !(await validarEvaluacion(
+        idEvaluacion
+      ))
+    ) {
+      return res.status(404).json({
+        error:
+          'La evaluación no existe',
+      })
+    }
+
+    const [evidencias] =
+      await pool.query(
+        `
+        SELECT
+          id_evidencia,
+          id_evaluacion,
+          tipo_evidencia,
+          uri_almacenamiento,
+          hash_sha256,
+          algoritmo_cifrado,
+          timestamp_captura,
+          fecha_retencion_hasta,
+          inmutable,
+          creado_en
+        FROM EvidenciaAntifraude
+        WHERE id_evaluacion = ?
+        ORDER BY
+          timestamp_captura DESC,
+          id_evidencia DESC
+        `,
+        [idEvaluacion]
+      )
+
+    const [detecciones] =
+      await pool.query(
+        `
+        SELECT
+          d.id_deteccion,
+          d.id_evaluacion,
+          d.id_evidencia,
+          d.tipo_indicio,
+          d.descripcion,
+          d.severidad,
+          d.estado_revision,
+          d.fecha_deteccion
+        FROM DeteccionFraude d
+        WHERE d.id_evaluacion = ?
+        ORDER BY
+          d.fecha_deteccion DESC,
+          d.id_deteccion DESC
+        `,
+        [idEvaluacion]
+      )
+
+    const evidenciasNormalizadas =
+      evidencias.map(
+        (evidencia) => {
+          const rutaRelativa =
+            path
+              .relative(
+                UPLOADS,
+                evidencia
+                  .uri_almacenamiento
+              )
+              .split(path.sep)
+              .join('/')
+
+          return {
+            ...evidencia,
+
+            inmutable:
+              evidencia.inmutable ===
+                1 ||
+              evidencia.inmutable ===
+                true,
+
+            archivo_url:
+              `/api/exam/archivos/${rutaRelativa}`,
+          }
+        }
+      )
+
+    const capturas =
+      evidenciasNormalizadas.filter(
+        (evidencia) =>
+          evidencia.tipo_evidencia ===
+          'captura'
+      ).length
+
+    const logsTecleo =
+      evidenciasNormalizadas.filter(
+        (evidencia) =>
+          evidencia.tipo_evidencia ===
+          'log_tecleo'
+      ).length
+
+    const videos =
+      evidenciasNormalizadas.filter(
+        (evidencia) =>
+          evidencia.tipo_evidencia ===
+          'video'
+      ).length
+
+    const retenciones =
+      evidenciasNormalizadas
+        .map(
+          (evidencia) =>
+            evidencia
+              .fecha_retencion_hasta
+        )
+        .filter(Boolean)
+        .sort()
+
+    return res.json({
+      ok: true,
+      id_evaluacion:
+        idEvaluacion,
+
+      resumen: {
+        total_evidencias:
+          evidenciasNormalizadas.length,
+
+        capturas,
+        logs_tecleo:
+          logsTecleo,
+        videos,
+
+        total_indicios:
+          detecciones.length,
+
+        retencion_hasta:
+          retenciones.length > 0
+            ? retenciones[
+                retenciones.length - 1
+              ]
+            : null,
+      },
+
+      evidencias:
+        evidenciasNormalizadas,
+
+      detecciones,
+    })
+  } catch (error) {
+    console.error(
+      'Consulta de evidencias:',
+      error
+    )
+
+    return res.status(500).json({
+      error:
+        'No fue posible consultar las evidencias',
+    })
+  }
+}
+
+module.exports = {
+  saveScreenshot,
+  saveKeystrokes,
+  saveVideo,
+  uploadMiddleware,
+  getEvidencias,
 }

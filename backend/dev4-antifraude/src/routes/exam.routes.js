@@ -1,15 +1,34 @@
-const express = require("express")
-const router = express.Router()
+const express = require('express')
 
 const {
   saveScreenshot,
   saveKeystrokes,
   saveVideo,
-  uploadMiddleware
-} = require("../controllers/exam.controller")
+  uploadMiddleware,
+  getEvidencias,
+} = require('../controllers/exam.controller')
 
-router.post("/screenshots", saveScreenshot)
-router.post("/keystrokes", saveKeystrokes)
-router.post("/video-inicial", uploadMiddleware, saveVideo)
+const router = express.Router()
+
+router.get(
+  '/evidencias/:id_evaluacion',
+  getEvidencias
+)
+
+router.post(
+  '/screenshots',
+  saveScreenshot
+)
+
+router.post(
+  '/keystrokes',
+  saveKeystrokes
+)
+
+router.post(
+  '/video-inicial',
+  uploadMiddleware,
+  saveVideo
+)
 
 module.exports = router

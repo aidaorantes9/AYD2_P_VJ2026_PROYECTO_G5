@@ -21,6 +21,9 @@ services:
 
     - ./backend/sm-seguridad/schema.sql:/docker-entrypoint-initdb.d/06-seguridad-schema.sql:ro
     - ./backend/sm-seguridad/seed.sql:/docker-entrypoint-initdb.d/07-seguridad-seed.sql:ro 
+
+    - ./backend/dev4-antifraude/schema.sql:/docker-entrypoint-initdb.d/08-antifraude-schema.sql:ro
+    - ./backend/dev4-antifraude/seed.sql:/docker-entrypoint-initdb.d/09-antifraude-seed.sql:ro
     healthcheck:
       test:
         [
@@ -174,6 +177,40 @@ services:
       retries: 5
       start_period: 10s
 
+  dev4-antifraude:
+    build:
+      context: ./backend/dev4-antifraude
+      dockerfile: Dockerfile
+    container_name: prccd-dev4-antifraude
+    restart: unless-stopped
+    environment:
+      PORT: 4004
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: prccd
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "4004:4004"
+    volumes:
+      - ./backend/dev4-antifraude/uploads:/app/src/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:4004/api/salud').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
   frontend:
     build:
       context: ./frontend/portal-prccd
@@ -184,6 +221,7 @@ services:
       VITE_EVALUACIONES_API_URL: http://localhost:4001
       VITE_INTEGRACION_API_URL: http://localhost:4002
       VITE_CERTIFICACION_API_URL: http://localhost:4003
+      VITE_ANTIFRAUDE_API_URL: http://localhost:4004
       VITE_SEGURIDAD_API_URL: http://localhost:4005
     ports:
       - "5173:5173"
