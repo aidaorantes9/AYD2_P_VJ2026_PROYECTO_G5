@@ -1,5 +1,13 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 
 import {
   CAlert,
@@ -17,13 +25,27 @@ const API_BASE =
 
 export default function VerificacionAuditoria() {
   const navigate = useNavigate()
+  const location = useLocation()
   const certificadoRef = useRef(null)
 
   const [codigo, setCodigo] = useState('')
-  const [resultado, setResultado] = useState(null)
+
+  const [resultado, setResultado] = useState(
+    location.state?.resultado || null
+  )
+
   const [cargando, setCargando] = useState(false)
   const [descargando, setDescargando] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (location.state?.resultado) {
+      setResultado(
+        location.state.resultado
+      )
+      setError('')
+    }
+  }, [location.state])
 
   async function verificar(evento) {
     evento.preventDefault()
@@ -31,7 +53,9 @@ export default function VerificacionAuditoria() {
     const codigoLimpio = codigo.trim()
 
     if (!codigoLimpio) {
-      setError('Ingrese un código de verificación')
+      setError(
+        'Ingrese un código de verificación'
+      )
       return
     }
 
@@ -65,13 +89,18 @@ export default function VerificacionAuditoria() {
   }
 
   async function descargar() {
+    if (!resultado?.certificado) {
+      return
+    }
+
     try {
       setDescargando(true)
       setError('')
 
       await descargarCertificadoPdf(
         certificadoRef.current,
-        resultado.certificado.codigo_verificacion
+        resultado.certificado
+          .codigo_verificacion
       )
     } catch (err) {
       setError(err.message)
@@ -84,15 +113,24 @@ export default function VerificacionAuditoria() {
     setCodigo('')
     setResultado(null)
     setError('')
+
+    navigate('/certificado', {
+      replace: true,
+      state: null,
+    })
   }
 
   if (resultado) {
-    const certificado = resultado.certificado
-    const datos = certificado.datos || {}
+    const certificado =
+      resultado.certificado
+
+    const datos =
+      certificado.datos || {}
 
     const aprobado =
-      String(datos.resultado || '').toUpperCase() ===
-      'APROBADO'
+      String(
+        datos.resultado || ''
+      ).toUpperCase() === 'APROBADO'
 
     return (
       <div
@@ -123,7 +161,9 @@ export default function VerificacionAuditoria() {
             margin: '24px auto',
             padding: '20px',
             border: `3px solid ${
-              aprobado ? '#159447' : '#dc2626'
+              aprobado
+                ? '#159447'
+                : '#dc2626'
             }`,
             borderRadius: '9px',
             backgroundColor: aprobado
@@ -145,8 +185,9 @@ export default function VerificacionAuditoria() {
             fontWeight: '800',
           }}
         >
-          ¡Felicidades! Ha obtenido la certificación
-          regional de competencias digitales.
+          ¡Felicidades! Ha obtenido la
+          certificación regional de competencias
+          digitales.
         </h4>
 
         <div
@@ -229,15 +270,18 @@ export default function VerificacionAuditoria() {
             color: '#6b7280',
           }}
         >
-          El documento incorpora firma electrónica,
-          código de verificación y rastro de auditoría.
-          La descarga y el tratamiento de datos se realizan
-          conforme al GDPR y a las políticas regionales
+          El documento incorpora firma
+          electrónica, código de verificación y
+          rastro de auditoría. La descarga y el
+          tratamiento de datos se realizan conforme
+          al GDPR y a las políticas regionales
           aplicables.
         </p>
 
         {error && (
-          <CAlert color="danger">{error}</CAlert>
+          <CAlert color="danger">
+            {error}
+          </CAlert>
         )}
 
         <CButton
@@ -275,11 +319,14 @@ export default function VerificacionAuditoria() {
         padding: '0 20px',
       }}
     >
-      <h2>Verificación de certificados</h2>
+      <h2>
+        Verificación de certificados
+      </h2>
 
       <p className="text-muted">
-        Consulte la autenticidad del certificado, su firma
-        electrónica y el rastro inmutable de auditoría.
+        Consulte la autenticidad del certificado,
+        su firma electrónica y el rastro inmutable
+        de auditoría.
       </p>
 
       <form
@@ -306,6 +353,7 @@ export default function VerificacionAuditoria() {
           style={{
             display: 'flex',
             gap: '12px',
+            flexWrap: 'wrap',
           }}
         >
           <input
@@ -317,7 +365,7 @@ export default function VerificacionAuditoria() {
             }
             placeholder="Ingrese el identificador del certificado"
             style={{
-              flex: 1,
+              flex: '1 1 420px',
               minWidth: 0,
               padding: '11px',
               border: '2px solid #8b5cf6',
@@ -349,7 +397,10 @@ export default function VerificacionAuditoria() {
       </form>
 
       {error && (
-        <CAlert color="danger" className="mt-3">
+        <CAlert
+          color="danger"
+          className="mt-3"
+        >
           {error}
         </CAlert>
       )}

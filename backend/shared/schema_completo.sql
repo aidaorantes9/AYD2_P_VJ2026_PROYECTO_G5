@@ -298,6 +298,10 @@ END$$
 DELIMITER ;
 
 
+ALTER TABLE Certificado
+ADD CONSTRAINT uq_certificado_evaluacion
+UNIQUE (id_evaluacion);
+
 CREATE DATABASE IF NOT EXISTS prccd;
 USE prccd;
 

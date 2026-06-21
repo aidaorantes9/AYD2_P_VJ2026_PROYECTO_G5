@@ -95,3 +95,8 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+ALTER TABLE Certificado
+ADD CONSTRAINT uq_certificado_evaluacion
+UNIQUE (id_evaluacion);

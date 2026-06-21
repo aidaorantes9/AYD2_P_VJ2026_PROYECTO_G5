@@ -5,6 +5,8 @@ import {
   useState,
 } from 'react'
 
+import { useNavigate } from 'react-router-dom'
+
 import {
   CAlert,
   CBadge,
@@ -20,11 +22,17 @@ const API_BASE =
   import.meta.env.VITE_EVALUACIONES_API_URL ||
   'http://localhost:4001'
 
+const CERTIFICACION_API_BASE =
+  import.meta.env.VITE_CERTIFICACION_API_URL ||
+  'http://localhost:4003'
+
 const TOTAL_PREGUNTAS = 10
 const ID_CANDIDATO = 1
 const TIEMPO_TOTAL_SEG = 30 * 60
 
 export default function Examen() {
+  const navigate = useNavigate()
+
   const [idEvaluacion, setIdEvaluacion] = useState(null)
   const [pregunta, setPregunta] = useState(null)
   const [numeroPregunta, setNumeroPregunta] = useState(1)
@@ -35,6 +43,9 @@ export default function Examen() {
   const [terminado, setTerminado] = useState(false)
   const [cargando, setCargando] = useState(true)
   const [enviando, setEnviando] = useState(false)
+  const [emitiendoCertificado, setEmitiendoCertificado] =
+    useState(false)
+
   const [error, setError] = useState('')
 
   const [tiempoRestante, setTiempoRestante] =
@@ -46,6 +57,8 @@ export default function Examen() {
   useEffect(() => {
     async function iniciarEvaluacion() {
       try {
+        setError('')
+
         const respuesta = await fetch(
           `${API_BASE}/api/evaluacion/${ID_CANDIDATO}/iniciar`,
           {
@@ -57,13 +70,15 @@ export default function Examen() {
 
         if (!respuesta.ok) {
           throw new Error(
-            datos.error || 'No se pudo iniciar la evaluación'
+            datos.error ||
+              'No se pudo iniciar la evaluación'
           )
         }
 
         setIdEvaluacion(datos.id_evaluacion)
         setPregunta(datos.pregunta)
         setNumeroPregunta(datos.numero_pregunta)
+
         tiempoInicioPregunta.current = Date.now()
       } catch (err) {
         setError(err.message)
@@ -75,8 +90,111 @@ export default function Examen() {
     iniciarEvaluacion()
   }, [])
 
+  const emitirCertificadoAutomaticamente = useCallback(
+    async (resultadoEvaluacion) => {
+      if (
+        !resultadoEvaluacion?.id_evaluacion ||
+        emitiendoCertificado
+      ) {
+        return false
+      }
+
+      setEmitiendoCertificado(true)
+      setError('')
+
+      try {
+        const respuestaEmision = await fetch(
+          `${CERTIFICACION_API_BASE}/api/certificados/emitir`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id_candidato: ID_CANDIDATO,
+              id_evaluacion:
+                resultadoEvaluacion.id_evaluacion,
+              actor: 'Sistema PRCCD',
+              datos_certificado: {
+                nombre_candidato: 'Ana Lopez',
+                universidad:
+                  'Universidad de San Carlos de Guatemala',
+              },
+            }),
+          }
+        )
+
+        const datosEmision =
+          await respuestaEmision.json()
+
+        if (!respuestaEmision.ok) {
+          throw new Error(
+            datosEmision.error ||
+              'No se pudo emitir el certificado'
+          )
+        }
+
+        const codigo =
+          datosEmision?.certificado
+            ?.codigo_verificacion
+
+        if (!codigo) {
+          throw new Error(
+            'La emisión no devolvió un código de verificación'
+          )
+        }
+
+        const respuestaVerificacion = await fetch(
+          `${CERTIFICACION_API_BASE}/api/auditoria/verificar/${encodeURIComponent(
+            codigo
+          )}`
+        )
+
+        const datosVerificacion =
+          await respuestaVerificacion.json()
+
+        if (
+          !respuestaVerificacion.ok ||
+          !datosVerificacion.valido
+        ) {
+          throw new Error(
+            datosVerificacion.error ||
+              datosVerificacion.mensaje ||
+              'El certificado fue emitido, pero no pudo verificarse'
+          )
+        }
+
+        navigate('/certificado', {
+          replace: true,
+          state: {
+            resultado: datosVerificacion,
+          },
+        })
+
+        return true
+      } catch (err) {
+        setError(
+          err.message ||
+            'No se pudo generar el certificado'
+        )
+
+        return false
+      } finally {
+        setEmitiendoCertificado(false)
+      }
+    },
+    [
+      navigate,
+      emitiendoCertificado,
+    ]
+  )
+
   const finalizarEvaluacion = useCallback(async () => {
-    if (!idEvaluacion || terminado || finalizando.current) {
+    if (
+      !idEvaluacion ||
+      terminado ||
+      finalizando.current
+    ) {
       return
     }
 
@@ -102,19 +220,28 @@ export default function Examen() {
 
       if (!respuesta.ok) {
         throw new Error(
-          datos.error || 'No se pudo finalizar la evaluación'
+          datos.error ||
+            'No se pudo finalizar la evaluación'
         )
       }
 
       setResultado(datos)
       setTerminado(true)
+
+      if (datos.aprobada) {
+        await emitirCertificadoAutomaticamente(datos)
+      }
     } catch (err) {
       setError(err.message)
       finalizando.current = false
     } finally {
       setEnviando(false)
     }
-  }, [idEvaluacion, terminado])
+  }, [
+    idEvaluacion,
+    terminado,
+    emitirCertificadoAutomaticamente,
+  ])
 
   useEffect(() => {
     if (
@@ -165,7 +292,11 @@ export default function Examen() {
   }
 
   async function responderPregunta() {
-    if (!opcionSeleccionada || !pregunta) {
+    if (
+      !opcionSeleccionada ||
+      !pregunta ||
+      enviando
+    ) {
       return
     }
 
@@ -187,8 +318,10 @@ export default function Examen() {
             id_candidato: ID_CANDIDATO,
             id_evaluacion: idEvaluacion,
             id_pregunta: pregunta.id_pregunta,
-            id_opcion_seleccionada: opcionSeleccionada,
-            tiempo_respuesta_ms: tiempoRespuesta,
+            id_opcion_seleccionada:
+              opcionSeleccionada,
+            tiempo_respuesta_ms:
+              tiempoRespuesta,
           }),
         }
       )
@@ -197,13 +330,21 @@ export default function Examen() {
 
       if (!respuesta.ok) {
         throw new Error(
-          datos.error || 'No se pudo registrar la respuesta'
+          datos.error ||
+            'No se pudo registrar la respuesta'
         )
       }
 
       if (datos.terminado) {
         setResultado(datos.resultado)
         setTerminado(true)
+
+        if (datos.resultado.aprobada) {
+          await emitirCertificadoAutomaticamente(
+            datos.resultado
+          )
+        }
+
         return
       }
 
@@ -227,6 +368,7 @@ export default function Examen() {
       <CCard className="m-4">
         <CCardBody className="text-center">
           <CSpinner />
+
           <p className="mt-2 mb-0">
             Iniciando examen adaptativo...
           </p>
@@ -242,16 +384,24 @@ export default function Examen() {
           <h4>Resultado del examen</h4>
 
           <CBadge
-            color={resultado.aprobada ? 'success' : 'danger'}
+            color={
+              resultado.aprobada
+                ? 'success'
+                : 'danger'
+            }
             className="mb-3"
           >
-            {resultado.aprobada ? 'Aprobado' : 'Reprobado'}
+            {resultado.aprobada
+              ? 'Aprobado'
+              : 'Reprobado'}
           </CBadge>
 
           <p>
             Calificación:{' '}
             <strong>
-              {Number(resultado.calificacion).toFixed(2)}
+              {Number(
+                resultado.calificacion
+              ).toFixed(2)}
             </strong>{' '}
             / 100
           </p>
@@ -263,8 +413,49 @@ export default function Examen() {
 
           {resultado.respondidas !== undefined && (
             <p>
-              Preguntas respondidas: {resultado.respondidas}
+              Preguntas respondidas:{' '}
+              {resultado.respondidas}
             </p>
+          )}
+
+          {emitiendoCertificado && (
+            <CAlert color="info">
+              <CSpinner
+                size="sm"
+                className="me-2"
+              />
+              Emitiendo y verificando su certificado...
+            </CAlert>
+          )}
+
+          {error && (
+            <CAlert color="danger">
+              {error}
+            </CAlert>
+          )}
+
+          {resultado.aprobada && (
+            <CButton
+              color="success"
+              disabled={emitiendoCertificado}
+              onClick={() =>
+                emitirCertificadoAutomaticamente(
+                  resultado
+                )
+              }
+            >
+              {emitiendoCertificado ? (
+                <>
+                  <CSpinner
+                    size="sm"
+                    className="me-2"
+                  />
+                  Generando certificado...
+                </>
+              ) : (
+                'Obtener certificado'
+              )}
+            </CButton>
           )}
         </CCardBody>
       </CCard>
@@ -299,7 +490,9 @@ export default function Examen() {
         <CCardBody>
           <div className="d-flex justify-content-between align-items-center mb-2">
             <div>
-              <span className="fw-bold">Candidato:</span>{' '}
+              <span className="fw-bold">
+                Candidato:
+              </span>{' '}
               Ana López
             </div>
 
@@ -317,11 +510,14 @@ export default function Examen() {
                 }
               >
                 Tiempo restante:{' '}
-                {formatearTiempo(tiempoRestante)}
+                {formatearTiempo(
+                  tiempoRestante
+                )}
               </CBadge>
 
               <CBadge color="primary">
-                Dificultad: {pregunta.nivel_dificultad}
+                Dificultad:{' '}
+                {pregunta.nivel_dificultad}
               </CBadge>
             </div>
           </div>
@@ -339,26 +535,34 @@ export default function Examen() {
             {pregunta.enunciado}
           </p>
 
-          {(pregunta.opciones || []).map((opcion) => (
-            <CFormCheck
-              key={opcion.id_opcion}
-              type="radio"
-              name="opcion"
-              id={`opcion-${opcion.id_opcion}`}
-              label={opcion.texto_opcion}
-              checked={
-                opcionSeleccionada === opcion.id_opcion
-              }
-              onChange={() =>
-                setOpcionSeleccionada(opcion.id_opcion)
-              }
-              disabled={enviando}
-              className="mb-2"
-            />
-          ))}
+          {(pregunta.opciones || []).map(
+            (opcion) => (
+              <CFormCheck
+                key={opcion.id_opcion}
+                type="radio"
+                name="opcion"
+                id={`opcion-${opcion.id_opcion}`}
+                label={opcion.texto_opcion}
+                checked={
+                  opcionSeleccionada ===
+                  opcion.id_opcion
+                }
+                onChange={() =>
+                  setOpcionSeleccionada(
+                    opcion.id_opcion
+                  )
+                }
+                disabled={enviando}
+                className="mb-2"
+              />
+            )
+          )}
 
           {error && (
-            <CAlert color="danger" className="mt-3">
+            <CAlert
+              color="danger"
+              className="mt-3"
+            >
               {error}
             </CAlert>
           )}
@@ -367,7 +571,8 @@ export default function Examen() {
             <CButton
               color="primary"
               disabled={
-                !opcionSeleccionada || enviando
+                !opcionSeleccionada ||
+                enviando
               }
               onClick={responderPregunta}
             >
@@ -379,7 +584,8 @@ export default function Examen() {
                   />
                   Guardando...
                 </>
-              ) : numeroPregunta < TOTAL_PREGUNTAS ? (
+              ) : numeroPregunta <
+                TOTAL_PREGUNTAS ? (
                 'Guardar y continuar'
               ) : (
                 'Finalizar examen'
@@ -390,7 +596,10 @@ export default function Examen() {
               color="danger"
               variant="outline"
               className="ms-auto"
-              disabled={enviando}
+              disabled={
+                enviando ||
+                emitiendoCertificado
+              }
               onClick={finalizarEvaluacion}
             >
               Finalizar ahora
@@ -411,7 +620,10 @@ export default function Examen() {
           </h6>
 
           <div className="mb-3">
-            <CBadge color="success" className="mb-1">
+            <CBadge
+              color="success"
+              className="mb-1"
+            >
               Cámara y sesión
             </CBadge>
 
@@ -421,7 +633,10 @@ export default function Examen() {
           </div>
 
           <div className="mb-3">
-            <CBadge color="success" className="mb-1">
+            <CBadge
+              color="success"
+              className="mb-1"
+            >
               Registro de tecleo
             </CBadge>
 
@@ -431,7 +646,10 @@ export default function Examen() {
           </div>
 
           <div className="mb-3">
-            <CBadge color="warning" className="mb-1">
+            <CBadge
+              color="warning"
+              className="mb-1"
+            >
               Análisis antifraude
             </CBadge>
 
@@ -441,8 +659,8 @@ export default function Examen() {
           </div>
 
           <p className="small text-muted mt-3 mb-0">
-            Datos simulados — pendiente integración con el
-            módulo Antifraude.
+            Datos simulados — pendiente integración
+            con el módulo Antifraude.
           </p>
         </CCardBody>
       </CCard>

@@ -34,6 +34,14 @@ router.get('/candidato/:id', async (req, res) => {
     // si no existe el candidato retornar 404
     if (rows.length === 0) return res.status(404).json({ error: 'Candidato no encontrado' });
     const candidato = rows[0];
+    if (candidato.estado_gdpr === 'olvidado') {
+      return res.json({
+        id: candidato.id,
+        nombre: null,
+        email: null,
+        estado_gdpr: 'olvidado',
+      });
+    }
     // descifrar los campos antes de enviarlos en la respuesta
     res.json({
       id:          candidato.id,

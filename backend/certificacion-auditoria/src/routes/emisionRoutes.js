@@ -1,64 +1,71 @@
 const express = require('express');
+
 const {
   emitirCertificado,
 } = require('../services/emisionService');
 
 const router = express.Router();
 
-/**
- * POST /api/certificados/emitir
- * Genera un certificado firmado y registra su evento de emisión.
- */
 router.post('/emitir', async (req, res) => {
   try {
     const {
       id_candidato,
-      id_evaluacion = null,
-      datos_certificado,
+      id_evaluacion,
       actor = 'Sistema PRCCD',
+      datos_certificado = {},
     } = req.body;
 
-    const certificado = await emitirCertificado({
-      idCandidato: id_candidato,
-      idEvaluacion: id_evaluacion,
-      datosCertificado: datos_certificado,
-      actor,
-    });
+    const certificado =
+      await emitirCertificado({
+        idCandidato:
+          Number(id_candidato),
+        idEvaluacion:
+          Number(id_evaluacion),
+        datosCertificado:
+          datos_certificado,
+        actor,
+      });
 
-    return res.status(201).json({
-      mensaje: 'Certificado emitido correctamente',
-      certificado,
-    });
+    return res
+      .status(
+        certificado.reutilizado
+          ? 200
+          : 201
+      )
+      .json({
+        mensaje:
+          certificado.reutilizado
+            ? 'El certificado ya existía y fue recuperado correctamente'
+            : 'Certificado emitido correctamente',
+        certificado,
+      });
   } catch (error) {
-    if (error.code === 'CANDIDATO_NO_ENCONTRADO') {
-      return res.status(404).json({
-        error: error.message,
-      });
+    const estados = {
+      SOLICITUD_INVALIDA: 400,
+      CANDIDATO_NO_ENCONTRADO: 404,
+      EVALUACION_NO_ENCONTRADA: 404,
+      EVALUACION_NO_APROBADA: 403,
+      GDPR_NO_ENCONTRADO: 409,
+      GDPR_NO_ACTIVO: 403,
+    };
+
+    const estado =
+      estados[error.code] || 500;
+
+    if (estado === 500) {
+      console.error(
+        'Error emitiendo certificado:',
+        error
+      );
     }
 
-    if (
-      error.message ===
-      'Solo se puede emitir un certificado para un resultado APROBADO'
-    ) {
-      return res.status(403).json({
-        error: error.message,
-      });
-    }
-
-    if (
-      error.message.includes('id del candidato') ||
-      error.message.includes('id de la evaluación') ||
-      error.message.includes('datos del certificado')
-    ) {
-      return res.status(400).json({
-        error: error.message,
-      });
-    }
-
-    console.error('Error emitiendo certificado:', error);
-
-    return res.status(500).json({
-      error: 'No fue posible emitir el certificado',
+    return res.status(estado).json({
+      error:
+        estado === 500
+          ? 'No fue posible emitir el certificado'
+          : error.message,
+      codigo:
+        error.code || 'ERROR_INTERNO',
     });
   }
 });
