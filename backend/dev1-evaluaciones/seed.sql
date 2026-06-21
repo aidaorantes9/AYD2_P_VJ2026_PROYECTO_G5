@@ -165,3 +165,11 @@ VALUES (
   'en_progreso',
   FALSE
 );
+
+UPDATE Evaluacion
+SET
+  calificacion = 80.00,
+  estado = 'finalizada',
+  aprobada = TRUE
+WHERE id_evaluacion = 1
+  AND id_candidato = 1;

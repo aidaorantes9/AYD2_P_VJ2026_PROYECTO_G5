@@ -9,12 +9,21 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - prccd_mysql_data:/var/lib/mysql
-      - ./backend/dev2-integracion/schema.sql:/docker-entrypoint-initdb.d/01-integracion.sql:ro
-      - ./backend/certificacion-auditoria/schema.sql:/docker-entrypoint-initdb.d/02-certificacion.sql:ro
-      - ./backend/dev2-integracion/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
-      - ./backend/dev1-evaluaciones/schema.sql:/docker-entrypoint-initdb.d/03-evaluaciones.sql:ro    
-      - ./backend/dev1-evaluaciones/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql:ro  
+    - prccd_mysql_data:/var/lib/mysql
+
+    - ./backend/dev2-integracion/schema.sql:/docker-entrypoint-initdb.d/01-integracion-schema.sql:ro
+    - ./backend/dev2-integracion/seed.sql:/docker-entrypoint-initdb.d/02-integracion-seed.sql:ro
+
+    - ./backend/dev1-evaluaciones/schema.sql:/docker-entrypoint-initdb.d/03-evaluaciones-schema.sql:ro
+    - ./backend/dev1-evaluaciones/seed.sql:/docker-entrypoint-initdb.d/04-evaluaciones-seed.sql:ro
+
+    - ./backend/certificacion-auditoria/schema.sql:/docker-entrypoint-initdb.d/05-certificacion-schema.sql:ro
+
+    - ./backend/sm-seguridad/schema.sql:/docker-entrypoint-initdb.d/06-seguridad-schema.sql:ro
+    - ./backend/sm-seguridad/seed.sql:/docker-entrypoint-initdb.d/07-seguridad-seed.sql:ro 
+
+    - ./backend/dev4-antifraude/schema.sql:/docker-entrypoint-initdb.d/08-antifraude-schema.sql:ro
+    - ./backend/dev4-antifraude/seed.sql:/docker-entrypoint-initdb.d/09-antifraude-seed.sql:ro
     healthcheck:
       test:
         [
@@ -22,13 +31,14 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "localhost",
+          "127.0.0.1",
           "-uroot",
           "-proot"
         ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
+      start_period: 120s
 
   certificacion-auditoria:
     build:
@@ -80,6 +90,8 @@ services:
       DB_NAME: prccd
       PORT: 4002
       FRONTEND_URL: http://localhost:5173
+      AES_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      AES_IV: 0123456789abcdef0123456789abcdef
     ports:
       - "4002:4002"
     depends_on:
@@ -130,6 +142,75 @@ services:
       retries: 5
       start_period: 10s
 
+
+  sm-seguridad:
+    build:
+      context: ./backend/sm-seguridad
+      dockerfile: Dockerfile
+    container_name: prccd-sm-seguridad
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: prccd
+      PORT: 4005
+      FRONTEND_URL: http://localhost:5173
+      AES_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      AES_IV: 0123456789abcdef0123456789abcdef
+    ports:
+      - "4005:4005"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:4005/api/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  dev4-antifraude:
+    build:
+      context: ./backend/dev4-antifraude
+      dockerfile: Dockerfile
+    container_name: prccd-dev4-antifraude
+    restart: unless-stopped
+    environment:
+      PORT: 4004
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: prccd
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "4004:4004"
+    volumes:
+      - ./backend/dev4-antifraude/uploads:/app/src/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:4004/api/salud').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
   frontend:
     build:
       context: ./frontend/portal-prccd
@@ -137,7 +218,11 @@ services:
     container_name: prccd-frontend
     restart: unless-stopped
     environment:
+      VITE_EVALUACIONES_API_URL: http://localhost:4001
+      VITE_INTEGRACION_API_URL: http://localhost:4002
       VITE_CERTIFICACION_API_URL: http://localhost:4003
+      VITE_ANTIFRAUDE_API_URL: http://localhost:4004
+      VITE_SEGURIDAD_API_URL: http://localhost:4005
     ports:
       - "5173:5173"
     volumes:

@@ -6,7 +6,7 @@ const API_BASE = import.meta.env.VITE_CERTIFICACION_API_URL || 'http://localhost
 // DEBE MODIFICARSE POR EL PUERTO DE ALLAN QUE ES 4004
 
 // AQUI DEBE IR PARA CONSUMIR EL BACKEND DE ALLAN, OJO ALLI ESTO SE TIENE QUE CAMBIAR SI O SI 
-const ENDPOINT_VERIFICACION = '/api/certificados/verificar'
+const ENDPOINT_VERIFICACION = '/api/auditoria/verificar'
 
 function AuditoriaReportes() {
   const [codigo, setCodigo] = useState('')
@@ -15,33 +15,32 @@ function AuditoriaReportes() {
   const [resultado, setResultado] = useState(null)
 
   function normalizarRespuesta(data) {
-    const contenido = data.resultado || data.certificado || data
+    const eventos = data.eventos || []
+    const anomalias = data.anomalias || []
+
+    const rastroIntegro =
+      eventos.length > 0 &&
+      eventos.every(
+        (evento) =>
+          evento.enlace_valido &&
+          evento.hash_valido &&
+          evento.firma_valida,
+      )
 
     return {
-      codigo_verificacion: contenido.codigo_verificacion || codigo,
+      codigo_verificacion:
+        data.certificado?.codigo_verificacion || codigo,
+
       firma_valida:
-        contenido.firma_valida ??
-        contenido.firma_electronica_valida ??
-        contenido.firmas_validadas ??
-        false,
-      rastro_integro:
-        contenido.rastro_integro ??
-        contenido.rastro_validado ??
-        contenido.inmutable ??
-        false,
-      alteraciones_detectadas:
-        contenido.alteraciones_detectadas ??
-        (contenido.resultado === 'alterado' ? 1 : 0),
-      retencion_evidencia:
-        contenido.retencion_evidencia ||
-        contenido.fecha_retencion_hasta ||
-        '5 anios',
-      eventos:
-        contenido.rastro_auditoria ||
-        contenido.bitacora ||
-        data.rastro_auditoria ||
-        data.bitacora ||
-        [],
+        data.integridad_certificado?.firma_valida ?? false,
+
+      rastro_integro: rastroIntegro,
+
+      alteraciones_detectadas: anomalias.length,
+
+      retencion_evidencia: '5 años',
+
+      eventos,
     }
   }
 
@@ -159,7 +158,7 @@ function AuditoriaReportes() {
               </small>
 
               <CBadge color="primary" style={{ padding: '8px 22px' }}>
-                CDU103 | RF05
+                CDU103 | RF17-RF21
               </CBadge>
             </div>
 
@@ -334,7 +333,8 @@ function AuditoriaReportes() {
                         </CTableDataCell>
 
                         <CTableDataCell style={{ textAlign: 'center' }}>
-                          {evento.evento ||
+                          {evento.tipo_evento ||
+                            evento.evento ||
                             evento.accion ||
                             evento.descripcion ||
                             '-'}

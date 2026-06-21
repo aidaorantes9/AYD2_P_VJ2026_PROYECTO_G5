@@ -14,6 +14,7 @@ import Dashboard from './views/dashboard/Dashboard'
 import Examen from './pages/Examen'
 import PanelIngestionDatos from './views/integracion/PanelIngestionDatos'
 import AuditoriaReportes from './views/certificacion/AuditoriaReportes'
+import CertificadoDetalle from './views/certificacion/CertificadoDetalle'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<LoginIntegracion />} />
               <Route path="/certificado" element={<VerificacionAuditoria />} />
+              <Route path="/certificado/ver/:codigo" element={<CertificadoDetalle />} />
               <Route path="/privacidad" element={<GestionPrivacidad />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/examen" element={<Examen />} />

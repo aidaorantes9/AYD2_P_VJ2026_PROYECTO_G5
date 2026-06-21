@@ -15,7 +15,9 @@ import {
   CSpinner,
 } from '@coreui/react'
 
-const API_BASE = import.meta.env.VITE_DEV2_API_URL || 'http://localhost:4002'
+const API_BASE =
+  import.meta.env.VITE_INTEGRACION_API_URL ||
+  'http://localhost:4002'
 
 const universidades = [
   {

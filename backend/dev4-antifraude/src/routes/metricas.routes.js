@@ -1,8 +1,11 @@
-const express = require("express");
-const router = express.Router();
+const express = require('express')
 
-const controller = require("../controllers/metricas.controller");
+const {
+  getMetricas,
+} = require('../controllers/metricas.controller')
 
-router.get("/metricas", controller.getMetricas);
+const router = express.Router()
 
-module.exports = router;
+router.get('/metricas', getMetricas)
+
+module.exports = router

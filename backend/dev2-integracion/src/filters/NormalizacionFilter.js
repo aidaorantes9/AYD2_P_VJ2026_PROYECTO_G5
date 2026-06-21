@@ -1,7 +1,7 @@
 const BaseFilter = require('./BaseFilter');
 
 // Convierte JSON, XML o CSV a una estructura común
-class NormalizationFilter extends BaseFilter {
+class NormalizacionFilter extends BaseFilter {
     async handle(context) {
         if (context.formato_datos === 'JSON') {
             context.datosNormalizados = this.normalizarJson(context.datosParseados);
@@ -139,4 +139,4 @@ class NormalizationFilter extends BaseFilter {
     }
 }
 
-module.exports = NormalizationFilter;
+module.exports = NormalizacionFilter;

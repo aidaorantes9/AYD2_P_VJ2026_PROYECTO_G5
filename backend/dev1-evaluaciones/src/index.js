@@ -1,21 +1,31 @@
 require('dotenv').config();
+
 const express = require('express');
-const cors    = require('cors');
+const cors = require('cors');
 
 const evaluacionRoutes = require('./routers/evaluacion');
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 4001;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  })
+);
+
 app.use(express.json());
+
+app.get('/api/salud', (req, res) => {
+  res.json({
+    servicio: 'dev1-evaluaciones',
+    estado: 'disponible',
+    puerto: PORT,
+  });
+});
 
 app.use('/api/evaluacion', evaluacionRoutes);
 
-app.get('/', (req, res) => {
-  res.json({ mensaje: 'Motor de Evaluaciones activo — Lizz 201708997', puerto: PORT });
-});
-
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Motor de evaluaciones ejecutándose en http://localhost:${PORT}`);
 });

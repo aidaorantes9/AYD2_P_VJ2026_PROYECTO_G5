@@ -1,6 +1,8 @@
 // URL base del backend mio (Kevin - 202101007)
 // Si existe una variable de entorno, se usa esa. Si no, se usa localhost:4002.
-const API_BASE_URL = import.meta.env.VITE_API_INTEGRACION_URL || 'http://localhost:4002';
+const API_BASE_URL =
+  import.meta.env.VITE_INTEGRACION_API_URL ||
+  'http://localhost:4002'
 // (ACLARACION: por el momento usara localhost 4002, luego es que se integrara todo)
 
 // Catálogo usado por la pantalla para simular las universidades disponibles

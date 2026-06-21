@@ -2,9 +2,9 @@
 const ExtensionFilter = require('./ExtensionFilter');
 const FileReaderFilter = require('./FileReaderFilter');
 const ParserFilter = require('./ParserFilter');
-const NormalizationFilter = require('./NormalizacionFilter');
-const RequiredFieldsFilter = require('./CamposRequeridosFilter');
-const PersistenceFilter = require('./PersistenciaFilter');
+const CamposRequeridosFilter = require('./CamposRequeridosFilter');
+const NormalizacionFilter = require('./NormalizacionFilter');
+const PersistenciaFilter = require('./PersistenciaFilter');
 
 // Construye la cadena completa de filtros de ingesta
 function crearCadenaIngesta() {
@@ -14,13 +14,13 @@ function crearCadenaIngesta() {
     const fileReaderFilter = new FileReaderFilter();
     const parserFilter = new ParserFilter();
     // para estas dos mas se deja asi en ingles pero en realidad es normalizacion y campos requeridos verdad
-    const normalizationFilter = new NormalizationFilter();
-    const requiredFieldsFilter = new RequiredFieldsFilter();
-    const persistenceFilter = new PersistenceFilter();
+    const camposRequeridosFilter = new CamposRequeridosFilter();
+    const normalizacionFilter = new NormalizacionFilter();
+    const persistenciaFilter = new PersistenciaFilter();
 
     // Se define el orden del flujo:
     // validar extensión, leer archivo, parsear, normalizar, validar y persistir
-    extensionFilter.setNext(fileReaderFilter).setNext(parserFilter).setNext(normalizationFilter).setNext(requiredFieldsFilter).setNext(persistenceFilter);
+    extensionFilter.setNext(fileReaderFilter).setNext(parserFilter).setNext(normalizacionFilter).setNext(camposRequeridosFilter).setNext(persistenciaFilter);
 
     // Se devuelve el primer filtro, porque desde ahí inicia toda la cadena
     return extensionFilter;
