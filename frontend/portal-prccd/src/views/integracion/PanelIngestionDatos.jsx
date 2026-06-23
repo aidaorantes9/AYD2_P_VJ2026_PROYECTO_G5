@@ -19,6 +19,21 @@ const API_BASE =
   import.meta.env.VITE_INTEGRACION_API_URL ||
   'http://localhost:4002'
 
+function obtenerSesionActual() {
+  try {
+    const sesionGuardada =
+      sessionStorage.getItem('sesion') || localStorage.getItem('sesion')
+
+    if (!sesionGuardada) {
+      return null
+    }
+
+    return JSON.parse(sesionGuardada)
+  } catch {
+    return null
+  }
+}
+
 const universidades = [
   {
     id: 1,
@@ -102,28 +117,33 @@ function PanelIngestionDatos() {
   }
 
   const autenticarOrigen = async () => {
-    const respuesta = await fetch(`${API_BASE}/api/integracion/autenticacion`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id_universidad: universidad.id,
-        usuario: 'integracion.demo',
-        password: 'demo123',
-        saml_assertion: 'assertion-demo',
-        access_token: 'token-demo',
-      }),
-    })
 
-    const data = await respuesta.json()
+    const sesion = obtenerSesionActual()
 
-    if (!respuesta.ok || !data.ok) {
-      throw new Error(data.mensaje || 'No se pudo autenticar el origen')
+    if (!sesion?.autenticado) {
+      throw new Error('Debe iniciar sesión para validar archivos académicos')
     }
 
-    return data
-  }
+    if (sesion.rol !== 'admin') {
+      throw new Error('Solo el administrador puede validar y procesar archivos académicos')
+    }
+
+    return {
+      ok: true,
+      modulo: 'Integracion e Ingesta',
+      patron: 'Admin local',
+      resultado: {
+        autenticado: true,
+        protocolo_usado: universidad.protocolo_auth,
+        formato_datos: universidad.formato_datos,
+        id_universidad: universidad.id,
+        universidad: universidad.nombre,
+        rol: sesion.rol,
+        usuario: sesion.nombre || 'Administrador',
+        mensaje: 'Administrador autorizado para procesar archivos académicos',
+      },
+    }
+    }
 
   const validarArchivo = async () => {
     limpiarMensajes()
