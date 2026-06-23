@@ -218,12 +218,13 @@ class PersistenciaFilter extends BaseFilter {
                 id_ingesta,
                 nombre_cifrado,
                 email_cifrado,
+                contrasenia,
                 genero,
                 id_externo_univ,
                 fecha_registro,
                 estado_gdpr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
             ON DUPLICATE KEY UPDATE
                 id_pais = VALUES(id_pais),
                 id_carrera = VALUES(id_carrera),
@@ -231,6 +232,7 @@ class PersistenciaFilter extends BaseFilter {
                 id_ingesta = VALUES(id_ingesta),
                 nombre_cifrado = VALUES(nombre_cifrado),
                 email_cifrado = VALUES(email_cifrado),
+                contrasenia = VALUES(contrasenia),
                 genero = VALUES(genero),
                 id_externo_univ = VALUES(id_externo_univ),
                 estado_gdpr = VALUES(estado_gdpr)
@@ -243,6 +245,7 @@ class PersistenciaFilter extends BaseFilter {
                 idIngesta,
                 nombreCifrado,
                 emailCifrado,
+                candidato.contrasenia,
                 candidato.genero,
                 candidato.id_externo_univ,
                 candidato.estado_gdpr || 'activo'

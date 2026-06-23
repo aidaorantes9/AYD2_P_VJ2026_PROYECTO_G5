@@ -85,7 +85,8 @@ function LoginIntegracion() {
       universidad: 'PRCCD',
       proveedor: 'local',
     }
-    localStorage.setItem('sesion', JSON.stringify(sesion))
+    sessionStorage.setItem('sesion', JSON.stringify(sesion))
+    localStorage.removeItem('sesion')
     setCargando(false)
     navigate('/')
   }
@@ -98,15 +99,22 @@ function LoginIntegracion() {
     return ''
   }
 
+  // ahora si un login digno de va jaja 
   async function iniciarSesionCandidato(event) {
+
     event.preventDefault()
     setResultado(null)
     setError('')
 
     const mensajeValidacion = validarFormularioCandidato()
-    if (mensajeValidacion) { setError(mensajeValidacion); return }
+
+    if (mensajeValidacion) {
+      setError(mensajeValidacion)
+      return
+    }
 
     setCargando(true)
+
     try {
       const respuesta = await FachadaIntegracion.iniciarSesionUniversidad({
         id_universidad: Number(idUniversidad),
@@ -114,21 +122,29 @@ function LoginIntegracion() {
         credencial: credencial.trim(),
       })
 
-      // Persistir sesión candidato
+      /* ESTO ES PARA LA PERSISTENCIA DEL CANDIDATO VERDAD: */
+      const candidato = respuesta.resultado || {}
+
       const sesion = {
         autenticado: true,
         rol: 'candidato',
-        idCandidato: respuesta.resultado?.id_candidato ?? null,
-        idUniversidad: Number(idUniversidad),
-        nombre: respuesta.resultado?.usuario_externo ?? usuario.trim(),
-        universidad: respuesta.resultado?.universidad ?? '',
-        proveedor: respuesta.resultado?.protocolo_usado ?? '',
+
+        idCandidato: Number(candidato.id_candidato),
+        idUniversidad: Number(candidato.id_universidad || idUniversidad),
+
+        nombre: candidato.nombre_candidato || candidato.usuario_externo || usuario.trim(),
+        email: candidato.email_candidato || candidato.usuario_externo || usuario.trim(),
+
+        universidad: candidato.universidad || universidadSeleccionada?.nombre || '',
+        proveedor: candidato.protocolo_usado || universidadSeleccionada?.protocolo_auth || '',
       }
-      localStorage.setItem('sesion', JSON.stringify(sesion))
+
+      sessionStorage.setItem('sesion', JSON.stringify(sesion))
+      localStorage.removeItem('sesion')
       setResultado(respuesta)
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      setError(err.message || 'Usuario o contraseña incorrectos')
     } finally {
       setCargando(false)
     }

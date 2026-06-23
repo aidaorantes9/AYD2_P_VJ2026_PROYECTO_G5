@@ -1,33 +1,27 @@
-// Se importa la conexión a la base de datos
-const pool = require('../db');
+const pool = require('../db')
+const AdapterFactory = require('../adapters/AdapterFactory')
 
-// Se importa la fábrica que selecciona el adaptador correcto
-const AdapterFactory = require('../adapters/AdapterFactory');
-
-// Controlador para autenticar contra una universidad simulada
+// Controlador para autenticar contra una universidad usando Adapter.
 async function autenticarUniversidad(req, res) {
     try {
-        // Se reciben los posibles datos de autenticación desde el body
         const {
             id_universidad,
             usuario,
             password,
             saml_assertion,
             access_token
-        } = req.body;
+        } = req.body
 
-        // Se valida que venga la universidad, porque de ahí se obtiene el protocolo
         if (!id_universidad) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'El campo id_universidad es obligatorio'
-            });
+            })
         }
 
-        // Se consulta la universidad para saber qué protocolo utiliza
         const [universidades] = await pool.query(
             `
-            SELECT 
+            SELECT
                 id_universidad,
                 nombre,
                 protocolo_auth,
@@ -37,54 +31,50 @@ async function autenticarUniversidad(req, res) {
             WHERE id_universidad = ?
             `,
             [id_universidad]
-        );
+        )
 
-        // Si no existe la universidad, no se puede seleccionar adaptador
         if (universidades.length === 0) {
             return res.status(404).json({
                 ok: false,
                 mensaje: 'Universidad no encontrada'
-            });
+            })
         }
 
-        const universidad = universidades[0];
+        const universidad = universidades[0]
 
-        // Se valida que la universidad esté activa para permitir la integración
         if (universidad.estado !== 'activo') {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'La universidad no se encuentra activa'
-            });
+            })
         }
 
-        // Se crea el adaptador correspondiente: LDAP, SAML u OAuth2
-        const adapter = AdapterFactory.crear(universidad);
+        const adapter = AdapterFactory.crear(universidad)
 
-        // Se ejecuta la autenticación simulada usando el adaptador seleccionado
         const resultado = await adapter.autenticar({
             usuario,
             password,
             saml_assertion,
             access_token
-        });
+        })
 
-        // Se responde con el resultado normalizado
-        return res.json({
+        return res.status(200).json({
             ok: true,
             modulo: 'Integracion e Ingesta',
             patron: 'Adapter',
             resultado
-        });
+        })
 
     } catch (error) {
-        // Se captura cualquier error de validación, base de datos o adaptador
-        return res.status(500).json({
+        const statusCode = error.statusCode || 500
+
+        return res.status(statusCode).json({
             ok: false,
-            mensaje: error.message
-        });
+            mensaje: error.message || 'Error interno al autenticar'
+        })
     }
 }
 
 module.exports = {
     autenticarUniversidad
-};
+}

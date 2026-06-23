@@ -98,6 +98,8 @@ CREATE TABLE IF NOT EXISTS Candidato (
     id_ingesta BIGINT NULL,
     nombre_cifrado VARBINARY(255) NOT NULL,
     email_cifrado VARBINARY(255) NOT NULL,
+    -- voy a agregar una columna para la contrasenia del candidato, esto no se hace tan asi pero si lo dejare asi porque pues ni modo va asi tocara hacerlo y ya esta 
+    contrasenia VARCHAR(100) NOT NULL,
     genero VARCHAR(20) NOT NULL,
     id_externo_univ VARCHAR(80) NOT NULL,
     fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -21,7 +21,7 @@ function Sidebar() {
   const navigate = useNavigate()
 
   const sesion = (() => {
-    try { return JSON.parse(localStorage.getItem('sesion')) }
+    try { return JSON.parse(sessionStorage.getItem('sesion')) }
     catch { return null }
   })()
 
@@ -29,6 +29,7 @@ function Sidebar() {
   const items = rol === 'admin' ? itemsAdmin : rol === 'candidato' ? itemsCandidato : []
 
   function cerrarSesion() {
+    sessionStorage.removeItem('sesion')
     localStorage.removeItem('sesion')
     navigate('/login')
   }

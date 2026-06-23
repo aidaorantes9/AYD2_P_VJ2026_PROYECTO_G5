@@ -15,7 +15,7 @@ function RutaProtegida({ children, roles = [] }) {
   let sesion = null
 
   try {
-    sesion = JSON.parse(localStorage.getItem('sesion'))
+    sesion = JSON.parse(sessionStorage.getItem('sesion'))
   } catch {
     sesion = null
   }

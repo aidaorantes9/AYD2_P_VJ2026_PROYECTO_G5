@@ -49,63 +49,49 @@ class FachadaIntegracion {
     static async iniciarSesionUniversidad(datosLogin) {
 
         const {
-        id_universidad,
-        usuario,
-        credencial
-        } = datosLogin;
+            id_universidad,
+            usuario,
+            credencial
+        } = datosLogin
 
-        const universidad = this.obtenerUniversidadPorId(id_universidad);
+        const universidad = this.obtenerUniversidadPorId(id_universidad)
 
         if (!universidad) {
-        
-            throw new Error('Universidad no encontrada en la fachada de integración');
-        
+            throw new Error('Universidad no encontrada en la fachada de integración')
         }
 
-        // Body base que todos los adaptadores reciben.
         const body = {
-        id_universidad: Number(id_universidad),
-        usuario
-        };
+            id_universidad: Number(id_universidad),
+            usuario
+        }
 
-        // Si la universidad usa LDAP, se envía password.
         if (universidad.protocolo_auth === 'LDAP') {
-            
-            body.password = credencial;
-        
+            body.password = credencial
         }
 
-        // Si la universidad usa SAML, se envía una assertion simulada.
         if (universidad.protocolo_auth === 'SAML') {
-        
-            body.saml_assertion = credencial || 'assertion-simulada';
-        
+            body.saml_assertion = credencial
         }
 
-        // Si la universidad usa OAuth2, se envía un token simulado.
         if (universidad.protocolo_auth === 'OAuth2') {
-        
-            body.access_token = credencial || 'token-simulado';
-        
+            body.access_token = credencial
         }
 
         const respuesta = await fetch(`${API_BASE_URL}/api/integracion/autenticacion`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-        });
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
 
-        const data = await respuesta.json();
+        const data = await respuesta.json()
 
         if (!respuesta.ok || data.ok === false) {
-    
-            throw new Error(data.mensaje || 'No se pudo iniciar sesión');
-    
+            throw new Error(data.mensaje || 'No se pudo iniciar sesión')
         }
 
-        return data;
+        return data
     }
 }
 

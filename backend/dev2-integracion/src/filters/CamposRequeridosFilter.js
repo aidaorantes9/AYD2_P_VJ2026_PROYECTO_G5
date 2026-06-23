@@ -18,7 +18,7 @@ class CamposRequeridosFilter extends BaseFilter {
         data.candidatos.forEach((candidato) => {
     
             if (!candidato.id_candidato || !candidato.nombre_completo || !candidato.id_externo_univ ||
-                !candidato.carrera || !Array.isArray(candidato.cursos_aprobados)) 
+                !candidato.carrera || !candidato.contrasenia || !Array.isArray(candidato.cursos_aprobados)) 
             {
                 throw new Error(`El candidato ${candidato.id_candidato || 'sin id'} tiene datos incompletos`);
             }
