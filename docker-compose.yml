@@ -10,20 +10,8 @@ services:
       - "3306:3306"
     volumes:
     - prccd_mysql_data:/var/lib/mysql
-
-    - ./backend/dev2-integracion/schema.sql:/docker-entrypoint-initdb.d/01-integracion-schema.sql:ro
-    - ./backend/dev2-integracion/seed.sql:/docker-entrypoint-initdb.d/02-integracion-seed.sql:ro
-
-    - ./backend/dev1-evaluaciones/schema.sql:/docker-entrypoint-initdb.d/03-evaluaciones-schema.sql:ro
-    - ./backend/dev1-evaluaciones/seed.sql:/docker-entrypoint-initdb.d/04-evaluaciones-seed.sql:ro
-
-    - ./backend/certificacion-auditoria/schema.sql:/docker-entrypoint-initdb.d/05-certificacion-schema.sql:ro
-
-    - ./backend/sm-seguridad/schema.sql:/docker-entrypoint-initdb.d/06-seguridad-schema.sql:ro
-    - ./backend/sm-seguridad/seed.sql:/docker-entrypoint-initdb.d/07-seguridad-seed.sql:ro 
-
-    - ./backend/dev4-antifraude/schema.sql:/docker-entrypoint-initdb.d/08-antifraude-schema.sql:ro
-    - ./backend/dev4-antifraude/seed.sql:/docker-entrypoint-initdb.d/09-antifraude-seed.sql:ro
+    - ./backend/shared/schema_completo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro,Z
+    - ./backend/shared/seed_completo.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro,Z
     healthcheck:
       test:
         [
@@ -141,7 +129,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
 
   sm-seguridad:
     build:

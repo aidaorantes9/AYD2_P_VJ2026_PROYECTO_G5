@@ -1,9 +1,33 @@
--- Selecciona la base de datos del proyecto
+-- =============================================================================
+-- SEED COMPLETO - PRCCD (Plataforma de Registro y Certificación de Competencias Digitales)
+-- =============================================================================
+-- Orden de inserción basado en dependencias de llaves foráneas:
+--   1. dev2-integracion   → Pais, Universidad, Carrera, IngestaDatosAcademicos, Candidato, HistorialAcademico
+--   2. dev1-evaluaciones  → PeriodoCertificacion, Competencia, Pregunta, OpcionRespuesta,
+--                           InscripcionPeriodo, Evaluacion
+--   3. sm-seguridad       → CandidatoSeguridad
+--   4. dev4-antifraude    → EvidenciaAntifraude, DeteccionFraude
+-- =============================================================================
+
 USE prccd;
+
+-- =============================================================================
+-- MÓDULO: dev2-integracion
+-- =============================================================================
 
 -- Limpia datos previos respetando dependencias entre tablas
 SET FOREIGN_KEY_CHECKS = 0;
 
+TRUNCATE TABLE DeteccionFraude;
+TRUNCATE TABLE EvidenciaAntifraude;
+TRUNCATE TABLE CandidatoSeguridad;
+TRUNCATE TABLE RespuestaEvaluacion;
+TRUNCATE TABLE Evaluacion;
+TRUNCATE TABLE InscripcionPeriodo;
+TRUNCATE TABLE OpcionRespuesta;
+TRUNCATE TABLE Pregunta;
+TRUNCATE TABLE Competencia;
+TRUNCATE TABLE PeriodoCertificacion;
 TRUNCATE TABLE HistorialAcademico;
 TRUNCATE TABLE Candidato;
 TRUNCATE TABLE IngestaDatosAcademicos;
@@ -238,25 +262,9 @@ VALUES
     (14, 6, 'PRG-101', 'Programacion I', 80.00),
     (15, 6, 'RED-301', 'Redes de Computadoras', 84.00);
 
-USE prccd;
-
--- Limpiar datos previos en orden correcto
-DELETE FROM RespuestaEvaluacion;
-DELETE FROM Evaluacion;
-DELETE FROM InscripcionPeriodo;
-DELETE FROM OpcionRespuesta;
-DELETE FROM Pregunta;
-DELETE FROM Competencia;
-DELETE FROM PeriodoCertificacion;
-
--- Reiniciar autoincrementos
-ALTER TABLE RespuestaEvaluacion AUTO_INCREMENT = 1;
-ALTER TABLE Evaluacion AUTO_INCREMENT = 1;
-ALTER TABLE InscripcionPeriodo AUTO_INCREMENT = 1;
-ALTER TABLE OpcionRespuesta AUTO_INCREMENT = 1;
-ALTER TABLE Pregunta AUTO_INCREMENT = 1;
-ALTER TABLE Competencia AUTO_INCREMENT = 1;
-ALTER TABLE PeriodoCertificacion AUTO_INCREMENT = 1;
+-- =============================================================================
+-- MÓDULO: dev1-evaluaciones
+-- =============================================================================
 
 -- 1. Periodo de certificacion
 INSERT INTO PeriodoCertificacion (
@@ -414,7 +422,9 @@ SET
 WHERE id_evaluacion = 1
   AND id_candidato = 1;
 
-USE prccd;
+-- =============================================================================
+-- MÓDULO: sm-seguridad
+-- =============================================================================
 
 INSERT INTO CandidatoSeguridad (id, nombre_cifrado, email_cifrado, estado_gdpr) VALUES
   (1, UNHEX('7727c36a13e42d8680743d4c6ed084e0'), UNHEX('7ad7bf97e9ab8dd187d790ecd101cf4f62e87f9b4c967845009c716b2e11d219'), 'activo'),
@@ -424,3 +434,67 @@ INSERT INTO CandidatoSeguridad (id, nombre_cifrado, email_cifrado, estado_gdpr) 
 
 ALTER TABLE CandidatoSeguridad AUTO_INCREMENT = 5;
 
+-- =============================================================================
+-- MÓDULO: dev4-antifraude
+-- =============================================================================
+
+INSERT INTO EvidenciaAntifraude (
+    id_evaluacion,
+    tipo_evidencia,
+    uri_almacenamiento,
+    hash_sha256,
+    algoritmo_cifrado,
+    timestamp_captura,
+    fecha_retencion_hasta,
+    inmutable
+)
+SELECT
+    1,
+    'captura',
+    '/evidencias/eval1_captura.png',
+    'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f9',
+    'SHA-256',
+    '2026-06-15 10:00:00',
+    '2031-06-15',
+    TRUE
+WHERE EXISTS (
+    SELECT 1
+    FROM Evaluacion
+    WHERE id_evaluacion = 1
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM EvidenciaAntifraude
+    WHERE id_evaluacion = 1
+      AND uri_almacenamiento =
+          '/evidencias/eval1_captura.png'
+);
+
+INSERT INTO DeteccionFraude (
+    id_evaluacion,
+    id_evidencia,
+    tipo_indicio,
+    descripcion,
+    severidad,
+    estado_revision,
+    fecha_deteccion
+)
+SELECT
+    e.id_evaluacion,
+    e.id_evidencia,
+    'patron_tecleo_anomalo',
+    'Se detectó un patrón de tecleo inconsistente con el historial del candidato',
+    'alta',
+    'pendiente',
+    '2026-06-15 10:05:00'
+FROM EvidenciaAntifraude e
+WHERE e.id_evaluacion = 1
+  AND e.uri_almacenamiento =
+      '/evidencias/eval1_captura.png'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM DeteccionFraude d
+      WHERE d.id_evidencia = e.id_evidencia
+        AND d.tipo_indicio =
+            'patron_tecleo_anomalo'
+  );

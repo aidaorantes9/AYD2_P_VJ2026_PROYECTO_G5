@@ -1,6 +1,6 @@
 universidad_origen,nombre_universidad,pais,codigo_iso,protocolo_auth,formato_datos,id_candidato,id_externo_univ,nombre_completo,email,genero,carrera,estado_gdpr,codigo_curso,nombre_curso,nota_final
 UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,5,UES-2024-001,Maria Ramos,maria.ramos@ues.edu.sv,F,Ingenieria en Sistemas,activo,PRG-101,Programacion I,86.00
 UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,5,UES-2024-001,Maria Ramos,maria.ramos@ues.edu.sv,F,Ingenieria en Sistemas,activo,BD-201,Bases de Datos I,91.00
-UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,5,UES-2024-001,Maria Ramos,maria.ramos@ues.edu.sv,F,Ingenieria en Sistemas,activo,SO-301,Sistemas Operativos,89.00
+UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,5,UES-2024-001,Aux Luis,aux@ues.edu.sv,F,Ingenieria en Sistemas,activo,SO-301,Sistemas Operativos,89.00
 UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,6,UES-2024-002,Pedro Jimenez,pedro.jimenez@ues.edu.sv,M,Ingenieria en Sistemas,activo,PRG-101,Programacion I,80.00
 UES,Universidad de El Salvador,El Salvador,SV,OAuth2,CSV,6,UES-2024-002,Pedro Jimenez,pedro.jimenez@ues.edu.sv,M,Ingenieria en Sistemas,activo,RED-301,Redes de Computadoras,84.00

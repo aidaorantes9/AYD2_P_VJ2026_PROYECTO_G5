@@ -1,3 +1,15 @@
+-- =============================================================================
+-- SCHEMA COMPLETO - PRCCD (Plataforma de Registro y Certificación de Competencias Digitales)
+-- =============================================================================
+-- Orden de creación basado en dependencias de llaves foráneas:
+--   1. sm-seguridad       → CandidatoSeguridad (independiente)
+--   2. dev2-integracion   → Pais, Universidad, Carrera, IngestaDatosAcademicos, Candidato, HistorialAcademico
+--   3. dev1-evaluaciones  → PeriodoCertificacion, InscripcionPeriodo, Competencia, Pregunta,
+--                           OpcionRespuesta, Evaluacion, RespuestaEvaluacion
+--   4. dev4-antifraude    → EvidenciaAntifraude, DeteccionFraude, MetricaAgregada
+--   5. certificacion-auditoria → Certificado, BitacoraAuditoria (+ triggers)
+-- =============================================================================
+
 -- Crea la base de datos del proyecto si no existe
 CREATE DATABASE IF NOT EXISTS prccd
 CHARACTER SET utf8mb4
@@ -6,29 +18,31 @@ COLLATE utf8mb4_unicode_ci;
 -- Selecciona la base de datos del proyecto
 USE prccd;
 
--- Desactiva temporalmente las llaves foráneas para eliminar tablas sin errores
-SET FOREIGN_KEY_CHECKS = 0;
+-- =============================================================================
+-- MÓDULO: sm-seguridad
+-- =============================================================================
 
--- Elimina las tablas del módulo Dev 2 si ya existen
-DROP TABLE IF EXISTS HistorialAcademico;
-DROP TABLE IF EXISTS Candidato;
-DROP TABLE IF EXISTS IngestaDatosAcademicos;
-DROP TABLE IF EXISTS Carrera;
-DROP TABLE IF EXISTS Universidad;
-DROP TABLE IF EXISTS Pais;
+CREATE TABLE IF NOT EXISTS CandidatoSeguridad (
+    id             BIGINT         NOT NULL AUTO_INCREMENT,
+    nombre_cifrado VARBINARY(255) NOT NULL,
+    email_cifrado  VARBINARY(255) NOT NULL,
+    estado_gdpr    ENUM('activo', 'anonimizado', 'olvidado') NOT NULL DEFAULT 'activo',
+    PRIMARY KEY (id)
+);
 
--- Reactiva la validación de llaves foráneas
-SET FOREIGN_KEY_CHECKS = 1;
+-- =============================================================================
+-- MÓDULO: dev2-integracion
+-- =============================================================================
 
 -- Catálogo de países de la región
-CREATE TABLE Pais (
+CREATE TABLE IF NOT EXISTS Pais (
     id_pais INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     codigo_iso CHAR(2) NOT NULL
 ) ENGINE=InnoDB;
 
 -- Universidades integradas al sistema
-CREATE TABLE Universidad (
+CREATE TABLE IF NOT EXISTS Universidad (
     id_universidad INT AUTO_INCREMENT PRIMARY KEY,
     id_pais INT NOT NULL,
     nombre VARCHAR(120) NOT NULL,
@@ -45,7 +59,7 @@ CREATE TABLE Universidad (
 ) ENGINE=InnoDB;
 
 -- Carreras asociadas a una universidad
-CREATE TABLE Carrera (
+CREATE TABLE IF NOT EXISTS Carrera (
     id_carrera INT AUTO_INCREMENT PRIMARY KEY,
     id_universidad INT NOT NULL,
     nombre VARCHAR(120) NOT NULL,
@@ -58,7 +72,7 @@ CREATE TABLE Carrera (
 ) ENGINE=InnoDB;
 
 -- Registro de procesos de ingesta académica
-CREATE TABLE IngestaDatosAcademicos (
+CREATE TABLE IF NOT EXISTS IngestaDatosAcademicos (
     id_ingesta BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_universidad INT NOT NULL,
     formato_datos ENUM('JSON', 'XML', 'CSV') NOT NULL,
@@ -76,7 +90,7 @@ CREATE TABLE IngestaDatosAcademicos (
 ) ENGINE=InnoDB;
 
 -- Candidatos importados desde las universidades
-CREATE TABLE Candidato (
+CREATE TABLE IF NOT EXISTS Candidato (
     id_candidato BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_pais INT NULL,
     id_carrera INT NULL,
@@ -115,8 +129,7 @@ CREATE TABLE Candidato (
 ) ENGINE=InnoDB;
 
 -- Historial académico normalizado de cada candidato
--- RECORDATORIO: ESTA TABLA ES NUEVA NO APARECE EN EL DIAGRAMA ORIGINAL, SE CREA PARA ALMACENAR LOS CURSOS Y NOTAS DE CADA CANDIDATO DE FORMA NORMALIZADA
-CREATE TABLE HistorialAcademico (
+CREATE TABLE IF NOT EXISTS HistorialAcademico (
     id_historial BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_candidato BIGINT NOT NULL,
     codigo_curso VARCHAR(50) NOT NULL,
@@ -129,6 +142,10 @@ CREATE TABLE HistorialAcademico (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- =============================================================================
+-- MÓDULO: dev1-evaluaciones
+-- =============================================================================
 
 CREATE TABLE IF NOT EXISTS PeriodoCertificacion (
   id_periodo        INT AUTO_INCREMENT PRIMARY KEY,
@@ -197,14 +214,131 @@ CREATE TABLE IF NOT EXISTS RespuestaEvaluacion (
   FOREIGN KEY (id_pregunta)   REFERENCES Pregunta(id_pregunta)
 );
 
+-- =============================================================================
+-- MÓDULO: dev4-antifraude
+-- =============================================================================
 
+CREATE TABLE IF NOT EXISTS EvidenciaAntifraude (
+    id_evidencia          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id_evaluacion         INT NOT NULL,
+    tipo_evidencia        ENUM(
+        'captura',
+        'log_tecleo',
+        'video'
+    ) NOT NULL,
+    uri_almacenamiento    VARCHAR(255) NOT NULL,
+    hash_sha256           CHAR(64) DEFAULT NULL,
+    algoritmo_cifrado     VARCHAR(30) DEFAULT NULL,
+    timestamp_captura     DATETIME NOT NULL,
+    fecha_retencion_hasta DATE DEFAULT NULL,
+    inmutable             TINYINT(1) NOT NULL DEFAULT 1,
+    creado_en             DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
--- Módulo de certificación y auditoría de la PRCCD
-CREATE DATABASE IF NOT EXISTS prccd
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+    PRIMARY KEY (id_evidencia),
 
-USE prccd;
+    INDEX idx_evidencia_evaluacion (
+        id_evaluacion
+    ),
+
+    CONSTRAINT fk_evidencia_evaluacion
+        FOREIGN KEY (id_evaluacion)
+        REFERENCES Evaluacion(id_evaluacion)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS DeteccionFraude (
+    id_deteccion      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id_evaluacion     INT NOT NULL,
+    id_evidencia      BIGINT UNSIGNED NOT NULL,
+    tipo_indicio      VARCHAR(60) NOT NULL,
+    descripcion       TEXT DEFAULT NULL,
+    severidad         ENUM(
+        'baja',
+        'media',
+        'alta',
+        'critica'
+    ) NOT NULL DEFAULT 'media',
+    estado_revision   ENUM(
+        'pendiente',
+        'confirmado',
+        'descartado'
+    ) NOT NULL DEFAULT 'pendiente',
+    fecha_deteccion   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id_deteccion),
+
+    INDEX idx_deteccion_evaluacion (
+        id_evaluacion
+    ),
+
+    INDEX idx_deteccion_evidencia (
+        id_evidencia
+    ),
+
+    CONSTRAINT fk_deteccion_evaluacion
+        FOREIGN KEY (id_evaluacion)
+        REFERENCES Evaluacion(id_evaluacion)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_deteccion_evidencia
+        FOREIGN KEY (id_evidencia)
+        REFERENCES EvidenciaAntifraude(id_evidencia)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS MetricaAgregada (
+    id_metrica          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id_competencia      INT DEFAULT NULL,
+    id_pais             INT DEFAULT NULL,
+    id_carrera          INT DEFAULT NULL,
+    id_periodo          INT DEFAULT NULL,
+    carrera_segmento    VARCHAR(120) NOT NULL,
+    genero_segmento     VARCHAR(20) NOT NULL,
+    total_evaluaciones  INT NOT NULL DEFAULT 0,
+    total_aprobados     INT NOT NULL DEFAULT 0,
+    tasa_aprobacion     DECIMAL(5,2) NOT NULL DEFAULT 0,
+    anonimizada         TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_calculo       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id_metrica),
+
+    INDEX idx_metrica_segmentos (
+        id_pais,
+        id_carrera,
+        genero_segmento
+    ),
+
+    CONSTRAINT fk_metrica_competencia
+        FOREIGN KEY (id_competencia)
+        REFERENCES Competencia(id_competencia)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_metrica_pais
+        FOREIGN KEY (id_pais)
+        REFERENCES Pais(id_pais)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_metrica_carrera
+        FOREIGN KEY (id_carrera)
+        REFERENCES Carrera(id_carrera)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_metrica_periodo
+        FOREIGN KEY (id_periodo)
+        REFERENCES PeriodoCertificacion(id_periodo)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+) ENGINE = InnoDB;
+
+-- =============================================================================
+-- MÓDULO: certificacion-auditoria
+-- =============================================================================
 
 -- Certificados digitales emitidos a candidatos aprobados
 CREATE TABLE IF NOT EXISTS Certificado (
@@ -229,6 +363,9 @@ CREATE TABLE IF NOT EXISTS Certificado (
 
     CONSTRAINT uq_certificado_hash
         UNIQUE (hash_certificado),
+
+    CONSTRAINT uq_certificado_evaluacion
+        UNIQUE (id_evaluacion),
 
     CONSTRAINT fk_certificado_candidato
         FOREIGN KEY (id_candidato)
@@ -272,7 +409,6 @@ CREATE TABLE IF NOT EXISTS BitacoraAuditoria (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
-
 -- Protección append-only de la bitácora inmutable
 DROP TRIGGER IF EXISTS trg_bitacora_bloquear_update;
 DROP TRIGGER IF EXISTS trg_bitacora_bloquear_delete;
@@ -296,21 +432,3 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-
-ALTER TABLE Certificado
-ADD CONSTRAINT uq_certificado_evaluacion
-UNIQUE (id_evaluacion);
-
-CREATE DATABASE IF NOT EXISTS prccd;
-USE prccd;
-
-CREATE TABLE IF NOT EXISTS CandidatoSeguridad (
-    id             BIGINT         NOT NULL AUTO_INCREMENT,
-    nombre_cifrado VARBINARY(255) NOT NULL,
-    email_cifrado  VARBINARY(255) NOT NULL,
-    estado_gdpr    ENUM('activo', 'anonimizado', 'olvidado') NOT NULL DEFAULT 'activo',
-    PRIMARY KEY (id)
-);
-
-
