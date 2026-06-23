@@ -1,4 +1,5 @@
 const pool = require('../db')
+const { descifrar } = require('../utils/cryptoDatos')
 
 // Clase base para definir el comportamiento común de los adaptadores.
 // Aquí se concentra la validación real contra la tabla Candidato.
@@ -17,6 +18,26 @@ class BaseAuthAdapter {
         return error
     }
 
+    convertirCampo(valor) {
+        if (valor === null || valor === undefined) {
+            return ''
+        }
+
+        if (Buffer.isBuffer(valor)) {
+            try {
+                return descifrar(valor)
+            } catch {
+                return valor.toString('utf8')
+            }
+        }
+
+        try {
+            return descifrar(Buffer.from(valor))
+        } catch {
+            return String(valor)
+        }
+    }
+
     async buscarCandidatoActivo(usuario, contrasenia) {
         const usuarioNormalizado = String(usuario || '').trim().toLowerCase()
         const contraseniaNormalizada = String(contrasenia || '').trim()
@@ -30,30 +51,42 @@ class BaseAuthAdapter {
             SELECT
                 c.id_candidato,
                 c.id_universidad,
-                CAST(c.nombre_cifrado AS CHAR) AS nombre_candidato,
-                CAST(c.email_cifrado AS CHAR) AS email_candidato,
+                c.nombre_cifrado,
+                c.email_cifrado,
+                c.contrasenia,
                 c.genero,
                 c.id_externo_univ,
                 c.estado_gdpr
             FROM Candidato c
             WHERE c.id_universidad = ?
-                AND c.estado_gdpr = 'activo'
-                AND LOWER(CAST(c.email_cifrado AS CHAR)) = ?
-                AND c.contrasenia = ?
-            LIMIT 1
+              AND c.estado_gdpr = 'activo'
             `,
-            [
-                this.universidad.id_universidad,
-                usuarioNormalizado,
-                contraseniaNormalizada
-            ]
+            [this.universidad.id_universidad]
         )
 
-        if (candidatos.length === 0) {
+        const candidatoEncontrado = candidatos.find((candidato) => {
+            const emailCandidato = this.convertirCampo(candidato.email_cifrado)
+                .trim()
+                .toLowerCase()
+
+            const contraseniaCandidato = String(candidato.contrasenia || '')
+                .trim()
+
+            return (
+                emailCandidato === usuarioNormalizado &&
+                contraseniaCandidato === contraseniaNormalizada
+            )
+        })
+
+        if (!candidatoEncontrado) {
             throw this.crearError('Usuario o contraseña incorrectos', 401)
         }
 
-        return candidatos[0]
+        return {
+            ...candidatoEncontrado,
+            nombre_candidato: this.convertirCampo(candidatoEncontrado.nombre_cifrado),
+            email_candidato: this.convertirCampo(candidatoEncontrado.email_cifrado),
+        }
     }
 
     crearRespuestaBase(candidato, protocolo) {
