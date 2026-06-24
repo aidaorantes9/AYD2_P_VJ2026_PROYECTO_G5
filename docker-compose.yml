@@ -204,6 +204,37 @@ services:
       retries: 10
       start_period: 15s
 
+  servicio-notificaciones:
+    build:
+      context: ./backend/servicio-notificaciones
+      dockerfile: Dockerfile
+    container_name: prccd-servicio-notificaciones
+    restart: unless-stopped
+
+    # Carga variables privadas sin escribir credenciales en docker-compose.
+    env_file:
+      - ./backend/servicio-notificaciones/.env
+
+    environment:
+      PORT: 4006
+      FRONTEND_URL: http://localhost:5173
+
+    ports:
+      - "4006:4006"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:4006/api/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   frontend:
     build:
       context: ./frontend/portal-prccd
@@ -216,6 +247,7 @@ services:
       VITE_CERTIFICACION_API_URL: http://localhost:4003
       VITE_ANTIFRAUDE_API_URL: http://localhost:4004
       VITE_SEGURIDAD_API_URL: http://localhost:4005
+      VITE_NOTIFICACIONES_API_URL: http://localhost:4006   # LO NUEVO QUE SE ANDA IMPLEMENTANDOOOOOO
     ports:
       - "5173:5173"
     volumes:
