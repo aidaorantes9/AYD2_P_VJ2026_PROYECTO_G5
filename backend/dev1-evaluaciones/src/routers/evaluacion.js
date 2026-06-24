@@ -1,6 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-const fs = require('fs'); // de lo que se esta agregando actualmente para implementar esto nuevo, ojala jale jaja 
+const fs = require('fs/promises'); // de lo que se esta agregando actualmente para implementar esto nuevo, ojala jale jaja 
 
 const {
   TOTAL_PREGUNTAS,
@@ -743,7 +743,7 @@ router.post('/respuesta-audio', cargarAudio, async (req, res) => {
     return res.status(200).json({
       ok: true,
       modulo: 'Motor de Evaluaciones',
-      tarea: 'F3-14 Endpoint de recepción de audio multipart/form-data',
+      tarea: 'Es la Tarea 16, Integracion Speech-to-Text',
       mensaje:
         'Audio recibido, validado y procesado por la capa Speech-to-Text.',
       resultado: {
@@ -760,17 +760,21 @@ router.post('/respuesta-audio', cargarAudio, async (req, res) => {
 
         speech_to_text: {
           proveedor: resultadoSTT.proveedor_stt,
+          modelo: resultadoSTT.modelo_stt,
           texto_transcrito: resultadoSTT.texto_transcrito,
           confianza: resultadoSTT.confianza,
           idioma: resultadoSTT.idioma,
+          modo_prueba: resultadoSTT.modo_prueba,
         },
 
         opcion_detectada: opcionDetectada
-          ? {
+        ? {
               id_opcion: opcionDetectada.id_opcion,
+              numero_detectado: opcionDetectada.numero_detectado,
+              respuesta_detectada: opcionDetectada.respuesta_detectada,
               texto_opcion: opcionDetectada.texto_opcion,
-            }
-          : null,
+          }
+        : null,
 
         requiere_confirmacion_manual: !opcionDetectada,
       },

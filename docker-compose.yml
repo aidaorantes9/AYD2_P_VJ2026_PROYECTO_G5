@@ -104,6 +104,12 @@ services:
       dockerfile: Dockerfile
     container_name: prccd-dev1-evaluaciones
     restart: unless-stopped
+
+    # Carga las variables privadas del módulo de evaluaciones.
+    # Aquí se lee STT_PROVIDER, STT_MODEL, OPENAI_API_KEY, STT_PROMPT y MAX_AUDIO_MB (o lo que se tenga que usar va jaja)
+    env_file:
+      - ./backend/dev1-evaluaciones/.env
+
     environment:
       DB_HOST: mysql
       DB_PORT: 3306

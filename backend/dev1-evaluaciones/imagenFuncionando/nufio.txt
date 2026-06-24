@@ -1,0 +1,33 @@
+Nufio mira jsjs en el front, vos tenes que jalar esto del form-data, para que jale la pregunta actual (que se esta viendo en el front), y se prueba asi: 
+
+Opcion A 
+Opcion B 
+Opcion C 
+Opcion D 
+Opcion E 
+
+y deberia devolver la respuesta elegida, ejemplo: 
+
+Candidato: Sofia Hernandez
+
+Progreso: 1 de 10
+
+Tiempo restante: 27:18
+
+Dificultad: Intermedio
+
+Pregunta 1
+Que es herencia en POO?
+
+Un tipo de bucle
+Mecanismo donde una clase hija adquiere propiedades y metodos de una clase padre
+Una forma de borrar variables
+Un protocolo de red 
+
+### YA NO TE QUISE PONER LA IMAGEN PORQUE SINCERAMENTE SON COMO LAS 2 AM Y YA ANDO CON SUEÑO jaja
+#### PERO ESA PREGUNTA EN LA BD ES: la pregunta 4, entonces si decis Respuesta 2
+
+lo que va a tirar el endpoint es: (14, 4, 'Mecanismo donde una clase hija adquiere propiedades y metodos de una clase padre', TRUE),
+
+osea lo de Mecanismo y eso va 
+Eso seria a groso modo lo que basicamente hace
