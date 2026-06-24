@@ -48,6 +48,7 @@ docker compose up --build
 ```bash
 docker exec -it prccd-mysql mysql -u root -p
 ```
+> Contraseña: root
 
 ## 5. Generar llaves Pem para firmar certificados
 

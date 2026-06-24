@@ -187,7 +187,7 @@ services:
     ports:
       - "4004:4004"
     volumes:
-      - ./backend/dev4-antifraude/uploads:/app/src/uploads
+      - ./backend/dev4-antifraude/uploads:/app/src/uploads:Z
     depends_on:
       mysql:
         condition: service_healthy
@@ -247,7 +247,7 @@ services:
       VITE_CERTIFICACION_API_URL: http://localhost:4003
       VITE_ANTIFRAUDE_API_URL: http://localhost:4004
       VITE_SEGURIDAD_API_URL: http://localhost:4005
-      VITE_NOTIFICACIONES_API_URL: http://localhost:4006   # LO NUEVO QUE SE ANDA IMPLEMENTANDOOOOOO
+      VITE_NOTIFICACIONES_API_URL: http://localhost:4006 
     ports:
       - "5173:5173"
     volumes:

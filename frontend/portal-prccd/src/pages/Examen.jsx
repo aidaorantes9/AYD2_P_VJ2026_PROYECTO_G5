@@ -16,6 +16,8 @@ import {
   CFormCheck,
   CProgress,
   CSpinner,
+  CRow,
+  CCol,
 } from '@coreui/react'
 
 import MonitoreoAntifraude from '../views/antifraude/MonitoreoAntifraude'
@@ -548,7 +550,6 @@ export default function Examen() {
       <CCard className="m-4">
         <CCardBody className="text-center">
           <CSpinner />
-
           <p className="mt-2 mb-0">
             Iniciando examen adaptativo...
           </p>
@@ -559,93 +560,97 @@ export default function Examen() {
 
   if (terminado && resultado) {
     return (
-      <CCard className="m-4">
-        <CCardBody>
-          <h4>
-            Resultado del examen
-          </h4>
+      <CRow className="m-4">
+        <CCol xs={12} md={8} lg={6}>
+          <CCard>
+            <CCardBody>
+              <h4>
+                Resultado del examen
+              </h4>
 
-          <CBadge
-            color={
-              resultado.aprobada
-                ? 'success'
-                : 'danger'
-            }
-            className="mb-3"
-          >
-            {resultado.aprobada
-              ? 'Aprobado'
-              : 'Reprobado'}
-          </CBadge>
+              <CBadge
+                color={
+                  resultado.aprobada
+                    ? 'success'
+                    : 'danger'
+                }
+                className="mb-3"
+              >
+                {resultado.aprobada
+                  ? 'Aprobado'
+                  : 'Reprobado'}
+              </CBadge>
 
-          <p>
-            Calificación:{' '}
-            <strong>
-              {Number(
-                resultado.calificacion
-              ).toFixed(2)}
-            </strong>{' '}
-            / 100
-          </p>
+              <p>
+                Calificación:{' '}
+                <strong>
+                  {Number(
+                    resultado.calificacion
+                  ).toFixed(2)}
+                </strong>{' '}
+                / 100
+              </p>
 
-          <p>
-            Correctas:{' '}
-            {resultado.correctas} de{' '}
-            {resultado.total}
-          </p>
+              <p>
+                Correctas:{' '}
+                {resultado.correctas} de{' '}
+                {resultado.total}
+              </p>
 
-          {resultado.respondidas !==
-            undefined && (
-            <p>
-              Preguntas respondidas:{' '}
-              {resultado.respondidas}
-            </p>
-          )}
+              {resultado.respondidas !==
+                undefined && (
+                <p>
+                  Preguntas respondidas:{' '}
+                  {resultado.respondidas}
+                </p>
+              )}
 
-          {emitiendoCertificado && (
-            <CAlert color="info">
-              <CSpinner
-                size="sm"
-                className="me-2"
-              />
-              Emitiendo y verificando
-              su certificado...
-            </CAlert>
-          )}
-
-          {error && (
-            <CAlert color="danger">
-              {error}
-            </CAlert>
-          )}
-
-          {resultado.aprobada && (
-            <CButton
-              color="success"
-              disabled={
-                emitiendoCertificado
-              }
-              onClick={() =>
-                emitirCertificadoAutomaticamente(
-                  resultado
-                )
-              }
-            >
-              {emitiendoCertificado ? (
-                <>
+              {emitiendoCertificado && (
+                <CAlert color="info">
                   <CSpinner
                     size="sm"
                     className="me-2"
                   />
-                  Generando certificado...
-                </>
-              ) : (
-                'Obtener certificado'
+                  Emitiendo y verificando
+                  su certificado...
+                </CAlert>
               )}
-            </CButton>
-          )}
-        </CCardBody>
-      </CCard>
+
+              {error && (
+                <CAlert color="danger">
+                  {error}
+                </CAlert>
+              )}
+
+              {resultado.aprobada && (
+                <CButton
+                  color="success"
+                  disabled={
+                    emitiendoCertificado
+                  }
+                  onClick={() =>
+                    emitirCertificadoAutomaticamente(
+                      resultado
+                    )
+                  }
+                >
+                  {emitiendoCertificado ? (
+                    <>
+                      <CSpinner
+                        size="sm"
+                        className="me-2"
+                      />
+                      Generando certificado...
+                    </>
+                  ) : (
+                    'Obtener certificado'
+                  )}
+                </CButton>
+              )}
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
     )
   }
 
@@ -672,171 +677,177 @@ export default function Examen() {
   }
 
   return (
-    <div className="d-flex gap-3 m-4 flex-wrap">
-      <CCard className="flex-grow-1">
-        <CCardBody>
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <span className="fw-bold">
-                Candidato:
-              </span>{' '}
-              {NOMBRE_CANDIDATO}
+    <CRow className="g-3 m-2">
+      {/* Columna del componente de monitoreo */}
+      <CCol xs={12} md={6} lg={4} className='mx-auto text-center'>
+        <MonitoreoAntifraude
+          idEvaluacion={idEvaluacion}
+          onEstadoChange={
+            manejarEstadoMonitoreo
+          }
+        />
+      </CCol>
+
+      {/* Columna principal del examen */}
+      <CCol xs={12} lg={8} className='mx-auto text-center'>
+        <CCard>
+          <CCardBody>
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+              <div>
+                <span className="fw-bold">
+                  Candidato:
+                </span>{' '}
+                {NOMBRE_CANDIDATO}
+              </div>
+
+              <div className="d-flex flex-wrap gap-2">
+                <CBadge color="info">
+                  Progreso:{' '}
+                  {numeroPregunta} de{' '}
+                  {TOTAL_PREGUNTAS}
+                </CBadge>
+
+                <CBadge
+                  color={
+                    tiempoRestante < 60
+                      ? 'danger'
+                      : 'warning'
+                  }
+                >
+                  Tiempo restante:{' '}
+                  {formatearTiempo(
+                    tiempoRestante
+                  )}
+                </CBadge>
+
+                <CBadge color="primary">
+                  Dificultad:{' '}
+                  {
+                    pregunta
+                      .nivel_dificultad
+                  }
+                </CBadge>
+              </div>
             </div>
 
-            <div className="d-flex gap-2 flex-wrap">
-              <CBadge color="info">
-                Progreso:{' '}
-                {numeroPregunta} de{' '}
-                {TOTAL_PREGUNTAS}
-              </CBadge>
+            <CProgress
+              value={progreso}
+              className="mb-4"
+            />
 
-              <CBadge
+            <h5 className="mb-4">
+              Pregunta {numeroPregunta}
+            </h5>
+
+            <p className="mb-3">
+              {pregunta.enunciado}
+            </p>
+
+            {!monitoreoActivo && (
+              <CAlert
                 color={
-                  tiempoRestante < 60
+                  estadoMonitoreo ===
+                    'detenido' ||
+                  estadoMonitoreo ===
+                    'error'
                     ? 'danger'
                     : 'warning'
                 }
               >
-                Tiempo restante:{' '}
-                {formatearTiempo(
-                  tiempoRestante
-                )}
-              </CBadge>
+                <strong>
+                  Monitoreo obligatorio.
+                </strong>{' '}
 
-              <CBadge color="primary">
-                Dificultad:{' '}
-                {
-                  pregunta
-                    .nivel_dificultad
-                }
-              </CBadge>
-            </div>
-          </div>
+                {monitoreoIniciado
+                  ? 'El monitoreo fue interrumpido. Reactívelo para continuar. El tiempo continúa avanzando.'
+                  : 'Active el monitoreo y autorice compartir la pantalla para comenzar la evaluación.'}
+              </CAlert>
+            )}
 
-          <CProgress
-            value={progreso}
-            className="mb-4"
-          />
-
-          <h5 className="mb-4">
-            Pregunta {numeroPregunta}
-          </h5>
-
-          <p className="mb-3">
-            {pregunta.enunciado}
-          </p>
-
-          {!monitoreoActivo && (
-            <CAlert
-              color={
-                estadoMonitoreo ===
-                  'detenido' ||
-                estadoMonitoreo ===
-                  'error'
-                  ? 'danger'
-                  : 'warning'
-              }
-            >
-              <strong>
-                Monitoreo obligatorio.
-              </strong>{' '}
-
-              {monitoreoIniciado
-                ? 'El monitoreo fue interrumpido. Reactívelo para continuar. El tiempo continúa avanzando.'
-                : 'Active el monitoreo y autorice compartir la pantalla para comenzar la evaluación.'}
-            </CAlert>
-          )}
-
-          {(pregunta.opciones || []).map(
-            (opcion) => (
-              <CFormCheck
-                key={opcion.id_opcion}
-                type="radio"
-                name="opcion"
-                id={`opcion-${opcion.id_opcion}`}
-                label={
-                  opcion.texto_opcion
-                }
-                checked={
-                  opcionSeleccionada ===
-                  opcion.id_opcion
-                }
-                onChange={() =>
-                  setOpcionSeleccionada(
+            {(pregunta.opciones || []).map(
+              (opcion) => (
+                <CFormCheck
+                  key={opcion.id_opcion}
+                  type="radio"
+                  name="opcion"
+                  id={`opcion-${opcion.id_opcion}`}
+                  label={
+                    opcion.texto_opcion
+                  }
+                  checked={
+                    opcionSeleccionada ===
                     opcion.id_opcion
-                  )
-                }
+                  }
+                  onChange={() =>
+                    setOpcionSeleccionada(
+                      opcion.id_opcion
+                    )
+                  }
+                  disabled={
+                    enviando ||
+                    !monitoreoActivo
+                  }
+                  className="mb-2"
+                />
+              )
+            )}
+
+            {error && (
+              <CAlert
+                color="danger"
+                className="mt-3"
+              >
+                {error}
+              </CAlert>
+            )}
+
+            <div className="d-flex flex-wrap gap-2 mt-4">
+              <CButton
+                color="primary"
                 disabled={
+                  !opcionSeleccionada ||
                   enviando ||
                   !monitoreoActivo
                 }
-                className="mb-2"
-              />
-            )
-          )}
+                onClick={
+                  responderPregunta
+                }
+              >
+                {enviando ? (
+                  <>
+                    <CSpinner
+                      size="sm"
+                      className="me-2"
+                    />
+                    Guardando...
+                  </>
+                ) : numeroPregunta <
+                  TOTAL_PREGUNTAS ? (
+                  'Guardar y continuar'
+                ) : (
+                  'Finalizar examen'
+                )}
+              </CButton>
 
-          {error && (
-            <CAlert
-              color="danger"
-              className="mt-3"
-            >
-              {error}
-            </CAlert>
-          )}
-
-          <div className="d-flex gap-2 mt-4">
-            <CButton
-              color="primary"
-              disabled={
-                !opcionSeleccionada ||
-                enviando ||
-                !monitoreoActivo
-              }
-              onClick={
-                responderPregunta
-              }
-            >
-              {enviando ? (
-                <>
-                  <CSpinner
-                    size="sm"
-                    className="me-2"
-                  />
-                  Guardando...
-                </>
-              ) : numeroPregunta <
-                TOTAL_PREGUNTAS ? (
-                'Guardar y continuar'
-              ) : (
-                'Finalizar examen'
-              )}
-            </CButton>
-
-            <CButton
-              color="danger"
-              variant="outline"
-              className="ms-auto"
-              disabled={
-                enviando ||
-                emitiendoCertificado ||
-                !monitoreoActivo
-              }
-              onClick={
-                finalizarEvaluacion
-              }
-            >
-              Finalizar ahora
-            </CButton>
-          </div>
-        </CCardBody>
-      </CCard>
-
-      <MonitoreoAntifraude
-        idEvaluacion={idEvaluacion}
-        onEstadoChange={
-          manejarEstadoMonitoreo
-        }
-      />
-    </div>
+              <CButton
+                color="danger"
+                variant="outline"
+                className="ms-lg-auto"
+                disabled={
+                  enviando ||
+                  emitiendoCertificado ||
+                  !monitoreoActivo
+                }
+                onClick={
+                  finalizarEvaluacion
+                }
+              >
+                Finalizar ahora
+              </CButton>
+            </div>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
   )
 }
