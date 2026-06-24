@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
+const fs = require('fs'); // de lo que se esta agregando actualmente para implementar esto nuevo, ojala jale jaja 
 
 const {
   TOTAL_PREGUNTAS,
@@ -15,6 +16,14 @@ const db = mysql.createPool({
   password: process.env.DB_PASSWORD || 'root',
   database: process.env.DB_NAME || 'prccd',
 });
+
+/* LO QUE ANDO PONIENDO AQUI ES PARA PROBAR LA PRIMER TAREA ASIGNADA HACIA MI PERSONA: F14 */
+const cargarAudio = require('../middleware/uploadAudio');
+
+const { transcribirAudio } = require('../services/speechToTextServicio');
+
+const { detectarOpcionDesdeTexto } = require('../services/respuestaVozServicio');
+/* Y AQUI CONCLUYE MAS LA IMPORTACION DE FS */
 
 function variantesNivel(nivel) {
   if (nivel === 'Básico' || nivel === 'Basico') {
@@ -601,6 +610,184 @@ router.post('/:id_candidato/finalizar', async (req, res) => {
     });
   } finally {
     conexion.release();
+  }
+});
+
+/* Y AQUI SE AGREGA LA FUNCIONALIDAD PARA CARGAR AUDIO (osea la ruta pe) */
+// POST /api/evaluacion/respuesta-audio
+// Recibe audio, lo transcribe y detecta la opción seleccionada
+router.post('/respuesta-audio', cargarAudio, async (req, res) => {
+  
+  let rutaTemporal = null
+
+  try {
+    // Verifica que multer haya recibido el archivo.
+    if (!req.file) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Debe enviar un archivo de audio en el campo audio.',
+      })
+    }
+
+    rutaTemporal = req.file.path
+
+    const {
+      id_candidato,
+      id_evaluacion,
+      id_pregunta,
+      idioma,
+      texto_mock,
+    } = req.body
+
+    // Convierte los identificadores recibidos a número.
+    const idCandidato = Number(id_candidato)
+    const idEvaluacion = Number(id_evaluacion)
+    const idPregunta = Number(id_pregunta)
+
+    // Valida los datos mínimos para relacionar el audio con el examen.
+    if (!idCandidato || !idEvaluacion || !idPregunta) {
+      return res.status(400).json({
+        ok: false,
+        error:
+          'Debe enviar id_candidato, id_evaluacion e id_pregunta junto con el audio.',
+      })
+    }
+
+    // Verifica que la evaluación exista y pertenezca al candidato.
+    const [evaluaciones] = await db.query(
+      `
+      SELECT
+        id_evaluacion,
+        id_candidato,
+        estado
+      FROM Evaluacion
+      WHERE id_evaluacion = ?
+        AND id_candidato = ?
+      LIMIT 1
+      `,
+      [idEvaluacion, idCandidato]
+    )
+
+    if (evaluaciones.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Evaluación no encontrada para el candidato indicado.',
+      })
+    }
+
+    // Solo se permite responder por voz si el examen está activo.
+    if (evaluaciones[0].estado !== 'en_progreso') {
+      return res.status(409).json({
+        ok: false,
+        error: 'La evaluación no está en progreso.',
+      })
+    }
+
+    // Verifica que la pregunta exista y esté activa.
+    const [preguntas] = await db.query(
+      `
+      SELECT
+        id_pregunta,
+        enunciado,
+        nivel_dificultad
+      FROM Pregunta
+      WHERE id_pregunta = ?
+        AND activa = TRUE
+      LIMIT 1
+      `,
+      [idPregunta]
+    )
+
+    if (preguntas.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Pregunta no encontrada o inactiva.',
+      })
+    }
+
+    // Obtiene las opciones disponibles para detectar la respuesta por texto.
+    const [opciones] = await db.query(
+      `
+      SELECT
+        id_opcion,
+        texto_opcion
+      FROM OpcionRespuesta
+      WHERE id_pregunta = ?
+      ORDER BY id_opcion
+      `,
+      [idPregunta]
+    )
+
+    if (opciones.length === 0) {
+      return res.status(409).json({
+        ok: false,
+        error: 'La pregunta no tiene opciones registradas.',
+      })
+    }
+
+    // Envía el archivo al servicio desacoplado de Speech-to-Text.
+    const resultadoSTT = await transcribirAudio({
+      rutaArchivo: req.file.path,
+      nombreOriginal: req.file.originalname,
+      mimeType: req.file.mimetype,
+      idioma,
+      textoMock: texto_mock,
+    })
+
+    // Intenta convertir el texto transcrito en una opción del banco.
+    const opcionDetectada = detectarOpcionDesdeTexto(
+      resultadoSTT.texto_transcrito,
+      opciones
+    )
+
+    return res.status(200).json({
+      ok: true,
+      modulo: 'Motor de Evaluaciones',
+      tarea: 'F3-14 Endpoint de recepción de audio multipart/form-data',
+      mensaje:
+        'Audio recibido, validado y procesado por la capa Speech-to-Text.',
+      resultado: {
+        id_candidato: idCandidato,
+        id_evaluacion: idEvaluacion,
+        id_pregunta: idPregunta,
+
+        archivo: {
+          nombre_original: req.file.originalname,
+          nombre_temporal: req.file.filename,
+          mime_type: req.file.mimetype,
+          tamanio_bytes: req.file.size,
+        },
+
+        speech_to_text: {
+          proveedor: resultadoSTT.proveedor_stt,
+          texto_transcrito: resultadoSTT.texto_transcrito,
+          confianza: resultadoSTT.confianza,
+          idioma: resultadoSTT.idioma,
+        },
+
+        opcion_detectada: opcionDetectada
+          ? {
+              id_opcion: opcionDetectada.id_opcion,
+              texto_opcion: opcionDetectada.texto_opcion,
+            }
+          : null,
+
+        requiere_confirmacion_manual: !opcionDetectada,
+      },
+    })
+  } catch (error) {
+    console.error('Error procesando respuesta por audio:', error)
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No fue posible procesar la respuesta por audio.',
+      detalle: error.message,
+    })
+  } finally {
+    // Elimina el archivo temporal después de procesarlo.
+    if (rutaTemporal) {
+      await fs.unlink(rutaTemporal).catch(() => {})
+    }
   }
 });
 
