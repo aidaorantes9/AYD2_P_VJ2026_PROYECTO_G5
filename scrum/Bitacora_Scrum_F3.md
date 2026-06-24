@@ -71,51 +71,60 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 
 ### 1.5 Captura del Tablero Kanban — Inicio del Sprint
 
-![Kanban inicial Fase 3](Docs/Images/inicio_kanban_f3.png)
+![Kanban inicial Fase 3](../docs/Images/inicio_kanban_f3.png)
 
 ---
-
-## 2. Daily Standup — Refinamiento Arquitectónico Diario
-
-### Martes 24/06/2026
+### Martes 23/06/2026
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Ejecuté el Sprint Planning de la Fase 3: definí las 26 tareas del backlog, las distribuí en el tablero Kanban de Trello con etiquetas, descripciones y fechas de entrega, y creé la bitácora `Bitacora_Scrum_F3.md` con el formato oficial del sprint. Renombré la bitácora de Fase 2 a `Bitacora_Scrum_F2.md` y subí la imagen del kanban inicial a `docs/Images/inicio_kanban_f3.png`. Todo commiteado y pusheado a develop. Resultado: repositorio actualizado con la estructura de documentación de Fase 3 lista para iniciar el sprint.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Redactaré el borrador del capítulo de voz del DDA (F3-08), justificando el nuevo estilo arquitectónico introducido para manejar el flujo de audio y el asincronismo, trazable con la sección 4.1 del enunciado y con EaC01 (desempeño bajo picos de tráfico) y EaC03 (disponibilidad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-
----
-
-#### Nufio — Frontend + CI/CD
-
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-
-3. **¿Existen impedimentos técnicos o de integración?**
+   Las tareas de pruebas (F3-05, F3-06, F3-07) están bloqueadas hasta que Kevin entregue el endpoint STT (F3-14, F3-15) y el servicio SMTP (F3-17). Sin ese código no es posible escribir ni ejecutar las pruebas de los nuevos módulos.
 
 ---
 
 #### Kevin Santos — STT Backend + Notificaciones
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Aplicó correcciones de la Fase 2 sobre el módulo de integración: realizó fixes en el flujo de ingesta de datos académicos y en el proceso de login federado, resolviendo inconsistencias que quedaron pendientes del sprint anterior. Resultado: módulo dev2-integracion estable y listo para recibir las nuevas funcionalidades de la Fase 3.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementará el servicio SMTP transversal con Nodemailer (F3-17) y la integración Speech-to-Text para el procesamiento de audio (F3-14, F3-15), trazables con la sección 4.2 de notificaciones y la sección 4.1 de voz del enunciado, y con EaC01 (desempeño) y EaC04 (seguridad en tránsito) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos.
 
 ---
 
 #### Ludwing Lopez — Docker + Infra + Triggers
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Realizó optimizaciones al sistema de base de datos de la Fase 2, corrigiendo problemas en la forma en que los módulos recibían y procesaban la información. Resultado: la capa de datos queda estable y consistente como base para las nuevas integraciones de la Fase 3.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Preparará el docker-compose para los entornos de Staging y Producción (F3-22), trazable con la sección 4.4 del enunciado y con RT01 y RT02 del DDA que exigen arquitectura preparada para despliegue multi-entorno.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos.
+
+---
+
+#### Nufio — Frontend + CI/CD
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Inició la investigación sobre CI/CD y revisó la documentación de GitHub Actions y las opciones de despliegue en Railway y Render para definir la estrategia del pipeline. Resultado: definición clara del enfoque técnico para implementar el pipeline de la Fase 3.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Iniciará la implementación de sus tareas correspondientes: la UI de grabación de voz en el examen móvil (F3-09) y el esqueleto del pipeline CI/CD en GitHub Actions (F3-12), trazables con la sección 4.1 de voz y la sección 4.4 de CI/CD del enunciado.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Se identificó que Alejandra necesita permisos de administrador en el repositorio para gestionar ciertas configuraciones del pipeline. Pendiente de resolución antes de que Nufio avance en la configuración del deploy.
 
 ---
 
