@@ -33,6 +33,7 @@ class NormalizacionFilter extends BaseFilter {
                 id_externo_univ: candidato.id_externo_univ,
                 nombre_completo: candidato.nombre_completo,
                 email: candidato.email,
+                contrasenia: candidato.contrasenia,
                 genero: candidato.genero,
                 carrera: candidato.carrera,
                 estado_gdpr: candidato.estado_gdpr,
@@ -73,6 +74,7 @@ class NormalizacionFilter extends BaseFilter {
                     id_externo_univ: candidato.id_externo_univ,
                     nombre_completo: candidato.nombre_completo,
                     email: candidato.email,
+                    contrasenia: candidato.contrasenia,
                     genero: candidato.genero,
                     carrera: candidato.carrera,
                     estado_gdpr: candidato.estado_gdpr,
@@ -110,6 +112,7 @@ class NormalizacionFilter extends BaseFilter {
                     nombre_completo: fila.nombre_completo,
                     email: fila.email,
                     genero: fila.genero,
+                    contrasenia: fila.contrasenia,
                     carrera: fila.carrera,
                     estado_gdpr: fila.estado_gdpr,
                     cursos_aprobados: []

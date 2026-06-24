@@ -29,11 +29,26 @@ const CERTIFICACION_API_BASE =
   'http://localhost:4003'
 
 const TOTAL_PREGUNTAS = 10
-const ID_CANDIDATO = 1
+// DEJO CONSTANCIA DE QUE ESTO ES LO QUE SE ESTA ELIMINANDO ACTUALMENTE DEL CODIGO PARA QUE AHORA SEA EL USUARIO EL QUE REALMENTE ESTA TRABAJANDO Y NO UNO QUEMADO QUE ERA ANA LOPEZ PREVIAMENTE 
+// const ID_CANDIDATO = 1
 const TIEMPO_TOTAL_SEG = 30 * 60
+
+function obtenerSesionActual() {
+  try {
+    return JSON.parse(sessionStorage.getItem('sesion'))
+  } catch {
+    return null
+  }
+}
 
 export default function Examen() {
   const navigate = useNavigate()
+
+  const sesion = obtenerSesionActual()
+
+  const ID_CANDIDATO = Number(sesion?.idCandidato)
+  const NOMBRE_CANDIDATO = sesion?.nombre || 'Candidato'
+  const UNIVERSIDAD_CANDIDATO = sesion?.universidad || 'Universidad no especificada'
 
   const [idEvaluacion, setIdEvaluacion] =
     useState(null)
@@ -119,6 +134,11 @@ export default function Examen() {
       try {
         setError('')
 
+        // se valida esto, osea se tira el error en caso no lo jale va 
+        if (!ID_CANDIDATO) {
+          throw new Error('No se encontro un candidato valido en la sesión actual')
+        }
+
         const respuesta = await fetch(
           `${API_BASE}/api/evaluacion/${ID_CANDIDATO}/iniciar`,
           {
@@ -201,10 +221,10 @@ export default function Examen() {
 
                   datos_certificado: {
                     nombre_candidato:
-                      'Ana Lopez',
+                      NOMBRE_CANDIDATO,
 
                     universidad:
-                      'Universidad de San Carlos de Guatemala',
+                      UNIVERSIDAD_CANDIDATO,
                   },
                 }),
               }
@@ -660,7 +680,7 @@ export default function Examen() {
               <span className="fw-bold">
                 Candidato:
               </span>{' '}
-              Ana López
+              {NOMBRE_CANDIDATO}
             </div>
 
             <div className="d-flex gap-2 flex-wrap">

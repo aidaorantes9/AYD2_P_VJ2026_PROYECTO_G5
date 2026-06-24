@@ -2,22 +2,22 @@ import { Link } from 'react-router-dom'
 import { CContainer, CRow, CCol, CCard, CCardBody, CCardTitle, CCardText, CBadge } from '@coreui/react'
 
 const modulosAdmin = [
-  { nombre: 'Ingesta de Datos',        ruta: '/ingesta',     responsable: 'Kevin (202101007)',    estado: 'listo' },
-  { nombre: 'Dashboard Analítico',     ruta: '/dashboard',   responsable: 'Nufio (201901444)',    estado: 'listo' },
-  { nombre: 'Certificado y Auditoría', ruta: '/certificado', responsable: 'Ludwing (201907608)',  estado: 'listo' },
-  { nombre: 'Antifraude',              ruta: '/antifraude',  responsable: 'Allan (202010046)',    estado: 'listo' },
-  { nombre: 'Privacidad',              ruta: '/privacidad',  responsable: 'Alejandra (202100239)',estado: 'listo' },
+  { nombre: 'Ingesta de Datos',        ruta: '/ingesta',     estado: 'listo' },
+  { nombre: 'Dashboard Analítico',     ruta: '/dashboard',   estado: 'listo' },
+  { nombre: 'Certificado y Auditoría', ruta: '/certificado', estado: 'listo' },
+  { nombre: 'Antifraude',              ruta: '/antifraude',  estado: 'listo' },
+  { nombre: 'Privacidad',              ruta: '/privacidad',  estado: 'listo' },
 ]
 
 const modulosCandidato = [
-  { nombre: 'Examen Adaptativo',       ruta: '/examen',      responsable: 'Lizz (201708997)',     estado: 'listo' },
-  { nombre: 'Certificado y Auditoría', ruta: '/certificado', responsable: 'Ludwing (201907608)',  estado: 'listo' },
-  { nombre: 'Privacidad',              ruta: '/privacidad',  responsable: 'Alejandra (202100239)',estado: 'listo' },
+  { nombre: 'Examen Adaptativo',       ruta: '/examen',      estado: 'listo' },
+  { nombre: 'Certificado y Auditoría', ruta: '/certificado', estado: 'listo' },
+  { nombre: 'Privacidad',              ruta: '/privacidad',  estado: 'listo' },
 ]
 
 function Home() {
   const sesion = (() => {
-    try { return JSON.parse(localStorage.getItem('sesion')) }
+    try { return JSON.parse(sessionStorage.getItem('sesion')) }
     catch { return null }
   })()
 
@@ -33,9 +33,9 @@ function Home() {
     : 'PRCCD — Menú Principal'
 
   const subtitulo = rol === 'admin'
-    ? `Bienvenido, ${nombre}. Gestión y monitoreo de la plataforma.`
+    ? `Bienvenid@, ${nombre}. Gestión y monitoreo de la plataforma.`
     : rol === 'candidato'
-    ? `Bienvenido, ${nombre}. Aquí puedes realizar tu evaluación y consultar tus certificados.`
+    ? `Bienvenid@, ${nombre}. Aquí puedes realizar tu evaluación y consultar tus certificados.`
     : 'Plataforma Regional de Certificación de Competencias Digitales'
 
   if (!rol) {

@@ -1,23 +1,24 @@
-// Se importa la clase base del adaptador.
-const BaseAuthAdapter = require('./BaseAuthAdapter');
+const BaseAuthAdapter = require('./BaseAuthAdapter')
 
 // Adaptador para universidades que usan SAML.
 class SamlAdapter extends BaseAuthAdapter {
     async autenticar(credenciales) {
-        const { usuario, saml_assertion } = credenciales;
+        const { usuario, saml_assertion } = credenciales
 
-        // En esta simulación, SAML acepta un usuario o una assertion simulada.
-        if (!usuario && !saml_assertion) {
-            throw new Error('SAML requiere usuario o saml_assertion');
+        if (!usuario || !saml_assertion) {
+            throw this.crearError('SAML requiere usuario y credencial', 400)
         }
 
-        // Se normaliza la respuesta para que el sistema la consuma igual que los otros protocolos.
+        // Para el MVP, la assertion SAML se valida contra la contraseña
+        // registrada en Candidato.
+        const candidato = await this.buscarCandidatoActivo(usuario, saml_assertion)
+
         return {
-            ...this.crearRespuestaBase(usuario || 'usuario_saml', 'SAML'),
+            ...this.crearRespuestaBase(candidato, 'SAML'),
             tipo_identidad: 'federacion_academica',
-            mensaje: 'Autenticacion simulada mediante SAML completada'
-        };
+            mensaje: 'Autenticacion mediante SAML validada contra Candidato'
+        }
     }
 }
 
-module.exports = SamlAdapter;
+module.exports = SamlAdapter

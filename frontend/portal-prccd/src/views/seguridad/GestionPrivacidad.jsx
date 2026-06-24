@@ -13,7 +13,15 @@ const API_BASE =
   import.meta.env.VITE_SEGURIDAD_API_URL ||
   'http://localhost:4005'
 
-const ID_CANDIDATO = 1
+// ESTO SE COMENTA Y YA NO SE VUELVE A UTILIZAR ERA SOLO UN DATO QUEMADO QUE SE UTILIZO PREVIAMENTE PERO PUES BUENO AHORA DEBE VARIAR VA  
+// const ID_CANDIDATO = 1
+function obtenerSesionActual() {
+  try {
+    return JSON.parse(sessionStorage.getItem('sesion'))
+  } catch {
+    return null
+  }
+} // y ya este es el buenooooo
 
 function colorEstado(estado) {
   if (estado === 'activo') return 'success'
@@ -23,7 +31,15 @@ function colorEstado(estado) {
   return 'secondary'
 }
 
+// NUEVOOOOOOOOOOOOO, osea nuevo cambio va jsjs
 export default function GestionPrivacidad() {
+
+  const sesion = obtenerSesionActual()
+
+  const ID_CANDIDATO_ACTUAL = Number(
+    sesion?.idCandidato || sesion?.id_candidato
+  )
+
   const [candidato, setCandidato] = useState(null)
   const [cargando, setCargando] = useState(false)
   const [cargandoDatos, setCargandoDatos] = useState(true)
@@ -32,8 +48,16 @@ export default function GestionPrivacidad() {
   useEffect(() => {
     async function cargarCandidato() {
       try {
+        setCargandoDatos(true)
+
+        if (!ID_CANDIDATO_ACTUAL) {
+          throw new Error(
+            'No se encontró un candidato válido en la sesión actual'
+          )
+        }
+
         const respuesta = await fetch(
-          `${API_BASE}/api/seguridad/candidato/${ID_CANDIDATO}`
+          `${API_BASE}/api/seguridad/candidato/${ID_CANDIDATO_ACTUAL}`
         )
 
         const datos = await respuesta.json()
@@ -56,15 +80,18 @@ export default function GestionPrivacidad() {
     }
 
     cargarCandidato()
-  }, [])
+  }, [ID_CANDIDATO_ACTUAL])
 
   async function solicitarOlvido() {
     setCargando(true)
     setMensaje(null)
 
     try {
+      const idCandidatoParaOlvido =
+        candidato?.id || candidato?.id_candidato || ID_CANDIDATO_ACTUAL
+
       const respuesta = await fetch(
-        `${API_BASE}/api/seguridad/olvidar/${candidato.id}`,
+        `${API_BASE}/api/seguridad/olvidar/${idCandidatoParaOlvido}`,
         {
           method: 'POST',
         }
