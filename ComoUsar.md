@@ -6,49 +6,174 @@
 
 > En caso de que usen podman, solo cambien la palabra `docker` por `podman`.
 
-### 1.1 Crear build inicial
-> Este comando se ejecuta cada vez que se modifica el codigo fuente, si ustedes editan se actualizara solo, pero si algunos cambios si sera necesario que vuelvan a ejecutar el comando (tenganlo en cuenta para no perder tiempo resolviendo un problema que no existe).
+### Arrancar Staging
 
 ```bash
-docker compose up --build
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  up -d --build --wait --wait-timeout 600
 ```
 
-### 1.2 Levantar el proyecto sin hacer build
+Accesos:
+
+```text
+Frontend: http://localhost:5174
+APIs:     http://localhost:4101 hasta http://localhost:4106
+MySQL:    localhost:3307
+```
+Para revisar los contenedores:
+
 ```bash
-docker compose up
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  ps
 ```
 
-### 1.3 Detener el proyecto
+Todos deberían aparecer como `Up` y, cuando corresponda, `healthy`.
+
+### Apagar Staging sin borrar la base de datos
 
 ```bash
-docker compose down
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  down
 ```
+
+Producción se utiliza para comprobar que la configuración final también puede arrancar correctamente.
+
+```bash
+docker compose \
+  --env-file environments/production/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d --build --wait --wait-timeout 600
+```
+
+Accesos:
+
+```text
+Frontend: http://localhost:5173
+APIs:     http://localhost:4001 hasta http://localhost:4006
+MySQL:    localhost:3306
+```
+
+Para apagarlo:
+
+```bash
+docker compose \
+  --env-file environments/production/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  down
+```
+
+No es necesario mantener Staging y Producción encendidos al mismo tiempo. Esto consume más memoria, procesador y espacio.
 
 ---
 
 ## 2. Levantar unicamente frontend
+Este comando inicia solamente el contenedor del frontend de Staging:
 
-### 2.1 Ejecutar frontend
-```bash
-cd frontend/portal-prccd
-npm start
-```
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  up -d --build --no-deps frontend
 
-## 3. En caso de errores (frontend)
+El frontend estará disponible en:
 
-> En caso de errores lo que haremos sera detener el compose y borrar los volumenes que podrian generar problema con librerias nuevas, con esto en teoria deberia de funcionar, si no es asi, el problema es ajeno a las librerias
+http://localhost:5174
 
-``````bash
-docker compose down -v
-docker compose up --build
-``````
+Para revisar su estado:
+
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  ps frontend
+
+Para ver sus logs:
+
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  logs -f frontend
+
+Para detener únicamente el frontend:
+
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  stop frontend
+
+El frontend puede abrirse por sí solo, pero las funciones como iniciar sesión, realizar evaluaciones, emitir certificados o consultar información no funcionarán mientras los servicios backend y MySQL estén apagados.
+
+Para levantar únicamente el frontend de Producción:
+
+docker compose \
+  --env-file environments/production/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d --build --no-deps frontend
+
+En Producción se abre en:
+
+http://localhost:5173
+
 
 ## 4. Conectarse MySQL
+Para iniciar solamente la base de datos de Staging:
 
-```bash
-docker exec -it prccd-mysql mysql -u root -p
-```
-> Contraseña: root
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  up -d --wait --wait-timeout 120 mysql
+
+Para comprobar su estado:
+
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  ps mysql
+
+MySQL de Staging estará disponible en:
+
+Host: localhost
+Puerto: 3307
+
+Para detener únicamente MySQL:
+
+docker compose \
+  --env-file environments/staging/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.staging.yml \
+  stop mysql
+
+Los datos no se eliminan al utilizar stop o down. Se eliminan únicamente al utilizar down -v.
+
+Para iniciar solamente MySQL de Producción:
+
+docker compose \
+  --env-file environments/production/compose.env \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d --wait --wait-timeout 120 mysql
+
+MySQL de Producción estará disponible en:
+
+Host: localhost
+Puerto: 3306
+
 
 ## 5. Generar llaves Pem para firmar certificados
 
