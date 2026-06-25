@@ -78,7 +78,7 @@ export const ControlesExamen = ({
     <CButton
       color="primary"
       disabled={!opcionSeleccionada || enviando || !monitoreoActivo}
-      onClick={onResponder}
+      onClick={()=> onResponder()}
     >
       {enviando ? (
         <>
