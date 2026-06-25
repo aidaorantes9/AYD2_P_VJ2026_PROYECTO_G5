@@ -76,6 +76,21 @@ export default function Examen() {
   const [enviando, setEnviando] =
     useState(false)
 
+  const [grabandoVoz, setGrabandoVoz] =
+    useState(false)
+
+  const [procesandoVoz, setProcesandoVoz] =
+    useState(false)
+
+  const [textoTranscrito, setTextoTranscrito] =
+    useState('')
+
+  const [mensajeVoz, setMensajeVoz] =
+    useState('')
+
+  const [errorVoz, setErrorVoz] =
+    useState('')
+
   const [
     emitiendoCertificado,
     setEmitiendoCertificado,
@@ -114,6 +129,36 @@ export default function Examen() {
     useRef(Date.now())
 
   const finalizando = useRef(false)
+
+  const grabadorVoz = useRef(null)
+
+  const fragmentosAudio =
+    useRef([])
+
+  const flujoAudio =
+    useRef(null)
+
+  useEffect(() => {
+    return () => {
+      const grabador =
+        grabadorVoz.current
+
+      if (
+        grabador &&
+        grabador.state !== 'inactive'
+      ) {
+        grabador.ondataavailable = null
+        grabador.onstop = null
+        grabador.stop()
+      }
+
+      flujoAudio.current
+        ?.getTracks()
+        .forEach((track) =>
+          track.stop()
+        )
+    }
+  }, [])
 
   const manejarEstadoMonitoreo =
     useCallback((nuevoEstado) => {
@@ -433,6 +478,328 @@ export default function Examen() {
       .padStart(2, '0')}`
   }
 
+  function obtenerTipoAudioCompatible() {
+    if (
+      typeof MediaRecorder ===
+      'undefined'
+    ) {
+      return ''
+    }
+
+    const tipos = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg',
+    ]
+
+    if (
+      typeof MediaRecorder
+        .isTypeSupported !==
+      'function'
+    ) {
+      return ''
+    }
+
+    return (
+      tipos.find((tipo) =>
+        MediaRecorder
+          .isTypeSupported(tipo)
+      ) || ''
+    )
+  }
+
+  function obtenerExtensionAudio(tipo) {
+    const valor =
+      String(tipo || '')
+        .toLowerCase()
+
+    if (valor.includes('mp4')) {
+      return 'm4a'
+    }
+
+    if (valor.includes('ogg')) {
+      return 'ogg'
+    }
+
+    return 'webm'
+  }
+
+  async function procesarRespuestaVoz(
+    audio
+  ) {
+    if (
+      !idEvaluacion ||
+      !pregunta?.id_pregunta
+    ) {
+      setErrorVoz(
+        'No existe una pregunta activa para procesar.'
+      )
+      return
+    }
+
+    setProcesandoVoz(true)
+    setErrorVoz('')
+    setMensajeVoz('')
+    setTextoTranscrito('')
+
+    try {
+      const tipoAudio =
+        audio.type ||
+        'audio/webm'
+
+      const extension =
+        obtenerExtensionAudio(
+          tipoAudio
+        )
+
+      const formulario =
+        new FormData()
+
+      formulario.append(
+        'audio',
+        audio,
+        `respuesta-voz.${extension}`
+      )
+
+      formulario.append(
+        'id_candidato',
+        String(ID_CANDIDATO)
+      )
+
+      formulario.append(
+        'id_evaluacion',
+        String(idEvaluacion)
+      )
+
+      formulario.append(
+        'id_pregunta',
+        String(
+          pregunta.id_pregunta
+        )
+      )
+
+      formulario.append(
+        'idioma',
+        navigator.language ||
+          'es-GT'
+      )
+
+      const respuesta =
+        await fetch(
+          `${API_BASE}/api/evaluacion/respuesta-audio`,
+          {
+            method: 'POST',
+            body: formulario,
+          }
+        )
+
+      const datos =
+        await respuesta.json()
+
+      if (!respuesta.ok) {
+        throw new Error(
+          datos.error ||
+          datos.detalle ||
+          'No se pudo procesar el audio.'
+        )
+      }
+
+      const transcripcion =
+        datos?.resultado
+          ?.speech_to_text
+          ?.texto_transcrito || ''
+
+      const opcionDetectada =
+        datos?.resultado
+          ?.opcion_detectada
+
+      setTextoTranscrito(
+        transcripcion
+      )
+
+      if (!opcionDetectada) {
+        setOpcionSeleccionada(
+          null
+        )
+
+        setErrorVoz(
+          'No se identificó una opción. Intente decir “respuesta uno”, “respuesta dos” o el texto de la opción.'
+        )
+
+        return
+      }
+
+      setOpcionSeleccionada(
+        Number(
+          opcionDetectada
+            .id_opcion
+        )
+      )
+
+      setMensajeVoz(
+        `Se detectó la opción ${opcionDetectada.numero_detectado || ''}: ${opcionDetectada.texto_opcion}. Revísela y presione Guardar y continuar.`
+      )
+    } catch (err) {
+      setErrorVoz(
+        err.message ||
+        'No se pudo procesar la respuesta por voz.'
+      )
+    } finally {
+      setProcesandoVoz(false)
+    }
+  }
+
+  async function iniciarGrabacionVoz() {
+    if (!monitoreoActivo) {
+      setErrorVoz(
+        'Debe activar el monitoreo antes de responder por voz.'
+      )
+      return
+    }
+
+    if (
+      !navigator.mediaDevices
+        ?.getUserMedia ||
+      typeof MediaRecorder ===
+        'undefined'
+    ) {
+      setErrorVoz(
+        'El navegador no permite grabar audio.'
+      )
+      return
+    }
+
+    setErrorVoz('')
+    setMensajeVoz('')
+    setTextoTranscrito('')
+
+    try {
+      const flujo =
+        await navigator
+          .mediaDevices
+          .getUserMedia({
+            audio: true,
+          })
+
+      flujoAudio.current =
+        flujo
+
+      const tipoAudio =
+        obtenerTipoAudioCompatible()
+
+      const grabador =
+        tipoAudio
+          ? new MediaRecorder(
+              flujo,
+              {
+                mimeType:
+                  tipoAudio,
+              }
+            )
+          : new MediaRecorder(
+              flujo
+            )
+
+      grabadorVoz.current =
+        grabador
+
+      fragmentosAudio.current =
+        []
+
+      grabador.ondataavailable =
+        (evento) => {
+          if (
+            evento.data &&
+            evento.data.size > 0
+          ) {
+            fragmentosAudio
+              .current
+              .push(evento.data)
+          }
+        }
+
+      grabador.onstop = () => {
+        const tipoFinal =
+          grabador.mimeType ||
+          tipoAudio ||
+          'audio/webm'
+
+        const audio = new Blob(
+          fragmentosAudio.current,
+          {
+            type: tipoFinal,
+          }
+        )
+
+        flujo
+          .getTracks()
+          .forEach((track) =>
+            track.stop()
+          )
+
+        flujoAudio.current =
+          null
+
+        setGrabandoVoz(false)
+
+        if (audio.size === 0) {
+          setErrorVoz(
+            'La grabación no contiene audio.'
+          )
+          return
+        }
+
+        void procesarRespuestaVoz(
+          audio
+        )
+      }
+
+      grabador.onerror = () => {
+        setGrabandoVoz(false)
+
+        setErrorVoz(
+          'Ocurrió un error durante la grabación.'
+        )
+      }
+
+      grabador.start()
+
+      setGrabandoVoz(true)
+    } catch (err) {
+      flujoAudio.current
+        ?.getTracks()
+        .forEach((track) =>
+          track.stop()
+        )
+
+      flujoAudio.current =
+        null
+
+      setGrabandoVoz(false)
+
+      setErrorVoz(
+        err.name ===
+        'NotAllowedError'
+          ? 'Debe autorizar el uso del micrófono.'
+          : 'No fue posible iniciar el micrófono.'
+      )
+    }
+  }
+
+  function detenerGrabacionVoz() {
+    const grabador =
+      grabadorVoz.current
+
+    if (
+      grabador &&
+      grabador.state ===
+        'recording'
+    ) {
+      grabador.stop()
+    }
+  }
+
   /*
    * Registra una respuesta y obtiene
    * la siguiente pregunta adaptativa.
@@ -528,6 +895,9 @@ export default function Examen() {
       )
 
       setOpcionSeleccionada(null)
+      setTextoTranscrito('')
+      setMensajeVoz('')
+      setErrorVoz('')
 
       tiempoInicioPregunta.current =
         Date.now()
@@ -726,6 +1096,87 @@ export default function Examen() {
             {pregunta.enunciado}
           </p>
 
+          <CCard className="mb-3 border">
+            <CCardBody className="py-3">
+              <div className="d-flex gap-2 align-items-center flex-wrap">
+                {!grabandoVoz ? (
+                  <CButton
+                    color="secondary"
+                    disabled={
+                      enviando ||
+                      procesandoVoz ||
+                      !monitoreoActivo
+                    }
+                    onClick={
+                      iniciarGrabacionVoz
+                    }
+                  >
+                    Responder por voz
+                  </CButton>
+                ) : (
+                  <CButton
+                    color="danger"
+                    onClick={
+                      detenerGrabacionVoz
+                    }
+                  >
+                    Detener grabación
+                  </CButton>
+                )}
+
+                {grabandoVoz && (
+                  <CBadge color="danger">
+                    Grabando...
+                  </CBadge>
+                )}
+
+                {procesandoVoz && (
+                  <span>
+                    <CSpinner
+                      size="sm"
+                      className="me-2"
+                    />
+                    Transcribiendo audio...
+                  </span>
+                )}
+              </div>
+
+              <small className="d-block mt-2 text-body-secondary">
+                Diga “respuesta uno”, “respuesta dos” o lea el texto de la opción.
+              </small>
+
+              {textoTranscrito && (
+                <CAlert
+                  color="info"
+                  className="mt-3 mb-0"
+                >
+                  <strong>
+                    Transcripción:
+                  </strong>{' '}
+                  {textoTranscrito}
+                </CAlert>
+              )}
+
+              {mensajeVoz && (
+                <CAlert
+                  color="success"
+                  className="mt-3 mb-0"
+                >
+                  {mensajeVoz}
+                </CAlert>
+              )}
+
+              {errorVoz && (
+                <CAlert
+                  color="warning"
+                  className="mt-3 mb-0"
+                >
+                  {errorVoz}
+                </CAlert>
+              )}
+            </CCardBody>
+          </CCard>
+
           {!monitoreoActivo && (
             <CAlert
               color={
@@ -768,6 +1219,8 @@ export default function Examen() {
                 }
                 disabled={
                   enviando ||
+                  procesandoVoz ||
+                  grabandoVoz ||
                   !monitoreoActivo
                 }
                 className="mb-2"
@@ -790,6 +1243,8 @@ export default function Examen() {
               disabled={
                 !opcionSeleccionada ||
                 enviando ||
+                procesandoVoz ||
+                grabandoVoz ||
                 !monitoreoActivo
               }
               onClick={
@@ -818,6 +1273,8 @@ export default function Examen() {
               className="ms-auto"
               disabled={
                 enviando ||
+                procesandoVoz ||
+                grabandoVoz ||
                 emitiendoCertificado ||
                 !monitoreoActivo
               }
