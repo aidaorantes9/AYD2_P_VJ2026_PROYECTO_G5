@@ -6,6 +6,7 @@ const {
   saveVideo,
   uploadMiddleware,
   getEvidencias,
+  registrarDeteccionFraude,
 } = require('../controllers/exam.controller')
 
 const router = express.Router()
@@ -13,6 +14,11 @@ const router = express.Router()
 router.get(
   '/evidencias/:id_evaluacion',
   getEvidencias
+)
+
+router.post(
+  '/detecciones',
+  registrarDeteccionFraude
 )
 
 router.post(

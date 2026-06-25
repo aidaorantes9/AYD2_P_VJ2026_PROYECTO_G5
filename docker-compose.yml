@@ -38,6 +38,11 @@ services:
       DB_NAME: ${DB_NAME:-prccd}
       PORT: 4003
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      AES_KEY: ${AES_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      AES_IV: ${AES_IV:-0123456789abcdef0123456789abcdef}
+      NOTIFICACIONES_API_URL: ${NOTIFICACIONES_API_URL:-http://servicio-notificaciones:4006}
+      NOTIFICACIONES_TIMEOUT_MS: ${NOTIFICACIONES_TIMEOUT_MS:-10000}
+      CERTIFICACION_PUBLIC_URL: ${CERTIFICACION_PUBLIC_URL:-http://localhost:4003}
       PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH:-/run/secrets/certificacion/private.pem}
       PUBLIC_KEY_PATH: ${PUBLIC_KEY_PATH:-/run/secrets/certificacion/public.pem}
     ports:
@@ -46,6 +51,8 @@ services:
       - ${CERT_KEYS_HOST_PATH:-./backend/certificacion-auditoria/keys}:/run/secrets/certificacion:ro
     depends_on:
       mysql:
+        condition: service_healthy
+      servicio-notificaciones:
         condition: service_healthy
     healthcheck:
       test:
@@ -179,12 +186,19 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-root}
       DB_NAME: ${DB_NAME:-prccd}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      AES_KEY: ${AES_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      AES_IV: ${AES_IV:-0123456789abcdef0123456789abcdef}
+      NOTIFICACIONES_API_URL: ${NOTIFICACIONES_API_URL:-http://servicio-notificaciones:4006}
+      NOTIFICACIONES_TIMEOUT_MS: ${NOTIFICACIONES_TIMEOUT_MS:-10000}
+      AUDITORES_ALERTA: ${AUDITORES_ALERTA:-auditor.prccd@example.com}
     ports:
       - "${ANTIFRAUDE_HOST_PORT:-4004}:4004"
     volumes:
       - antifraude_uploads:/app/src/uploads
     depends_on:
       mysql:
+        condition: service_healthy
+      servicio-notificaciones:
         condition: service_healthy
     healthcheck:
       test:

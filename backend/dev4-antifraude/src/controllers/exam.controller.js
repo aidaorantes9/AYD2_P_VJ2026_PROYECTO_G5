@@ -3,6 +3,9 @@ const path = require('path')
 const multer = require('multer')
 const crypto = require('crypto')
 const pool = require('../db')
+const {
+  notificarDeteccionFraude,
+} = require('../services/notificacionFraudeService')
 
 const UPLOADS = path.resolve(__dirname, '../uploads')
 
@@ -645,10 +648,230 @@ async function getEvidencias(
   }
 }
 
+
+/*
+ * POST /api/exam/detecciones
+ */
+async function registrarDeteccionFraude(
+  req,
+  res
+) {
+  const conexion =
+    await pool.getConnection()
+
+  try {
+    const idEvaluacion =
+      obtenerIdEvaluacion(
+        req.body.id_evaluacion
+      )
+
+    const idEvidencia =
+      Number(req.body.id_evidencia)
+
+    const tipoIndicio =
+      String(
+        req.body.tipo_indicio || ''
+      ).trim()
+
+    const descripcion =
+      String(
+        req.body.descripcion || ''
+      ).trim()
+
+    const severidad =
+      String(
+        req.body.severidad ||
+        'media'
+      )
+        .trim()
+        .toLowerCase()
+
+    const severidadesValidas = [
+      'baja',
+      'media',
+      'alta',
+      'critica',
+    ]
+
+    if (!idEvaluacion) {
+      return res.status(400).json({
+        error:
+          'id_evaluacion inválido',
+      })
+    }
+
+    if (
+      !Number.isInteger(
+        idEvidencia
+      ) ||
+      idEvidencia <= 0
+    ) {
+      return res.status(400).json({
+        error:
+          'id_evidencia inválido',
+      })
+    }
+
+    if (!tipoIndicio) {
+      return res.status(400).json({
+        error:
+          'tipo_indicio es obligatorio',
+      })
+    }
+
+    if (
+      !severidadesValidas.includes(
+        severidad
+      )
+    ) {
+      return res.status(400).json({
+        error:
+          'La severidad debe ser baja, media, alta o critica',
+      })
+    }
+
+    await conexion.beginTransaction()
+
+    const [evidencias] =
+      await conexion.query(
+        `
+        SELECT id_evidencia
+        FROM EvidenciaAntifraude
+        WHERE id_evidencia = ?
+          AND id_evaluacion = ?
+        FOR UPDATE
+        `,
+        [
+          idEvidencia,
+          idEvaluacion,
+        ]
+      )
+
+    if (evidencias.length === 0) {
+      await conexion.rollback()
+
+      return res.status(404).json({
+        error:
+          'La evidencia no existe o no pertenece a la evaluación',
+      })
+    }
+
+    const [resultado] =
+      await conexion.query(
+        `
+        INSERT INTO DeteccionFraude (
+          id_evaluacion,
+          id_evidencia,
+          tipo_indicio,
+          descripcion,
+          severidad,
+          estado_revision,
+          fecha_deteccion
+        )
+        VALUES (
+          ?, ?, ?, ?, ?,
+          'pendiente', NOW()
+        )
+        `,
+        [
+          idEvaluacion,
+          idEvidencia,
+          tipoIndicio,
+          descripcion || null,
+          severidad,
+        ]
+      )
+
+    await conexion.commit()
+
+    let notificacion = {
+      intentada: true,
+      enviada: false,
+    }
+
+    try {
+      await notificarDeteccionFraude({
+        idEvaluacion,
+        severidad,
+
+        descripcion:
+          descripcion ||
+          tipoIndicio,
+      })
+
+      notificacion = {
+        intentada: true,
+        enviada: true,
+      }
+    } catch (
+      errorNotificacion
+    ) {
+      console.error(
+        'Detección registrada, pero no se pudo enviar la alerta:',
+        errorNotificacion.message
+      )
+
+      notificacion = {
+        intentada: true,
+        enviada: false,
+
+        advertencia:
+          'La detección fue registrada, pero la alerta por correo no pudo enviarse.',
+      }
+    }
+
+    return res.status(201).json({
+      ok: true,
+
+      mensaje:
+        'Detección antifraude registrada correctamente',
+
+      deteccion: {
+        id_deteccion:
+          resultado.insertId,
+
+        id_evaluacion:
+          idEvaluacion,
+
+        id_evidencia:
+          idEvidencia,
+
+        tipo_indicio:
+          tipoIndicio,
+
+        descripcion:
+          descripcion || null,
+
+        severidad,
+
+        estado_revision:
+          'pendiente',
+      },
+
+      notificacion,
+    })
+  } catch (error) {
+    await conexion.rollback()
+
+    console.error(
+      'Registro de detección antifraude:',
+      error
+    )
+
+    return res.status(500).json({
+      error:
+        'No fue posible registrar la detección antifraude',
+    })
+  } finally {
+    conexion.release()
+  }
+}
+
 module.exports = {
   saveScreenshot,
   saveKeystrokes,
   saveVideo,
   uploadMiddleware,
   getEvidencias,
+  registrarDeteccionFraude,
 }
