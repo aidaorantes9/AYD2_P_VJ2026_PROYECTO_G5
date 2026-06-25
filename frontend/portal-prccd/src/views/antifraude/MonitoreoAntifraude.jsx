@@ -24,6 +24,7 @@ const DURACION_VIDEO_INICIAL_MS = 5000
 
 export default function MonitoreoAntifraude({
   idEvaluacion,
+  numeroPregunta = 1,
   onEstadoChange,
 }) {
   const [estado, setEstado] = useState('pendiente')
@@ -34,8 +35,8 @@ export default function MonitoreoAntifraude({
 
   const [capturas, setCapturas] = useState(0)
   const [logsEnviados, setLogsEnviados] = useState(0)
-  const [videoGuardado, setVideoGuardado] =
-    useState(false)
+  const [videoGuardado, setVideoGuardado] = useState(false)
+  const [detecciones, setDetecciones] = useState(0)
 
   const videoRef = useRef(null)
   const streamRef = useRef(null)
@@ -45,10 +46,9 @@ export default function MonitoreoAntifraude({
   const grabadorRef = useRef(null)
   const desmontadoRef = useRef(false)
 
-  /*
-   * Informa al componente Examen cada vez
-   * que cambia el estado del monitoreo.
-   */
+  const ultimaEvidenciaRef = useRef(null)
+  const indiciosRegistradosRef = useRef(new Set())
+
   useEffect(() => {
     onEstadoChange?.(estado)
   }, [estado, onEstadoChange])
@@ -67,19 +67,126 @@ export default function MonitoreoAntifraude({
     return datos
   }
 
-  const enviarLogs = useCallback(
-    async ({ keepalive = false } = {}) => {
-      if (
-        !idEvaluacion ||
-        logsRef.current.length === 0
-      ) {
+  const crearEvidenciaTecnica = useCallback(
+    async ({ tipoIndicio, descripcion }) => {
+      if (!idEvaluacion) {
+        return null
+      }
+
+      const respuesta = await fetch(
+        `${API_BASE}/api/exam/keystrokes`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id_evaluacion: idEvaluacion,
+            logs: [
+              {
+                tipo: 'indicio_frontend',
+                codigo: tipoIndicio,
+                fecha: new Date().toISOString(),
+                detalle: descripcion,
+              },
+            ],
+          }),
+        }
+      )
+
+      const datos = await leerRespuesta(respuesta)
+
+      ultimaEvidenciaRef.current = datos.id_evidencia
+
+      if (!desmontadoRef.current) {
+        setLogsEnviados((cantidad) => cantidad + 1)
+      }
+
+      return datos.id_evidencia
+    },
+    [idEvaluacion]
+  )
+
+  const registrarDeteccionFraude = useCallback(
+    async ({
+      tipoIndicio,
+      descripcion,
+      severidad = 'media',
+      idEvidencia = null,
+    }) => {
+      if (!idEvaluacion || !tipoIndicio) {
         return
       }
 
-      const lote = logsRef.current.splice(
-        0,
-        logsRef.current.length
-      )
+      const claveIndicio = `${idEvaluacion}-${numeroPregunta}-${tipoIndicio}-${idEvidencia || 'sin-evidencia'}`
+
+      if (indiciosRegistradosRef.current.has(claveIndicio)) {
+        return
+      }
+
+      indiciosRegistradosRef.current.add(claveIndicio)
+
+      try {
+        const evidencia =
+          idEvidencia ||
+          ultimaEvidenciaRef.current ||
+          (await crearEvidenciaTecnica({
+            tipoIndicio,
+            descripcion,
+          }))
+
+        if (!evidencia) {
+          throw new Error(
+            'No existe evidencia técnica para asociar la detección.'
+          )
+        }
+
+        const respuesta = await fetch(
+          `${API_BASE}/api/exam/detecciones`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id_evaluacion: idEvaluacion,
+              id_evidencia: evidencia,
+              tipo_indicio: tipoIndicio,
+              descripcion,
+              severidad,
+            }),
+          }
+        )
+
+        const datos = await leerRespuesta(respuesta)
+
+        if (!desmontadoRef.current) {
+          setDetecciones((cantidad) => cantidad + 1)
+
+          setMensaje(
+            datos?.notificacion?.enviada
+              ? 'Anomalía detectada. Se notificó al auditor del SICA.'
+              : 'Anomalía detectada. La detección fue registrada, pero no se pudo enviar el correo.'
+          )
+        }
+      } catch (error) {
+        indiciosRegistradosRef.current.delete(claveIndicio)
+
+        if (!desmontadoRef.current) {
+          setMensaje(error.message)
+        }
+      }
+    },
+    [crearEvidenciaTecnica, idEvaluacion, numeroPregunta]
+  )
+
+  const enviarLogs = useCallback(
+    async ({ keepalive = false } = {}) => {
+      if (!idEvaluacion || logsRef.current.length === 0) {
+        return
+      }
+
+      const lote = logsRef.current.splice(0, logsRef.current.length)
 
       try {
         const respuesta = await fetch(
@@ -97,18 +204,14 @@ export default function MonitoreoAntifraude({
           }
         )
 
-        await leerRespuesta(respuesta)
+        const datos = await leerRespuesta(respuesta)
+
+        ultimaEvidenciaRef.current = datos.id_evidencia
 
         if (!desmontadoRef.current) {
-          setLogsEnviados(
-            (cantidad) => cantidad + lote.length
-          )
+          setLogsEnviados((cantidad) => cantidad + lote.length)
         }
       } catch (error) {
-        /*
-         * Si el envío normal falla, regresamos
-         * los eventos a la cola para reintentarlos.
-         */
         if (!keepalive) {
           logsRef.current.unshift(...lote)
 
@@ -130,12 +233,11 @@ export default function MonitoreoAntifraude({
       !video.videoWidth ||
       !video.videoHeight
     ) {
-      return
+      return null
     }
 
     try {
-      const canvas =
-        document.createElement('canvas')
+      const canvas = document.createElement('canvas')
 
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
@@ -150,10 +252,7 @@ export default function MonitoreoAntifraude({
         canvas.height
       )
 
-      const image = canvas.toDataURL(
-        'image/png',
-        0.85
-      )
+      const image = canvas.toDataURL('image/png', 0.85)
 
       const respuesta = await fetch(
         `${API_BASE}/api/exam/screenshots`,
@@ -169,55 +268,45 @@ export default function MonitoreoAntifraude({
         }
       )
 
-      await leerRespuesta(respuesta)
+      const datos = await leerRespuesta(respuesta)
+
+      ultimaEvidenciaRef.current = datos.id_evidencia
 
       if (!desmontadoRef.current) {
-        setCapturas(
-          (cantidad) => cantidad + 1
-        )
+        setCapturas((cantidad) => cantidad + 1)
       }
+
+      return datos
     } catch (error) {
       if (!desmontadoRef.current) {
         setMensaje(error.message)
       }
+
+      return null
     }
   }, [idEvaluacion])
 
   const grabarVideoInicial = useCallback(
     async (stream) => {
-      if (
-        !idEvaluacion ||
-        typeof MediaRecorder === 'undefined'
-      ) {
+      if (!idEvaluacion || typeof MediaRecorder === 'undefined') {
         return
       }
 
       try {
         const opciones = {}
 
-        if (
-          MediaRecorder.isTypeSupported(
-            'video/webm;codecs=vp8'
-          )
-        ) {
-          opciones.mimeType =
-            'video/webm;codecs=vp8'
+        if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+          opciones.mimeType = 'video/webm;codecs=vp8'
         }
 
         const fragmentos = []
 
-        const grabador = new MediaRecorder(
-          stream,
-          opciones
-        )
+        const grabador = new MediaRecorder(stream, opciones)
 
         grabadorRef.current = grabador
 
         grabador.ondataavailable = (evento) => {
-          if (
-            evento.data &&
-            evento.data.size > 0
-          ) {
+          if (evento.data && evento.data.size > 0) {
             fragmentos.push(evento.data)
           }
         }
@@ -228,21 +317,13 @@ export default function MonitoreoAntifraude({
           }
 
           try {
-            const video = new Blob(
-              fragmentos,
-              {
-                type:
-                  grabador.mimeType ||
-                  'video/webm',
-              }
-            )
+            const video = new Blob(fragmentos, {
+              type: grabador.mimeType || 'video/webm',
+            })
 
             const formulario = new FormData()
 
-            formulario.append(
-              'id_evaluacion',
-              String(idEvaluacion)
-            )
+            formulario.append('id_evaluacion', String(idEvaluacion))
 
             formulario.append(
               'video',
@@ -258,7 +339,9 @@ export default function MonitoreoAntifraude({
               }
             )
 
-            await leerRespuesta(respuesta)
+            const datos = await leerRespuesta(respuesta)
+
+            ultimaEvidenciaRef.current = datos.id_evidencia
 
             if (!desmontadoRef.current) {
               setVideoGuardado(true)
@@ -273,9 +356,7 @@ export default function MonitoreoAntifraude({
         grabador.start()
 
         window.setTimeout(() => {
-          if (
-            grabador.state === 'recording'
-          ) {
+          if (grabador.state === 'recording') {
             grabador.stop()
           }
         }, DURACION_VIDEO_INICIAL_MS)
@@ -292,87 +373,65 @@ export default function MonitoreoAntifraude({
 
   const detenerRecursos = useCallback(() => {
     if (intervaloCapturaRef.current) {
-      clearInterval(
-        intervaloCapturaRef.current
-      )
-
+      clearInterval(intervaloCapturaRef.current)
       intervaloCapturaRef.current = null
     }
 
     if (intervaloLogsRef.current) {
-      clearInterval(
-        intervaloLogsRef.current
-      )
-
+      clearInterval(intervaloLogsRef.current)
       intervaloLogsRef.current = null
     }
 
     if (
       grabadorRef.current &&
-      grabadorRef.current.state ===
-        'recording'
+      grabadorRef.current.state === 'recording'
     ) {
       grabadorRef.current.stop()
     }
 
     if (streamRef.current) {
-      streamRef.current
-        .getTracks()
-        .forEach((track) => track.stop())
-
+      streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
     }
   }, [])
 
-  const detenerMonitoreo =
-    useCallback(async () => {
-      await enviarLogs()
-      detenerRecursos()
+  const detenerMonitoreo = useCallback(async () => {
+    await enviarLogs()
+    detenerRecursos()
 
-      if (!desmontadoRef.current) {
-        setEstado('detenido')
+    if (!desmontadoRef.current) {
+      setEstado('detenido')
 
-        setMensaje(
-          'El monitoreo fue detenido. Debe activarlo nuevamente para continuar.'
-        )
-      }
-    }, [detenerRecursos, enviarLogs])
+      setMensaje(
+        'El monitoreo fue detenido. Debe activarlo nuevamente para continuar.'
+      )
+    }
+  }, [detenerRecursos, enviarLogs])
 
   async function activarMonitoreo() {
     if (!idEvaluacion) {
-      setMensaje(
-        'La evaluación todavía no está disponible.'
-      )
+      setMensaje('La evaluación todavía no está disponible.')
       return
     }
 
-    if (
-      !navigator.mediaDevices
-        ?.getDisplayMedia
-    ) {
+    if (!navigator.mediaDevices?.getDisplayMedia) {
       setEstado('error')
 
-      setMensaje(
-        'El navegador no permite compartir pantalla.'
-      )
+      setMensaje('El navegador no permite compartir pantalla.')
       return
     }
 
     setEstado('activando')
 
-    setMensaje(
-      'Solicitando autorización para compartir pantalla...'
-    )
+    setMensaje('Solicitando autorización para compartir pantalla...')
 
     try {
-      const stream =
-        await navigator.mediaDevices
-          .getDisplayMedia({
-            video: {
-              frameRate: 1,
-            },
-            audio: false,
-          })
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          frameRate: 1,
+        },
+        audio: false,
+      })
 
       streamRef.current = stream
 
@@ -383,15 +442,17 @@ export default function MonitoreoAntifraude({
 
       await video.play()
 
-      const track =
-        stream.getVideoTracks()[0]
+      const track = stream.getVideoTracks()[0]
 
-      /*
-       * También se ejecuta cuando el candidato
-       * pulsa "Dejar de compartir".
-       */
       track.onended = () => {
         if (!desmontadoRef.current) {
+          void registrarDeteccionFraude({
+            tipoIndicio: 'interrupcion_monitoreo',
+            descripcion:
+              'El candidato detuvo la compartición de pantalla durante la evaluación.',
+            severidad: 'alta',
+          })
+
           void detenerMonitoreo()
         }
       }
@@ -402,32 +463,18 @@ export default function MonitoreoAntifraude({
         'Monitoreo activo. Ya puede responder la evaluación.'
       )
 
-      /*
-       * Captura inicial.
-       */
       window.setTimeout(() => {
         void capturarPantalla()
       }, 1000)
 
-      /*
-       * Captura periódica cada dos minutos.
-       */
-      intervaloCapturaRef.current =
-        window.setInterval(() => {
-          void capturarPantalla()
-        }, INTERVALO_CAPTURA_MS)
+      intervaloCapturaRef.current = window.setInterval(() => {
+        void capturarPantalla()
+      }, INTERVALO_CAPTURA_MS)
 
-      /*
-       * Envío de logs cada quince segundos.
-       */
-      intervaloLogsRef.current =
-        window.setInterval(() => {
-          void enviarLogs()
-        }, INTERVALO_LOGS_MS)
+      intervaloLogsRef.current = window.setInterval(() => {
+        void enviarLogs()
+      }, INTERVALO_LOGS_MS)
 
-      /*
-       * Video inicial de cinco segundos.
-       */
       void grabarVideoInicial(stream)
     } catch (error) {
       setEstado('error')
@@ -440,10 +487,6 @@ export default function MonitoreoAntifraude({
     }
   }
 
-  /*
-   * Registra únicamente metadatos técnicos.
-   * No almacena el texto escrito.
-   */
   useEffect(() => {
     if (estado !== 'activo') {
       return undefined
@@ -459,24 +502,70 @@ export default function MonitoreoAntifraude({
         shift: evento.shiftKey,
         meta: evento.metaKey,
       })
+
+      const usaControl = evento.ctrlKey || evento.metaKey
+
+      const atajoSospechoso =
+        (usaControl &&
+          ['KeyC', 'KeyV', 'KeyX', 'KeyP', 'KeyS'].includes(
+            evento.code
+          )) ||
+        (evento.altKey && evento.code === 'Tab')
+
+      if (atajoSospechoso) {
+        void registrarDeteccionFraude({
+          tipoIndicio: `atajo_teclado_sospechoso_${evento.code}`,
+          descripcion: `El candidato utilizó una combinación de teclas restringida: ${evento.code}.`,
+          severidad: 'media',
+        })
+      }
     }
 
-    window.addEventListener(
-      'keydown',
-      registrarEvento
-    )
+    window.addEventListener('keydown', registrarEvento)
 
     return () => {
-      window.removeEventListener(
-        'keydown',
-        registrarEvento
-      )
+      window.removeEventListener('keydown', registrarEvento)
     }
-  }, [estado])
+  }, [estado, registrarDeteccionFraude])
 
-  /*
-   * Limpieza cuando se abandona la vista.
-   */
+  useEffect(() => {
+    if (estado !== 'activo') {
+      return undefined
+    }
+
+    function detectarCambioDePestana() {
+      if (document.hidden) {
+        void registrarDeteccionFraude({
+          tipoIndicio: 'cambio_pestana_examen',
+          descripcion:
+            'El candidato cambió de pestaña o minimizó la ventana durante la evaluación.',
+          severidad: 'media',
+        })
+      }
+    }
+
+    function detectarPerdidaDeFoco() {
+      void registrarDeteccionFraude({
+        tipoIndicio: 'perdida_foco_examen',
+        descripcion:
+          'La ventana del examen perdió el foco durante la evaluación.',
+        severidad: 'media',
+      })
+    }
+
+    document.addEventListener('visibilitychange', detectarCambioDePestana)
+    window.addEventListener('blur', detectarPerdidaDeFoco)
+
+    return () => {
+      document.removeEventListener(
+        'visibilitychange',
+        detectarCambioDePestana
+      )
+
+      window.removeEventListener('blur', detectarPerdidaDeFoco)
+    }
+  }, [estado, registrarDeteccionFraude])
+
   useEffect(() => {
     desmontadoRef.current = false
 
@@ -507,13 +596,11 @@ export default function MonitoreoAntifraude({
   return (
     <CCard>
       <CCardBody>
-        {/* Cabecera con título y badge */}
         <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
           <h6 className="mb-0">Monitoreo de integridad</h6>
           <CBadge color={colorEstado}>{estado}</CBadge>
         </div>
 
-        {/* Mensaje de alerta */}
         <CAlert
           color={
             estado === 'error' || estado === 'detenido'
@@ -527,24 +614,29 @@ export default function MonitoreoAntifraude({
           {mensaje}
         </CAlert>
 
-        {/* Datos de monitoreo en filas responsivas */}
         <div className="d-flex flex-wrap gap-2 mb-2 small">
           <div>
             <strong>Evaluación:</strong> {idEvaluacion || 'Pendiente'}
           </div>
+
           <div>
             <strong>Capturas:</strong> {capturas}
           </div>
+
           <div>
             <strong>Eventos de teclado:</strong> {logsEnviados}
           </div>
+
           <div>
             <strong>Video inicial:</strong>{' '}
             {videoGuardado ? 'Almacenado' : 'Pendiente'}
           </div>
+
+          <div>
+            <strong>Detecciones:</strong> {detecciones}
+          </div>
         </div>
 
-        {/* Botón principal */}
         {puedeActivar && (
           <CButton
             color="primary"
@@ -576,12 +668,10 @@ export default function MonitoreoAntifraude({
           </CButton>
         )}
 
-        {/* Nota legal */}
         <p className="small text-muted mt-3 mb-0">
           Se registran evidencias técnicas. No se almacena el texto escrito.
         </p>
 
-        {/* Video oculto */}
         <video
           ref={videoRef}
           autoPlay

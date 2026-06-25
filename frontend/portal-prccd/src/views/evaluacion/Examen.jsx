@@ -98,6 +98,7 @@ export default function Examen() {
       <CCol xs={12} md={12} lg={3}>
         <MonitoreoAntifraude
           idEvaluacion={idEvaluacion}
+          numeroPregunta={numeroPregunta}
           onEstadoChange={manejarEstadoMonitoreo}
         />
       </CCol>
