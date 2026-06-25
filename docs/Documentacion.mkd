@@ -14,6 +14,7 @@
 ![Integrantes](Images/integrantes.png)
 
 ---
+---
 ## Índice
 
 1. [Identificación del Caso de Negocio y Stakeholders](#1-identificación-del-caso-de-negocio-y-stakeholders)
@@ -57,6 +58,23 @@
 
 11. [Gestión del Proyecto — Enfoque Ágil](#11-gestión-del-proyecto--enfoque-ágil)
 
+12. [Evolución Arquitectónica — Fase 3](#12-evolución-arquitectónica--fase-3)
+    - 12.1 [Contexto del Cambio](#121-contexto-del-cambio)
+    - 12.2 [Nuevos Requerimientos Funcionales](#122-nuevos-requerimientos-funcionales)
+    - 12.3 [Decisión Arquitectónica — Estilos Introducidos](#123-decisión-arquitectónica--estilos-introducidos)
+      - 12.3.1 [Recepción de Audio — Extensión del Estilo Multi-tier](#1231-recepción-de-audio--extensión-del-estilo-multi-tier)
+      - 12.3.2 [Procesamiento STT — Pipes and Filters](#1232-procesamiento-stt--pipes-and-filters)
+      - 12.3.3 [Servicio de Notificaciones — Extensión del Estilo Multi-tier](#1233-servicio-de-notificaciones--extensión-del-estilo-multi-tier)
+    - 12.4 [Escenarios de Atributos de Calidad — Impacto y Tabla Actualizada](#124-escenarios-de-atributos-de-calidad--impacto-y-tabla-actualizada)
+    - 12.5 [Modificación de Vistas Arquitectónicas](#125-modificación-de-vistas-arquitectónicas)
+      - 12.5.1 [CDU100 — Gestión de Evaluaciones](#1251-cdu100--gestión-de-evaluaciones-actualizado-fase-3)
+      - 12.5.2 [CDU101 — Emisión de Certificaciones](#1252-cdu101--emisión-de-certificaciones-actualizado-fase-3)
+      - 12.5.3 [CDU103 — Auditoría de Certificaciones](#1253-cdu103--auditoría-de-certificaciones-actualizado-fase-3)
+      - 12.5.4 [Vista de Sistema — Diagrama de Bloques](#1254-vista-de-sistema--diagrama-de-bloques-actualizado-fase-3)
+      - 12.5.5 [Diagrama de Componentes](#1255-diagrama-de-componentes-actualizado-fase-3)
+      - 12.5.6 [Diagrama de Distribución](#1256-diagrama-de-distribución-actualizado-fase-3)
+      - 12.5.7 [Diagrama de Despliegue](#1257-diagrama-de-despliegue-actualizado-fase-3)
+    - 12.6 [Matrices de Trazabilidad Actualizadas](#126-matrices-de-trazabilidad-actualizadas)
 ---
 
 ## 1. Identificación del Caso de Negocio y Stakeholders
@@ -1160,5 +1178,345 @@ pertenece y en la descripción la historia de usuario correspondiente en formato
 vinculando el requerimiento del usuario con la tarea técnica a implementar.
 
 ![Detalle de tarea](Images/tarea-hdu.png)
+
+---
+## 12. Evolución Arquitectónica — Fase 3
+
+### 12.1 Contexto del Cambio
+
+Con el MVP de la Fase 2 aprobado y funcionando, la Fase 3 introduce dos nuevas
+funcionalidades transversales al sistema: el soporte para respuestas por voz en
+el examen adaptativo mediante Speech-to-Text, y un servicio de notificaciones por
+correo electrónico que reacciona a eventos críticos del ecosistema. Ambas
+funcionalidades se integran sobre la arquitectura existente sin modificar los
+flujos core definidos en las Fases 1 y 2.
+
+---
+
+### 12.2 Nuevos Requerimientos Funcionales
+
+Los siguientes RF se agregan al catálogo existente (RF01–RF25) para documentar
+las nuevas funcionalidades de la Fase 3.
+
+| ID | Descripción | Prioridad | CDU |
+|---|---|---|---|
+| RF26 | El sistema debe permitir al candidato grabar su respuesta por voz desde un dispositivo móvil, procesarla mediante Speech-to-Text con Whisper local y enviarla al motor adaptativo existente para evaluación, manteniendo el flujo de dificultad Básico/Intermedio/Avanzado sin modificaciones. | Alta | CDU100 |
+| RF27 | El sistema debe enviar un correo al candidato cuando su certificado digital haya sido emitido exitosamente, incluyendo el hash de verificación criptográfica. | Alta | CDU101 |
+| RF28 | El sistema debe enviar un reporte consolidado por correo a la universidad correspondiente cuando sus estudiantes egresados aprueben la certificación. | Media | CDU101 |
+| RF29 | El sistema debe enviar una alerta inmediata por correo a los auditores del SICA cuando el módulo antifraude detecte anomalías durante un examen. | Alta | CDU103 |
+
+---
+
+### 12.3 Decisión Arquitectónica — Estilos Introducidos
+
+#### 12.3.1 Recepción de Audio — Extensión del Estilo Multi-tier
+
+La recepción del audio desde el frontend sigue el estilo Multi-tier ya definido
+en la sección 5.1.1. El audio llega desde la capa de presentación (Portal Web
+React) hacia la capa de lógica de negocio (Svc. Evaluaciones + STT, puerto 4001)
+donde Multer lo recibe, valida y persiste temporalmente. No se introduce un nuevo
+estilo, sino que se extiende la capa de negocio existente con nuevos endpoints
+dentro del mismo módulo.
+
+#### 12.3.2 Procesamiento STT — Pipes and Filters
+
+El procesamiento interno del audio introduce el estilo **Pipes and Filters** como
+nuevo estilo complementario a la arquitectura existente. Una vez recibido el
+audio, este atraviesa una secuencia de filtros independientes antes de llegar
+al motor adaptativo:
+
+| Paso | Filtro | Archivo | Descripción |
+|---|---|---|---|
+| 1 | Recepción y validación | `uploadAudio.js` | Recibe el archivo vía multipart/form-data, valida extensión y tipo MIME, persiste en `tmp/audio/`. Soporta webm, wav, mp3, m4a, ogg. Límite de 15 MB. |
+| 2 | Conversión de formato | `speechToTextServicio.js` | Convierte el audio a WAV mono 16kHz PCM 16-bit mediante ffmpeg, formato requerido por Whisper. |
+| 3 | Transcripción STT | `speechToTextServicio.js` | Ejecuta `whisper.cpp` localmente como proceso hijo mediante `child_process.execFile`. Transcribe el WAV con el modelo `ggml-base.bin` y limpia el texto resultante. |
+| 4 | Detección de opción | `respuestaVozServicio.js` | Normaliza el texto transcrito y lo compara contra las opciones de la pregunta activa. Soporta frases como "respuesta uno", "la respuesta dos" o coincidencia directa con el texto de la opción. |
+| 5 | Evaluación adaptativa | `evaluacion.js` | La opción detectada se envía al motor adaptativo existente sin modificaciones, manteniendo la lógica de dificultad y la bitácora inmutable. |
+| 6 | Limpieza | `speechToTextServicio.js` | Los archivos temporales WAV y TXT se eliminan en el bloque `finally`, independientemente del resultado. |
+
+**Justificación:** cada transformación produce un artefacto que el siguiente paso
+consume de forma independiente. Sustituir cualquier filtro no afecta los demás.
+Por ejemplo, cambiar de `whisper_local` a `openai` solo requiere modificar la
+variable de entorno `STT_PROVIDER` sin tocar el resto de la cadena.
+
+**Por qué Whisper local:** cumple con RE01 (presupuesto) y RT03 (stack Open
+Source). Es gratuito, corre on-premise y no requiere cuota por uso. El servicio
+mantiene compatibilidad con OpenAI Whisper API como alternativa futura configurable
+mediante variable de entorno.
+
+**Por qué el STT vive en dev1-evaluaciones:** el texto transcrito debe resolverse
+contra las opciones de la pregunta activa en la misma transacción del motor
+adaptativo. Separarlo introduciría latencia y complejidad innecesaria.
+
+#### 12.3.3 Servicio de Notificaciones — Extensión del Estilo Multi-tier
+
+El servicio de notificaciones (`servicio-notificaciones`, puerto 4006) sigue el
+mismo patrón transversal del módulo de seguridad de Fase 2. Es un microservicio
+independiente dentro de la capa de lógica de negocio que otros módulos consumen
+mediante HTTP interno. Usa Nodemailer con Mailtrap para pruebas y es configurable
+para cualquier proveedor SMTP real mediante variables de entorno. No introduce un
+nuevo estilo arquitectónico sino que extiende el estilo Multi-tier existente con
+un nuevo servicio transversal.
+
+---
+### 12.4 Escenarios de Atributos de Calidad — Impacto y Tabla Actualizada
+
+Los escenarios EaC01 al EaC10 definidos en la Fase 1 se mantienen vigentes.
+La incorporación del módulo de voz y el servicio de notificaciones en la Fase 3
+genera impacto directo en los siguientes atributos:
+
+| EaC | Impacto del módulo de voz | Impacto del servicio de notificaciones |
+|---|---|---|
+| EaC01 Desempeño | Latencia adicional de 3-5s por transcripción. El límite de 2 segundos aplica para el canal de texto. Para el canal de voz el límite se extiende a 5 segundos reconociendo la naturaleza del procesamiento STT. | Sin impacto. Las notificaciones son llamadas HTTP asíncronas que no bloquean el flujo principal. |
+| EaC03 Disponibilidad | Falla del STT no afecta el canal de texto. El modo `mock` permite degradación controlada sin Whisper instalado. | Falla del SMTP no afecta la emisión de certificados. El correo es notificación, no prerequisito. |
+| EaC04 Seguridad | Audio eliminado tras procesamiento. TLS en tránsito. Sin persistencia de datos biométricos de voz en ninguna tabla. | Credenciales SMTP en variables de entorno. Nunca en código ni en base de datos. |
+| EaC09 Privacidad | El audio no se almacena ni se asocia al candidato en ninguna tabla de la base de datos. | Si `estado_gdpr = olvidado`, el servicio no envía correos al candidato anonimizado. |
+
+A continuación se presenta la tabla completa de EaC con los escenarios
+originales y la nota de Fase 3 incorporada en EaC01:
+
+| ID | Categoría | Escenario | Prioridad |
+|---|---|---|---|
+| EaC01 | Desempeño | **Fuente de estímulo:** miles de candidatos simultáneos. **Estímulo:** acceden al módulo de examen adaptativo durante la primera semana de cada mes. **Artefacto:** Motor de Evaluaciones (CDU100). **Entorno:** período de certificación con carga máxima prevista. **Respuesta:** el sistema procesa cada respuesta del candidato y determina la siguiente pregunta en tiempo real sin degradación perceptible. **Medida:** el tiempo de respuesta por pregunta no supera los 2 segundos bajo carga máxima concurrente para el canal de texto. **Nota Fase 3:** para el canal de voz el tiempo de respuesta se extiende a un máximo de 5 segundos, reconociendo la latencia adicional del procesamiento Speech-to-Text (conversión ffmpeg + transcripción Whisper local). Este límite diferenciado no afecta el canal de texto ni la lógica adaptativa existente. | Alta |
+| EaC02 | Escalabilidad | **Fuente de estímulo:** crecimiento del número de candidatos y volumen de evidencia antifraude almacenada. **Estímulo:** el sistema acumula telemetría (capturas, logs, video) de miles de evaluaciones mensuales durante 5 años. **Artefacto:** módulo de almacenamiento de evidencia antifraude (CDU100, CDU103). **Entorno:** operación normal con retención legal activa. **Respuesta:** el sistema escala el almacenamiento sin rediseño arquitectónico. **Medida:** el sistema soporta el incremento de datos sin modificar la arquitectura de la capa de datos. | Alta |
+| EaC03 | Disponibilidad | **Fuente de estímulo:** falla interna de un componente del servidor. **Estímulo:** el servicio de exámenes adaptativos se interrumpe durante un período de certificación activo. **Artefacto:** Motor de Evaluaciones (CDU100). **Entorno:** período de certificación con candidatos realizando exámenes en curso. **Respuesta:** el sistema restablece el servicio sin pérdida de progreso de los candidatos activos. **Medida:** el tiempo de recuperación no supera los 5 minutos y ningún candidato pierde su evaluación en curso. | Alta |
+| EaC04 | Seguridad | **Fuente de estímulo:** un atacante intercepta la comunicación entre el candidato y la plataforma durante la evaluación. **Estímulo:** intento de captura o modificación de respuestas en tránsito. **Artefacto:** canal de comunicación del Motor de Evaluaciones (CDU100). **Entorno:** operación normal en período de certificación. **Respuesta:** el sistema rechaza la comunicación no cifrada y registra el intento como evidencia antifraude. **Medida:** ninguna respuesta viaja en texto plano; todo el tráfico usa TLS 1.2 o superior. | Alta |
+| EaC05 | Integridad | **Fuente de estímulo:** un administrador malintencionado intenta modificar la calificación de un candidato directamente en la base de datos. **Estímulo:** modificación no autorizada de un registro en la tabla Evaluacion. **Artefacto:** bitácora inmutable de auditoría (CDU101, CDU103). **Entorno:** operación normal post-evaluación. **Respuesta:** el sistema detecta la inconsistencia en la cadena de hashes y genera una alerta de alteración. **Medida:** cualquier modificación retroactiva es detectable en menos de 1 consulta de verificación de hash. | Alta |
+| EaC06 | Seguridad | **Fuente de estímulo:** entidad auditora externa (Ministerio o Dirección Financiera). **Estímulo:** solicitud de verificación de autenticidad de un certificado emitido. **Artefacto:** módulo de emisión y verificación criptográfica de certificados (CDU101). **Entorno:** operación normal post-certificación. **Respuesta:** el sistema valida la firma electrónica y el hash del certificado devolviendo un resultado de integridad confirmada o alterada. **Medida:** la verificación se completa en menos de 3 segundos con resultado binario (íntegro/alterado). | Alta |
+| EaC07 | Interoperabilidad | **Fuente de estímulo:** una universidad agrega un nuevo protocolo de autenticación no contemplado inicialmente. **Estímulo:** solicitud de integración con un nuevo protocolo institucional. **Artefacto:** capa de integración con adaptadores LDAP/SAML/OAuth2 (CDU102). **Entorno:** operación normal fuera de período de certificación. **Respuesta:** el sistema incorpora el nuevo adaptador sin modificar los existentes ni interrumpir el servicio. **Medida:** la integración de un nuevo protocolo no requiere modificar más de 1 componente existente. | Media |
+| EaC08 | Modificabilidad | **Fuente de estímulo:** una universidad cambia el formato de exportación de sus datos académicos. **Estímulo:** llegada de archivos en un formato nuevo no soportado previamente. **Artefacto:** cadena de filtros de ingesta Chain of Responsibility (CDU102). **Entorno:** operación normal de ingestión de datos. **Respuesta:** el sistema incorpora el nuevo filtro de transformación sin afectar los filtros existentes. **Medida:** agregar soporte para un nuevo formato requiere modificar únicamente 1 filtro de la cadena sin retrabajo en los demás. | Media |
+| EaC09 | Privacidad | **Fuente de estímulo:** candidato ejerce su derecho al olvido conforme al GDPR. **Estímulo:** solicitud formal de eliminación de datos personales. **Artefacto:** módulo de seguridad transversal y tabla CandidatoSeguridad (CDU101). **Entorno:** operación normal post-certificación. **Respuesta:** el sistema anonimiza los datos personales del candidato sin eliminar el historial de evaluaciones ni los certificados emitidos. **Medida:** el cambio de estado a "olvidado" se ejecuta en una sola transacción sin afectar la trazabilidad de auditoría. | Alta |
+| EaC10 | Usabilidad | **Fuente de estímulo:** directivo de alta gerencia o representante de ministerio gubernamental. **Estímulo:** accede al dashboard analítico para consultar métricas de competencias digitales regionales. **Artefacto:** módulo de visualización de métricas (CDU104). **Entorno:** operación normal fuera de período de certificación. **Respuesta:** el sistema presenta los datos segmentados por país, carrera y género de forma visual e intuitiva sin exponer datos personales individuales. **Medida:** el usuario puede filtrar y visualizar métricas en menos de 3 interacciones sin capacitación previa. | Media |
+
+---
+
+### 12.5 Modificación de Vistas Arquitectónicas
+
+#### 12.5.1 CDU100 — Gestión de Evaluaciones (actualizado Fase 3)
+
+Se agrega el include **Responder por Voz** (RF26) al caso de uso principal
+**Realizar Examen Adaptativo**. El candidato puede elegir responder por texto
+(flujo original) o por voz (flujo nuevo). Ambas rutas convergen en el mismo
+endpoint del motor adaptativo sin modificar la lógica de calificación ni la
+bitácora inmutable.
+
+![CDU100 Actualizado Fase 3](Images/cdu100_actualizado.png)
+
+---
+
+##### RF26 — Responder por Voz
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Responder por Voz |
+| Actores | Candidato, Sistema |
+| Propósito | Permitir al candidato grabar su respuesta por voz desde un dispositivo móvil como alternativa al canal de texto, sin modificar la lógica de evaluación adaptativa existente. |
+| Resumen | El candidato graba su respuesta en audio desde el portal móvil. El sistema recibe el archivo mediante Multer, lo convierte a WAV con ffmpeg, lo transcribe con Whisper local y detecta la opción seleccionada mediante normalización de texto. El texto detectado se envía al motor adaptativo existente como si fuera una respuesta por texto, manteniendo el flujo Básico/Intermedio/Avanzado sin modificaciones. |
+
+| Acción del Candidato | Respuesta del Sistema (implementación Fase 3) |
+| --- | --- |
+| 1. El candidato selecciona responder por voz y graba su respuesta. | 2. El frontend envía el archivo al endpoint `POST /api/evaluacion/respuesta-audio` como multipart/form-data. `uploadAudio.js` valida el formato (webm, wav, mp3, m4a, ogg) y lo persiste temporalmente en `tmp/audio/`. |
+| 3. El candidato confirma el envío del audio. | 4. `speechToTextServicio.js` convierte el audio a WAV mono 16kHz con ffmpeg y ejecuta `whisper-cli` localmente con el modelo `ggml-base.bin`. El texto transcrito pasa a `respuestaVozServicio.js` que normaliza el texto y detecta la opción seleccionada por coincidencia numérica o textual. La opción detectada se envía al motor adaptativo de `evaluacion.js`. Los archivos temporales se eliminan automáticamente en el bloque `finally`. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si el audio no puede transcribirse | El sistema retorna error controlado. El candidato puede reintentar por voz o cambiar al canal de texto sin perder el progreso del examen. |
+| Si el texto transcrito no coincide con ninguna opción | El sistema retorna error indicando que no detectó una opción válida y solicita al candidato que repita la respuesta. |
+---
+
+#### 12.5.2 CDU101 — Emisión de Certificaciones (actualizado Fase 3)
+
+Se agregan dos includes nuevos a **Emitir Certificado**: **Notificar Candidato
+por Correo** (RF27) y **Notificar Reporte a Universidad** (RF28). Ambas
+notificaciones se disparan automáticamente al emitir exitosamente un certificado,
+consumiendo el `servicio-notificaciones` mediante HTTP interno.
+
+![CDU101 Actualizado Fase 3](Images/cdu101_actualizado.png)
+
+---
+
+##### RF27 — Notificar Candidato por Correo
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Notificar Candidato por Correo |
+| Actores | Sistema, Candidato |
+| Propósito | Informar al candidato que su certificado digital ha sido emitido exitosamente, proporcionando el hash de verificación criptográfica para que pueda comprobar su autenticidad. |
+| Resumen | Al completar la emisión del certificado en CDU101, el módulo de certificación llama al `servicio-notificaciones` mediante HTTP interno. El servicio construye el correo con los datos del certificado y lo envía al candidato mediante el proveedor SMTP configurado. |
+
+| Acción del Sistema | Respuesta del Sistema (implementación Fase 3) |
+| --- | --- |
+| 1. El módulo de certificación completa la emisión del certificado exitosamente. | 2. El `Svc. Certificación-Auditoría` realiza una llamada HTTP interna al `servicio-notificaciones` con el correo del candidato, el código de verificación y el hash criptográfico del certificado emitido. |
+| | 3. El `servicio-notificaciones` usa `correoServicio.js` para construir y enviar el correo mediante Nodemailer con el proveedor SMTP configurado en variables de entorno. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si el candidato tiene `estado_gdpr = olvidado` | El servicio no envía el correo ya que los datos personales han sido anonimizados conforme al GDPR. |
+| Si el proveedor SMTP falla | El error se registra pero no interrumpe el flujo de emisión del certificado. La notificación es asíncrona y no es prerequisito de la certificación. |
+
+---
+
+##### RF28 — Notificar Reporte a Universidad
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Notificar Reporte a Universidad |
+| Actores | Sistema, Universidades |
+| Propósito | Informar a la universidad correspondiente cuando sus estudiantes egresados aprueban la certificación, enviando un reporte consolidado de los candidatos certificados. |
+| Resumen | Al emitir exitosamente un certificado, el módulo de certificación identifica la universidad de origen del candidato y llama al `servicio-notificaciones` para enviar el reporte consolidado a la institución correspondiente. |
+
+| Acción del Sistema | Respuesta del Sistema (implementación Fase 3) |
+| --- | --- |
+| 1. El módulo de certificación completa la emisión del certificado exitosamente. | 2. El `Svc. Certificación-Auditoría` identifica la universidad de origen del candidato e invoca el `servicio-notificaciones` con los datos del egresado certificado y el correo institucional de la universidad. |
+| | 3. El `servicio-notificaciones` construye el reporte consolidado y lo envía al correo institucional de la universidad mediante Nodemailer. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si la universidad no tiene correo institucional registrado | El servicio omite el envío y registra el evento sin interrumpir el flujo de certificación. |
+| Si el proveedor SMTP falla | El error se registra pero no interrumpe el flujo de emisión del certificado. |
+
+---
+
+#### 12.5.3 CDU103 — Auditoría de Certificaciones (actualizado Fase 3)
+
+Se agrega un extend nuevo a **Validar Rastro de Auditoría Inmutable**:
+**Notificar Alerta de Fraude** (RF29). Cuando el módulo antifraude detecta
+anomalías, el sistema dispara automáticamente una alerta al auditor del SICA
+mediante el `servicio-notificaciones`.
+
+![CDU103 Actualizado Fase 3](Images/cdu103_actualizado.png)
+
+---
+
+##### RF29 — Notificar Alerta de Fraude
+
+| Campo | Detalle |
+| --- | --- |
+| Nombre | Notificar Alerta de Fraude |
+| Actores | Sistema, Auditores SICA |
+| Propósito | Alertar de forma inmediata a los auditores del SICA cuando el módulo antifraude detecta anomalías durante un examen, para que puedan tomar acciones correctivas oportunamente. |
+| Resumen | Cuando `VALIDAR RASTRO DE AUDITORÍA INMUTABLE` detecta inconsistencias en la cadena de hashes o el módulo antifraude identifica comportamiento sospechoso, el sistema llama al `servicio-notificaciones` para enviar una alerta de bandera roja al auditor del SICA con el detalle de la anomalía detectada. |
+
+| Acción del Sistema | Respuesta del Sistema (implementación Fase 3) |
+| --- | --- |
+| 1. El módulo de auditoría detecta anomalías durante la validación del rastro o el análisis de evidencia antifraude. | 2. El `Svc. Antifraude-Métricas` o el `Svc. Certificación-Auditoría` invoca el `servicio-notificaciones` con el detalle de la anomalía detectada, el `id_evaluacion` afectado y el tipo de fraude identificado. |
+| | 3. El `servicio-notificaciones` construye la alerta de bandera roja y la envía al correo del auditor del SICA mediante Nodemailer. |
+
+| Cursos Alternos | Descripción |
+| --- | --- |
+| Si no hay auditores registrados con correo | El servicio omite el envío y registra el evento en el log del sistema. |
+| Si el proveedor SMTP falla | El error se registra. La detección de fraude ya quedó registrada en `DeteccionFraude` independientemente del envío del correo. |
+
+---
+
+#### 12.5.4 Vista de Sistema — Diagrama de Bloques (actualizado Fase 3)
+
+Se agrega el bloque **Servicio de Notificaciones** en la capa de lógica de
+negocio, conectado con el Motor de Evaluaciones, el Módulo de Certificaciones
+y el Módulo de Auditoría. El bloque externo **Proveedor SMTP** representa la
+dependencia con el proveedor de correo real (Mailtrap en pruebas).
+
+![Vista de Sistema Actualizada Fase 3](Images/bloques_actualizado.png)
+
+---
+
+#### 12.5.5 Diagrama de Componentes (actualizado Fase 3)
+
+Se reemplaza el diagrama de componentes de Fase 1 por uno que refleja las
+tecnologías realmente implementadas en Fase 2 y Fase 3. El Portal Web es ahora
+una sola aplicación React + Vite. Los servicios backend son todos Node.js +
+Express en sus puertos asignados. Se agrega el `Svc. Notificaciones` como
+componente transversal en la capa de lógica de negocio.
+
+![Diagrama de Componentes Actualizado Fase 3](Images/componentes_actualizado.png)
+
+---
+
+#### 12.5.6 Diagrama de Distribución (actualizado Fase 3)
+
+Se actualiza el diagrama de distribución para reflejar la infraestructura real
+implementada. Se agregan los actores externos **Proveedor SMTP / Mailtrap** y
+**Universidades USAC, UCR, UES**. Las capas internas ahora reflejan las
+tecnologías reales: React + Vite en la capa de presentación y Node.js + Express
+en la capa de lógica de negocio.
+
+![Diagrama de Distribución Actualizado Fase 3](Images/distribucion_actualizado.png)
+
+---
+
+#### 12.5.7 Diagrama de Despliegue (actualizado Fase 3)
+
+Se reemplaza el diagrama de despliegue de Fase 1 por uno que refleja la
+implementación real. Se eliminan tecnologías planificadas no implementadas
+(Spring Boot, Apache Camel, Kafka, Hyperledger) y se documentan las reales
+(Node.js + Express, React + Vite, MySQL, crypto Node.js). Se agrega el
+`Svc. Notificaciones` en el Servidor de Aplicaciones y el `Proveedor SMTP /
+Mailtrap` como actor externo.
+
+![Diagrama de Despliegue Actualizado Fase 3](Images/despliegue_actualizado.png)
+
+---
+
+### 12.6 Matrices de Trazabilidad Actualizadas
+
+#### Stakeholders vs. Requerimientos
+
+| | RF01 | RF02 | RF03 | RF04 | RF05 | RF06 | RF07 | RF08 | RF09 | RF10 | RF11 | RF12 | RF13 | RF14 | RF15 | RF16 | RF17 | RF18 | RF19 | RF20 | RF21 | RF22 | RF23 | RF24 | RF25 | RF26 | RF27 | RF28 | RF29 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Candidato | X | X | X | X | X | X | X | X | X | | | | | | | | | | | | | | | | | X | X | | |
+| Universidades | | | | | | | | | | X | X | X | X | X | X | X | | | | | | | | | | | | X | |
+| Dirección Financiera | | | | | | | | | | | | | | | | | X | X | X | X | X | | | | | | | | |
+| Ministerios Gubernamentales | | | | | | | | | | | | | | | | | X | X | X | X | X | X | X | X | X | | | | |
+| Alta Gerencia SICA | | | | | | | | | | | | | | | | | | | | | | X | X | X | X | | | | |
+| Auditores SICA | | | | | | | | | | | | | | | | | | | | | | | | | | | | | X |
+
+---
+
+#### Stakeholders vs. CDU
+
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| Candidato | X | X | | | |
+| Universidades | | X | X | | |
+| Dirección Financiera | | | | X | |
+| Ministerios Gubernamentales | | | | X | X |
+| Alta Gerencia SICA | | | | | X |
+| Auditores SICA | | | | X | |
+
+---
+
+#### Requerimiento vs. CDU
+
+| | CDU100 | CDU101 | CDU102 | CDU103 | CDU104 |
+|---|---|---|---|---|---|
+| RF01 | X | | | | |
+| RF02 | X | | | | |
+| RF03 | X | | | | |
+| RF04 | X | | | | |
+| RF05 | X | | | | |
+| RF06 | | X | | | |
+| RF07 | | X | | | |
+| RF08 | | X | | | |
+| RF09 | | X | | | |
+| RF10 | | | X | | |
+| RF11 | | | X | | |
+| RF12 | | | X | | |
+| RF13 | | | X | | |
+| RF14 | | | X | | |
+| RF15 | | | X | | |
+| RF16 | | | X | | |
+| RF17 | | | | X | |
+| RF18 | | | | X | |
+| RF19 | | | | X | |
+| RF20 | | | | X | |
+| RF21 | | | | X | |
+| RF22 | | | | | X |
+| RF23 | | | | | X |
+| RF24 | | | | | X |
+| RF25 | | | | | X |
+| RF26 | X | | | | |
+| RF27 | | X | | | |
+| RF28 | | X | | | |
+| RF29 | | | | X | |
 
 ---
