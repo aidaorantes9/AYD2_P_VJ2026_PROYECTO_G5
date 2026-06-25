@@ -24,61 +24,54 @@ router.post('/emitir', async (req, res) => {
     const idCandidato =
       Number(id_candidato);
 
-    const idEvaluacion =
-      Number(id_evaluacion);
-
-    // Emite el certificado usando la lógica existente del módulo
     const certificado =
       await emitirCertificado({
         idCandidato,
-        idEvaluacion,
+
+        idEvaluacion:
+          Number(id_evaluacion),
+
         datosCertificado:
           datos_certificado,
 
         actor,
       });
 
-    let notificacionCorreo = null;
+    let notificacion = {
+      intentada: false,
+      enviada: false,
+    };
 
     /*
-      Solo se envía correo si el certificado acaba de ser creado
-      Si el certificado ya existía, se evita enviar correos duplicados
-    */
+     * Solo se envía el correo cuando
+     * el certificado acaba de crearse.
+     * Si se reutiliza uno existente,
+     * se evita mandar correos duplicados.
+     */
     if (!certificado.reutilizado) {
       try {
-        // Envía el correo al candidato usando el servicio SMTP transversal
-        notificacionCorreo =
-          await notificarCertificadoEmitido({
-            idCandidato,
-            certificado,
-          });
+        await notificarCertificadoEmitido({
+          idCandidato,
+          certificado,
+        });
+
+        notificacion = {
+          intentada: true,
+          enviada: true,
+        };
       } catch (errorNotificacion) {
         console.error(
-          'Error enviando notificación de certificado:',
-          errorNotificacion
+          'Certificado emitido, pero no se pudo enviar la notificación:',
+          errorNotificacion.message
         );
 
-        /*
-            El certificado ya fue emitido correctamente
-            Si falla el correo, no se revierte la emisión
-        */
-        notificacionCorreo = {
-          ok: false,
-          enviado: false,
-          error:
-            'El certificado fue emitido, pero no se pudo enviar el correo.',
-          detalle:
-            errorNotificacion.message,
+        notificacion = {
+          intentada: true,
+          enviada: false,
+          advertencia:
+            'El certificado fue emitido, pero el correo no pudo enviarse.',
         };
       }
-    } else {
-      // esto es bastante importante porque no se notifica otra vez si el certificado ya existía
-      notificacionCorreo = {
-        ok: false,
-        omitida: true,
-        motivo:
-          'El certificado ya existía. No se envió correo duplicado.',
-      };
     }
 
     return res
@@ -94,10 +87,7 @@ router.post('/emitir', async (req, res) => {
             : 'Certificado emitido correctamente',
 
         certificado,
-
-        // Este campo evidencia la tarea F3-18 que ando realizando 
-        notificacion_correo:
-          notificacionCorreo,
+        notificacion,
       });
   } catch (error) {
     const estados = {

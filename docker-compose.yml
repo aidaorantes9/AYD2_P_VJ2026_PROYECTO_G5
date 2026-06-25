@@ -227,6 +227,9 @@ services:
     restart: unless-stopped
     env_file:
       - ${SMTP_ENV_FILE:-./environments/staging/smtp.env.example}
+      # tengo muchas dudas de esto porque no entiendo muy bien, alli no hay credenciales realmente... 
+      # pero bueno preguntare luego pero no lo tocare por ahora
+      # - ${SMTP_ENV_FILE:-./backend/servicio-notificaciones/.env}
     environment:
       APP_ENV: ${APP_ENV:-local}
       PORT: 4006
