@@ -4,6 +4,12 @@ const {
   emitirCertificado,
 } = require('../services/emisionService');
 
+const {
+  notificarCertificadoEmitido,
+} = require(
+  '../services/notificacionCertificadoService'
+);
+
 const router = express.Router();
 
 router.post('/emitir', async (req, res) => {
@@ -15,16 +21,58 @@ router.post('/emitir', async (req, res) => {
       datos_certificado = {},
     } = req.body;
 
+    const idCandidato =
+      Number(id_candidato);
+
     const certificado =
       await emitirCertificado({
-        idCandidato:
-          Number(id_candidato),
+        idCandidato,
+
         idEvaluacion:
           Number(id_evaluacion),
+
         datosCertificado:
           datos_certificado,
+
         actor,
       });
+
+    let notificacion = {
+      intentada: false,
+      enviada: false,
+    };
+
+    /*
+     * Solo se envía el correo cuando
+     * el certificado acaba de crearse.
+     * Si se reutiliza uno existente,
+     * se evita mandar correos duplicados.
+     */
+    if (!certificado.reutilizado) {
+      try {
+        await notificarCertificadoEmitido({
+          idCandidato,
+          certificado,
+        });
+
+        notificacion = {
+          intentada: true,
+          enviada: true,
+        };
+      } catch (errorNotificacion) {
+        console.error(
+          'Certificado emitido, pero no se pudo enviar la notificación:',
+          errorNotificacion.message
+        );
+
+        notificacion = {
+          intentada: true,
+          enviada: false,
+          advertencia:
+            'El certificado fue emitido, pero el correo no pudo enviarse.',
+        };
+      }
+    }
 
     return res
       .status(
@@ -37,7 +85,9 @@ router.post('/emitir', async (req, res) => {
           certificado.reutilizado
             ? 'El certificado ya existía y fue recuperado correctamente'
             : 'Certificado emitido correctamente',
+
         certificado,
+        notificacion,
       });
   } catch (error) {
     const estados = {
@@ -64,8 +114,10 @@ router.post('/emitir', async (req, res) => {
         estado === 500
           ? 'No fue posible emitir el certificado'
           : error.message,
+
       codigo:
-        error.code || 'ERROR_INTERNO',
+        error.code ||
+        'ERROR_INTERNO',
     });
   }
 });
