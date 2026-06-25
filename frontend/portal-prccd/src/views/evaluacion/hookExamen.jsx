@@ -206,12 +206,23 @@ export function useExamen(navigate) {
   }, [tiempoRestante, idEvaluacion, terminado, monitoreoIniciado, finalizarEvaluacion]);
 
   // --- Responder pregunta ---
-  const responderPregunta = useCallback(async () => {
+  const responderPregunta = useCallback(async (opcionPorVoz = null) => {
     if (!monitoreoActivo) {
       setError('Debe activar el monitoreo antes de responder la evaluación.');
       return;
     }
-    if (!opcionSeleccionada || !pregunta || enviando) return;
+
+    // Si React manda el evento del botón, se ignora.
+    // Solo se acepta opcionPorVoz cuando es un id numérico/string.
+    const opcionValidaPorVoz =
+      typeof opcionPorVoz === 'number' ||
+      typeof opcionPorVoz === 'string';
+
+    const opcionFinal = opcionValidaPorVoz
+      ? opcionPorVoz
+      : opcionSeleccionada;
+
+    if (!opcionFinal || !pregunta || enviando) return;
 
     setEnviando(true);
     setError('');
@@ -226,7 +237,7 @@ export function useExamen(navigate) {
           id_candidato: ID_CANDIDATO,
           id_evaluacion: idEvaluacion,
           id_pregunta: pregunta.id_pregunta,
-          id_opcion_seleccionada: opcionSeleccionada,
+          id_opcion_seleccionada: opcionFinal,
           tiempo_respuesta_ms: tiempoRespuesta,
         }),
       });
@@ -266,12 +277,24 @@ export function useExamen(navigate) {
   ]);
 
   // --- Resultado de voz ---
-  const manejarResultadoVoz = useCallback((resultadoVoz) => {
-    if (resultadoVoz?.opcion_detectada?.id_opcion) {
-      setOpcionSeleccionada(resultadoVoz.opcion_detectada.id_opcion);
-    }
-    // Si requiere_confirmacion_manual, no hacemos nada
-  }, []);
+  const manejarResultadoVoz = useCallback(
+    async (resultadoVoz) => {
+      const idOpcionDetectada =
+        resultadoVoz?.opcion_detectada?.id_opcion;
+
+      if (!idOpcionDetectada) {
+        setError(
+          'La voz fue transcrita, pero no se pudo asociar con una opción de respuesta.'
+        );
+        return;
+      }
+
+      setOpcionSeleccionada(idOpcionDetectada);
+
+      await responderPregunta(idOpcionDetectada);
+    },
+    [responderPregunta]
+  );
 
   // --- Formatear tiempo ---
   const formatearTiempo = useCallback((segundos) => {
