@@ -1,0 +1,48 @@
+x-production-service: &production-service
+  restart: always
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  mysql:
+    <<: *production-service
+    labels:
+      com.prccd.environment: production
+
+  certificacion-auditoria:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  dev2-integracion:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  dev1-evaluaciones:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  sm-seguridad:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  dev4-antifraude:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  servicio-notificaciones:
+    <<: *production-service
+    environment:
+      APP_ENV: production
+
+  frontend:
+    <<: *production-service
+    environment:
+      APP_ENV: production
