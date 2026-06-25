@@ -45,6 +45,18 @@ services:
       CERTIFICACION_PUBLIC_URL: ${CERTIFICACION_PUBLIC_URL:-http://localhost:4003}
       PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH:-/run/secrets/certificacion/private.pem}
       PUBLIC_KEY_PATH: ${PUBLIC_KEY_PATH:-/run/secrets/certificacion/public.pem}
+      FRONTEND_URL: http://localhost:5173
+      PRIVATE_KEY_PATH: /run/secrets/certificacion/private.pem
+      PUBLIC_KEY_PATH: /run/secrets/certificacion/public.pem
+      
+      # para la F3-18: URL interna del servicio SMTP transversal
+      NOTIFICACIONES_API_URL: ${NOTIFICACIONES_API_URL:-http://servicio-notificaciones:4006}
+
+      # para la F3-18: permite apagar el envío automático sin borrar código
+      NOTIFICACIONES_CERTIFICADO_ACTIVAS: ${NOTIFICACIONES_CERTIFICADO_ACTIVAS:-true}
+
+      # para la F3-18: enlace público enviado al candidato
+      CERTIFICADO_VERIFICACION_BASE_URL: ${CERTIFICADO_VERIFICACION_BASE_URL:-http://localhost:5173/certificado/ver}certificado/ver}
     ports:
       - "${CERTIFICACION_HOST_PORT:-4003}:4003"
     volumes:

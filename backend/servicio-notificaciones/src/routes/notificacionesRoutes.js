@@ -62,8 +62,8 @@ router.post('/enviar', async (req, res) => {
     }
 })
 
-// Envía una notificación cuando se genera una credencial digital.
-// Este endpoint lo puede consumir el módulo de certificación.
+// Envía una notificación cuando se genera una credencial digital
+// Este endpoint lo puede consumir el módulo de certificación
 router.post('/certificado', async (req, res) => {
     try {
         const {
@@ -85,7 +85,6 @@ Tu credencial digital de la PRCCD fue generada correctamente.
 
 Código de verificación: ${codigo_verificacion || 'No especificado'}
 Hash criptográfico: ${hash_criptografico || 'No especificado'}
-URL de verificación: ${url_verificacion || 'No especificada'}
 
 PRCCD - SICA
         `.trim()
