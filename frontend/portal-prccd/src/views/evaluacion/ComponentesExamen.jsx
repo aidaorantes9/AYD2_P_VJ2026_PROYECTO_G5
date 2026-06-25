@@ -1,4 +1,15 @@
-import { CBadge, CProgress, CFormCheck, CButton, CCard, CCardBody, CSpinner, CAlert, CRow, CCol } from '@coreui/react';
+import {
+  CBadge,
+  CProgress,
+  CFormCheck,
+  CButton,
+  CCard,
+  CCardBody,
+  CSpinner,
+  CAlert,
+  CRow,
+  CCol,
+} from '@coreui/react';
 
 export const CabeceraExamen = ({
   nombreCandidato,
@@ -60,8 +71,10 @@ export const ControlesExamen = ({
   emitiendoCertificado,
   onResponder,
   onFinalizar,
+  children, // BotonAudio
 }) => (
-  <div className="d-flex flex-wrap gap-2 mt-4">
+  <div className="d-flex flex-wrap align-items-center gap-2 mt-4">
+    {/* Botón principal */}
     <CButton
       color="primary"
       disabled={!opcionSeleccionada || enviando || !monitoreoActivo}
@@ -79,6 +92,10 @@ export const ControlesExamen = ({
       )}
     </CButton>
 
+    {/* Botón de audio (children) */}
+    {children}
+
+    {/* Botón "Finalizar ahora" alineado a la derecha */}
     <CButton
       color="danger"
       variant="outline"

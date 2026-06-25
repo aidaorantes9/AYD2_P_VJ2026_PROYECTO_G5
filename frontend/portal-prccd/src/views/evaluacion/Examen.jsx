@@ -11,7 +11,7 @@ import {
 
 import MonitoreoAntifraude from '../antifraude/MonitoreoAntifraude';
 import BotonAudio from './BotonAudio';
-import { useExamen } from './useExamen';
+import { useExamen } from './hookExamen';
 import {
   CabeceraExamen,
   OpcionesPregunta,
@@ -46,6 +46,8 @@ export default function Examen() {
     emitirCertificadoAutomaticamente,
     manejarResultadoVoz,
     formatearTiempo,
+    ID_CANDIDATO,
+    API_BASE,
   } = useExamen(navigate);
 
   const progreso = useMemo(
@@ -141,17 +143,7 @@ export default function Examen() {
               disabled={enviando || !monitoreoActivo}
             />
 
-            {/* Botón de voz */}
-            {idEvaluacion && pregunta && (
-              <BotonAudio
-                idCandidato={/* desde sesión */ 1} // Debe venir de useExamen
-                idEvaluacion={idEvaluacion}
-                idPregunta={pregunta.id_pregunta}
-                apiBase={'http://localhost:4001'} // Pasar desde useExamen
-                onResultado={manejarResultadoVoz}
-                disabled={enviando || !monitoreoActivo}
-              />
-            )}
+
 
             {error && <CAlert color="danger" className="mt-3">{error}</CAlert>}
 
@@ -164,7 +156,16 @@ export default function Examen() {
               emitiendoCertificado={emitiendoCertificado}
               onResponder={responderPregunta}
               onFinalizar={finalizarEvaluacion}
-            />
+            >
+              <BotonAudio
+                idCandidato={ID_CANDIDATO}
+                idEvaluacion={idEvaluacion}
+                idPregunta={pregunta.id_pregunta}
+                apiBase={API_BASE}
+                onResultado={manejarResultadoVoz}
+                disabled={enviando || !monitoreoActivo}
+              />
+            </ControlesExamen>
           </CCardBody>
         </CCard>
       </CCol>
