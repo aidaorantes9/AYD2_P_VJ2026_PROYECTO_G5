@@ -1,2 +1,23 @@
+# Llaves criptográficas reales
 backend/certificacion-auditoria/keys/*.pem
+
+# Archivos generados o temporales
 backend/dev4-antifraude/uploads/
+backend/dev1-evaluaciones/tmp/
+revision_*.txt
+estructura_proyecto.txt
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Archivos .env locales de los servicios
+**/.env
+
+# Credenciales SMTP reales por ambiente
+environments/staging/smtp.env
+environments/production/smtp.env
+
+# API keys reales opcionales para STT
+environments/staging/stt.private.env
+environments/production/stt.private.env

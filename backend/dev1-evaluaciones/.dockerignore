@@ -1,0 +1,12 @@
+node_modules/
+tmp/
+audiosPruebas/
+imagenFuncionando/
+
+.env
+.env.*
+
+npm-debug.log*
+coverage/
+.git/
+.gitignore

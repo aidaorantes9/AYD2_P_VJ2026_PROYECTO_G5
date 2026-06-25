@@ -1,0 +1,40 @@
+services:
+  mysql:
+    restart: unless-stopped
+    labels:
+      com.prccd.environment: staging
+
+  certificacion-auditoria:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  dev2-integracion:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  dev1-evaluaciones:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  sm-seguridad:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  dev4-antifraude:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  servicio-notificaciones:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging
+
+  frontend:
+    restart: unless-stopped
+    environment:
+      APP_ENV: staging

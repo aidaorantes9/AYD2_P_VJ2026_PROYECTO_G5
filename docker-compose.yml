@@ -1,27 +1,23 @@
+name: ${COMPOSE_PROJECT_NAME:-prccd}
+
 services:
   mysql:
     image: mysql:8.0
-    container_name: prccd-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: prccd
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-prccd}
     ports:
-      - "3306:3306"
+      - "${MYSQL_HOST_PORT:-3306}:3306"
     volumes:
-    - prccd_mysql_data:/var/lib/mysql
-    - ./backend/shared/schema_completo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro,Z
-    - ./backend/shared/seed_completo.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro,Z
+      - prccd_mysql_data:/var/lib/mysql
+      - ./backend/shared/schema_completo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/shared/seed_completo.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
       test:
         [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "127.0.0.1",
-          "-uroot",
-          "-proot"
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"
         ]
       interval: 5s
       timeout: 5s
@@ -32,22 +28,22 @@ services:
     build:
       context: ./backend/certificacion-auditoria
       dockerfile: Dockerfile
-    container_name: prccd-certificacion-auditoria
     restart: unless-stopped
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: prccd
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_NAME: ${DB_NAME:-prccd}
       PORT: 4003
-      FRONTEND_URL: http://localhost:5173
-      PRIVATE_KEY_PATH: /run/secrets/certificacion/private.pem
-      PUBLIC_KEY_PATH: /run/secrets/certificacion/public.pem
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH:-/run/secrets/certificacion/private.pem}
+      PUBLIC_KEY_PATH: ${PUBLIC_KEY_PATH:-/run/secrets/certificacion/public.pem}
     ports:
-      - "4003:4003"
+      - "${CERTIFICACION_HOST_PORT:-4003}:4003"
     volumes:
-      - ./backend/certificacion-auditoria/keys:/run/secrets/certificacion:ro,Z
+      - ${CERT_KEYS_HOST_PATH:-./backend/certificacion-auditoria/keys}:/run/secrets/certificacion:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -68,20 +64,20 @@ services:
     build:
       context: ./backend/dev2-integracion
       dockerfile: Dockerfile
-    container_name: prccd-dev2-integracion
     restart: unless-stopped
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: prccd
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_NAME: ${DB_NAME:-prccd}
       PORT: 4002
-      FRONTEND_URL: http://localhost:5173
-      AES_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      AES_IV: 0123456789abcdef0123456789abcdef
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      AES_KEY: ${AES_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      AES_IV: ${AES_IV:-0123456789abcdef0123456789abcdef}
     ports:
-      - "4002:4002"
+      - "${INTEGRACION_HOST_PORT:-4002}:4002"
     depends_on:
       mysql:
         condition: service_healthy
@@ -102,24 +98,23 @@ services:
     build:
       context: ./backend/dev1-evaluaciones
       dockerfile: Dockerfile
-    container_name: prccd-dev1-evaluaciones
+      args:
+        WHISPER_MODEL: base
+        WHISPER_CPP_REF: master
     restart: unless-stopped
-
-    # Carga las variables privadas del módulo de evaluaciones.
-    # Aquí se lee STT_PROVIDER, STT_MODEL, OPENAI_API_KEY, STT_PROMPT y MAX_AUDIO_MB (o lo que se tenga que usar va jaja)
     env_file:
-      - ./backend/dev1-evaluaciones/.env
-
+      - ${STT_ENV_FILE:-./environments/staging/stt.env}
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: prccd
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_NAME: ${DB_NAME:-prccd}
       PORT: 4001
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     ports:
-      - "4001:4001"
+      - "${EVALUACIONES_HOST_PORT:-4001}:4001"
     depends_on:
       mysql:
         condition: service_healthy
@@ -134,26 +129,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   sm-seguridad:
     build:
       context: ./backend/sm-seguridad
       dockerfile: Dockerfile
-    container_name: prccd-sm-seguridad
     restart: unless-stopped
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: prccd
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_NAME: ${DB_NAME:-prccd}
       PORT: 4005
-      FRONTEND_URL: http://localhost:5173
-      AES_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      AES_IV: 0123456789abcdef0123456789abcdef
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      AES_KEY: ${AES_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      AES_IV: ${AES_IV:-0123456789abcdef0123456789abcdef}
     ports:
-      - "4005:4005"
+      - "${SEGURIDAD_HOST_PORT:-4005}:4005"
     depends_on:
       mysql:
         condition: service_healthy
@@ -174,20 +169,20 @@ services:
     build:
       context: ./backend/dev4-antifraude
       dockerfile: Dockerfile
-    container_name: prccd-dev4-antifraude
     restart: unless-stopped
     environment:
+      APP_ENV: ${APP_ENV:-local}
       PORT: 4004
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: prccd
-      FRONTEND_URL: http://localhost:5173
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_NAME: ${DB_NAME:-prccd}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     ports:
-      - "4004:4004"
+      - "${ANTIFRAUDE_HOST_PORT:-4004}:4004"
     volumes:
-      - ./backend/dev4-antifraude/uploads:/app/src/uploads
+      - antifraude_uploads:/app/src/uploads
     depends_on:
       mysql:
         condition: service_healthy
@@ -197,7 +192,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "fetch('http://localhost:4004/api/salud').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+          "fetch('http://localhost:4004/api/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
         ]
       interval: 10s
       timeout: 5s
@@ -208,20 +203,15 @@ services:
     build:
       context: ./backend/servicio-notificaciones
       dockerfile: Dockerfile
-    container_name: prccd-servicio-notificaciones
     restart: unless-stopped
-
-    # Carga variables privadas sin escribir credenciales en docker-compose.
     env_file:
-      - ./backend/servicio-notificaciones/.env
-
+      - ${SMTP_ENV_FILE:-./environments/staging/smtp.env.example}
     environment:
+      APP_ENV: ${APP_ENV:-local}
       PORT: 4006
-      FRONTEND_URL: http://localhost:5173
-
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     ports:
-      - "4006:4006"
-
+      - "${NOTIFICACIONES_HOST_PORT:-4006}:4006"
     healthcheck:
       test:
         [
@@ -239,23 +229,57 @@ services:
     build:
       context: ./frontend/portal-prccd
       dockerfile: Dockerfile
-    container_name: prccd-frontend
     restart: unless-stopped
+    command:
+      [
+        "npm",
+        "run",
+        "start",
+        "--",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5173"
+      ]
     environment:
-      VITE_EVALUACIONES_API_URL: http://localhost:4001
-      VITE_INTEGRACION_API_URL: http://localhost:4002
-      VITE_CERTIFICACION_API_URL: http://localhost:4003
-      VITE_ANTIFRAUDE_API_URL: http://localhost:4004
-      VITE_SEGURIDAD_API_URL: http://localhost:4005
-      VITE_NOTIFICACIONES_API_URL: http://localhost:4006   # LO NUEVO QUE SE ANDA IMPLEMENTANDOOOOOO
+      APP_ENV: ${APP_ENV:-local}
+      VITE_EVALUACIONES_API_URL: ${VITE_EVALUACIONES_API_URL:-http://localhost:4001}
+      VITE_INTEGRACION_API_URL: ${VITE_INTEGRACION_API_URL:-http://localhost:4002}
+      VITE_CERTIFICACION_API_URL: ${VITE_CERTIFICACION_API_URL:-http://localhost:4003}
+      VITE_ANTIFRAUDE_API_URL: ${VITE_ANTIFRAUDE_API_URL:-http://localhost:4004}
+      VITE_SEGURIDAD_API_URL: ${VITE_SEGURIDAD_API_URL:-http://localhost:4005}
+      VITE_NOTIFICACIONES_API_URL: ${VITE_NOTIFICACIONES_API_URL:-http://localhost:4006}
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend/portal-prccd:/app:Z
-      - /app/node_modules
+      - "${FRONTEND_HOST_PORT:-5173}:5173"
     depends_on:
+      dev1-evaluaciones:
+        condition: service_healthy
+      dev2-integracion:
+        condition: service_healthy
       certificacion-auditoria:
         condition: service_healthy
+      dev4-antifraude:
+        condition: service_healthy
+      sm-seguridad:
+        condition: service_healthy
+      servicio-notificaciones:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:5173').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
 volumes:
   prccd_mysql_data:
+    name: ${COMPOSE_PROJECT_NAME:-prccd}-mysql-data
+
+  antifraude_uploads:
+    name: ${COMPOSE_PROJECT_NAME:-prccd}-antifraude-uploads
