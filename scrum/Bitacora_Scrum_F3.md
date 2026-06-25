@@ -127,46 +127,57 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
    Se identificó que Alejandra necesita permisos de administrador en el repositorio para gestionar ciertas configuraciones del pipeline. Pendiente de resolución antes de que Nufio avance en la configuración del deploy.
 
 ---
-
-### Miércoles 25/06/2026
+### Miércoles 24/06/2026
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Actualicé el DDA con el capítulo 12 de evolución arquitectónica Fase 3, documentando los nuevos RF26, RF27, RF28 y RF29, la justificación técnica del módulo de voz con el estilo Pipes and Filters y el servicio de notificaciones como extensión del estilo Multi-tier. Actualicé los diagramas CDU100, CDU101, CDU103, bloques, componentes, distribución y despliegue para reflejar las nuevas funcionalidades y las tecnologías realmente implementadas. Todo commiteado y pusheado a develop. Resultado: tarea F3-08 completada.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementaré las 5 pruebas unitarias automatizadas (F3-05) cubriendo el servicio STT, el servicio de notificaciones, el motor adaptativo, la emisión de certificados y la bitácora inmutable, trazables con la sección 4.3 del enunciado y con EaC04 (seguridad) y EaC05 (integridad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-
----
-
-#### Nufio — Frontend + CI/CD
-
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-
-3. **¿Existen impedimentos técnicos o de integración?**
+   Las pruebas de integración (F3-06) y la prueba de aceptación (F3-07) están pendientes de que Ludwing termine los triggers de notificación y Nufio complete el mapeo de datos del frontend de voz.
 
 ---
 
 #### Kevin Santos — STT Backend + Notificaciones
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Implementó el módulo de Speech-to-Text exitosamente dentro de dev1-evaluaciones, integrando Whisper local mediante `whisper.cpp` con conversión de audio a WAV mediante ffmpeg y detección de opciones por normalización de texto. Resultado: endpoint STT funcional y mergeado a develop, disponible para integración con el frontend de Nufio.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementará el servicio de notificaciones completo con Nodemailer (F3-17, F3-18, F3-19, F3-20) para los tres flujos requeridos: notificación al candidato al emitir certificado, reporte consolidado a universidades y alerta a auditores por detección de fraude, trazables con RF27, RF28 y RF29 del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Sin impedimentos.
 
 ---
 
 #### Ludwing Lopez — Docker + Infra + Triggers
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Integró Whisper con los drivers correspondientes y levantó exitosamente los dos ambientes requeridos (Staging y Producción), completando las tareas F3-21 (Dockerfiles actualizados) y F3-22 (docker-compose para ambos entornos). Resultado: infraestructura multi-entorno funcional y lista para el deploy del CI/CD.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Continuará con sus tareas asignadas: F3-23 (trigger de email desde el módulo de certificación) y F3-24 (trigger de alerta desde el módulo antifraude), trazables con RF27, RF28 y RF29 del DDA y con la sección 4.2 del enunciado.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Necesitará las credenciales SMTP para integrar los triggers con el servicio de notificaciones. Pendiente de coordinación con Kevin una vez que el servicio SMTP esté disponible.
+
+---
+
+#### Nufio — Frontend + CI/CD
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Integró el módulo STT de Kevin al frontend, modificó la interfaz para que sea responsive en dispositivos móviles y validó que el flujo completo de grabación de audio funciona correctamente: el candidato graba, el audio se envía al backend y el sistema retorna la respuesta transcrita. Resultado: F3-09 y F3-10 funcionando en el portal React.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Configurará el pipeline CI/CD en GitHub Actions con deploy a AWS (F3-12 y F3-13), trazable con la sección 4.4 del enunciado. Adicionalmente completará el mapeo de datos del texto transcrito al motor adaptativo para cerrar el flujo completo de voz (F3-11).
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Tiene pendiente el mapeo de los datos del texto transcrito hacia el motor adaptativo para que el flujo de voz quede completamente funcional end-to-end.
 
 ---
 
