@@ -11,13 +11,7 @@
 -- =============================================================================
 
 -- Crea la base de datos del proyecto si no existe
-CREATE DATABASE IF NOT EXISTS prccd
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
 -- Selecciona la base de datos del proyecto
-USE prccd;
-
 -- =============================================================================
 -- MÓDULO: sm-seguridad
 -- =============================================================================
