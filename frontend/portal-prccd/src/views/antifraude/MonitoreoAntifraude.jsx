@@ -505,27 +505,18 @@ export default function MonitoreoAntifraude({
     estado === 'error'
 
   return (
-    <CCard
-      style={{
-        minWidth: '270px',
-        maxWidth: '270px',
-      }}
-    >
+    <CCard>
       <CCardBody>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h6 className="mb-0">
-            Monitoreo de integridad
-          </h6>
-
-          <CBadge color={colorEstado}>
-            {estado}
-          </CBadge>
+        {/* Cabecera con título y badge */}
+        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <h6 className="mb-0">Monitoreo de integridad</h6>
+          <CBadge color={colorEstado}>{estado}</CBadge>
         </div>
 
+        {/* Mensaje de alerta */}
         <CAlert
           color={
-            estado === 'error' ||
-            estado === 'detenido'
+            estado === 'error' || estado === 'detenido'
               ? 'danger'
               : estado === 'activo'
                 ? 'success'
@@ -536,30 +527,24 @@ export default function MonitoreoAntifraude({
           {mensaje}
         </CAlert>
 
-        <div className="small mb-2">
-          <strong>Evaluación:</strong>{' '}
-          {idEvaluacion || 'Pendiente'}
+        {/* Datos de monitoreo en filas responsivas */}
+        <div className="d-flex flex-wrap gap-2 mb-2 small">
+          <div>
+            <strong>Evaluación:</strong> {idEvaluacion || 'Pendiente'}
+          </div>
+          <div>
+            <strong>Capturas:</strong> {capturas}
+          </div>
+          <div>
+            <strong>Eventos de teclado:</strong> {logsEnviados}
+          </div>
+          <div>
+            <strong>Video inicial:</strong>{' '}
+            {videoGuardado ? 'Almacenado' : 'Pendiente'}
+          </div>
         </div>
 
-        <div className="small mb-2">
-          <strong>Capturas:</strong>{' '}
-          {capturas}
-        </div>
-
-        <div className="small mb-2">
-          <strong>
-            Eventos de teclado:
-          </strong>{' '}
-          {logsEnviados}
-        </div>
-
-        <div className="small mb-3">
-          <strong>Video inicial:</strong>{' '}
-          {videoGuardado
-            ? 'Almacenado'
-            : 'Pendiente'}
-        </div>
-
+        {/* Botón principal */}
         {puedeActivar && (
           <CButton
             color="primary"
@@ -574,15 +559,8 @@ export default function MonitoreoAntifraude({
         )}
 
         {estado === 'activando' && (
-          <CButton
-            color="primary"
-            className="w-100"
-            disabled
-          >
-            <CSpinner
-              size="sm"
-              className="me-2"
-            />
+          <CButton color="primary" className="w-100" disabled>
+            <CSpinner size="sm" className="me-2" />
             Activando...
           </CButton>
         )}
@@ -598,11 +576,12 @@ export default function MonitoreoAntifraude({
           </CButton>
         )}
 
+        {/* Nota legal */}
         <p className="small text-muted mt-3 mb-0">
-          Se registran evidencias técnicas.
-          No se almacena el texto escrito.
+          Se registran evidencias técnicas. No se almacena el texto escrito.
         </p>
 
+        {/* Video oculto */}
         <video
           ref={videoRef}
           autoPlay
