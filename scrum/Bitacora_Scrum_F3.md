@@ -180,46 +180,88 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
    Tiene pendiente el mapeo de los datos del texto transcrito hacia el motor adaptativo para que el flujo de voz quede completamente funcional end-to-end.
 
 ---
-
-### Jueves 26/06/2026
+### Jueves 25/06/2026
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Implementé las 5 pruebas unitarias automatizadas con Jest (F3-05),
+   cubriendo detectarOpcionDesdeTexto, validarArchivoAudio, obtenerAuditores,
+   quitarBarraFinal y notificarCertificadoEmitido con mocks. Las 14 assertions
+   pasaron en verde. Documenté las pruebas en tests/Documentacion_Pruebas.md
+   con captura de evidencia. Todo commiteado a develop.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Implementé las 4 pruebas de integración automatizadas con Supertest (F3-06),
+   cubriendo el flujo de voz completo con STT, emisión de certificado con PKI
+   y notificación al candidato, y alerta de fraude al auditor. Se verificó que
+   los correos llegaron correctamente a Mailtrap. Todo trazable con RF26, RF27,
+   RF28 y RF29 del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-
----
-
-#### Nufio — Frontend + CI/CD
-
-1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-
-2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-
-3. **¿Existen impedimentos técnicos o de integración?**
+   La construcción del contenedor dev1-evaluaciones tardó varias horas por la
+   velocidad de conexión de la máquina virtual. Se resolvió cargando la imagen
+   pre-compilada compartida por Ludwing. Las pruebas de aceptación (F3-07)
+   quedan pendientes de confirmación del auxiliar sobre el formato del video.
 
 ---
 
 #### Kevin Santos — STT Backend + Notificaciones
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Completó todas sus tareas asignadas de Fase 3: implementó las alertas
+   automáticas a auditores por detección de fraude (F3-20), la grabación de
+   voz con respuesta automática integrada al motor adaptativo (F3-15, F3-16),
+   y el reporte consolidado de candidatos evaluados y aprobados a universidades
+   (F3-19). Resultado: módulo de notificaciones completamente funcional y
+   mergeado a develop.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Realizará pruebas de los módulos implementados y búsqueda de bugs para
+   garantizar la estabilidad del sistema antes de la entrega, trazable con
+   EaC03 (disponibilidad) y EaC05 (integridad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Durante el merge surgió un conflicto que fue resuelto exitosamente sin
+   pérdida de funcionalidad.
 
 ---
 
 #### Ludwing Lopez — Docker + Infra + Triggers
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Completó todas sus tareas asignadas: triggers de notificación desde
+   certificación y antifraude, configuración de ambientes staging y producción,
+   y variables de entorno por ambiente. Resultado: infraestructura multi-entorno
+   completamente funcional y documentada en ComoUsar.md.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Realizará pruebas de los módulos implementados y búsqueda de bugs para
+   garantizar la estabilidad del sistema antes de la entrega, trazable con
+   EaC03 (disponibilidad) y EaC02 (escalabilidad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
+   Hubo confusiones con código desordenado en algunos módulos que fueron
+   resueltas sin afectar la funcionalidad final.
+
+---
+
+#### Nufio — Frontend + CI/CD
+
+1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
+   Completó la integración del módulo de voz en el examen adaptativo con
+   interfaz responsive para dispositivos móviles (F3-09, F3-10, F3-11).
+   Inició la configuración del pipeline CI/CD. Resultado: flujo de voz
+   completamente funcional en el portal React.
+
+2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
+   Continuará con la configuración del pipeline CI/CD en GitHub Actions con
+   deploy a Google Cloud Platform (F3-12, F3-13), trazable con la sección
+   4.4 del enunciado.
+
+3. **¿Existen impedimentos técnicos o de integración?**
+   Se descartó AWS y Railway por limitaciones de servicios. Se optó por
+   Google Cloud Platform como plataforma de deploy para el pipeline CI/CD.
 
 ---
 
