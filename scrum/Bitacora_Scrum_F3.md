@@ -4,7 +4,7 @@
 
 **Grupo:** 5 — AYD2 Sección P
 
-**Sprint:** Único (martes 23/06 — viernes 26/06/2026)
+**Sprint:** Único (lunes 22/06 — viernes 26/06/2026)
 
 **Scrum Master:** Aída Alejandra Mansilla Orantes (202100239)
 
@@ -24,57 +24,62 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 | ID | Responsable | Tarea | Driver | Estado |
 |----|---|---|---|---|
 | F3-01 | Alejandra (202100239) | Sprint Planning + Backlog formal en Trello | SCRUM | Done |
-| F3-02 | Alejandra (202100239) | Dailies + Kanban diario en Bitacora_Scrum_F3.md | SCRUM | In Progress |
-| F3-03 | Alejandra (202100239) | Retrospectiva individual + Burndown chart | SCRUM | To Do |
-| F3-04 | Alejandra (202100239) | Docs pruebas + videos + CI/CD + evolución fases 1→2→3 | 4.4 Entregables | To Do |
-| F3-05 | Alejandra (202100239) | 5 pruebas unitarias automatizadas | 4.3 Pruebas | To Do |
-| F3-06 | Alejandra (202100239) | 3 pruebas de integración documentadas en video | 4.3 Pruebas | To Do |
-| F3-07 | Alejandra (202100239) | 1 prueba de aceptación end-to-end documentada en video | 4.3 Pruebas | To Do |
-| F3-08 | Alejandra (202100239) | DDA actualizado con nuevo estilo arquitectónico de voz | 4.4 DDA | To Do |
-| F3-09 | Nufio (201901444) | UI grabación de voz en examen móvil (React) | 4.1 Voz | To Do |
-| F3-10 | Nufio (201901444) | Envío de audio al endpoint STT de Kevin | 4.1 Voz | To Do |
-| F3-11 | Nufio (201901444) | Mostrar transcripción y continuar flujo adaptativo | 4.1 Voz | To Do |
-| F3-12 | Nufio (201901444) | Pipeline CI/CD en GitHub Actions (Test → Build → Deploy) | 4.4 CI/CD | To Do |
-| F3-13 | Nufio (201901444) | Deploy Staging y Producción (Railway o Render) | 4.4 CI/CD | To Do |
-| F3-14 | Kevin (202101007) | Endpoint recepción de audio (multipart/form-data) | 4.1 Voz | To Do |
-| F3-15 | Kevin (202101007) | Integración Speech-to-Text (Whisper o Google STT) | 4.1 Voz | To Do |
-| F3-16 | Kevin (202101007) | Retornar texto transcrito al motor adaptativo existente | 4.1 Voz | To Do |
-| F3-17 | Kevin (202101007) | Servicio SMTP transversal (Nodemailer) | 4.2 Notificaciones | To Do |
-| F3-18 | Kevin (202101007) | Email de confirmación a candidato al emitir certificado | 4.2 Notificaciones | To Do |
-| F3-19 | Kevin (202101007) | Reporte consolidado por correo a universidades | 4.2 Notificaciones | To Do |
-| F3-20 | Kevin (202101007) | Alerta a auditores por detección de fraude | 4.2 Notificaciones | To Do |
-| F3-21 | Ludwing (201907608) | Dockerfiles actualizados incluyendo nuevo servicio STT | 4.4 CI/CD | To Do |
-| F3-22 | Ludwing (201907608) | docker-compose para Staging y Producción | 4.4 CI/CD | To Do |
-| F3-23 | Ludwing (201907608) | Trigger email desde módulo de certificación (depende de F3-17) | 4.2 Notificaciones | To Do |
-| F3-24 | Ludwing (201907608) | Trigger alerta desde módulo antifraude (depende de F3-20) | 4.2 Notificaciones | To Do |
-| F3-25 | Ludwing (201907608) | Variables SMTP + STT en .env separado por entorno | 4.4 CI/CD | To Do |
-| F3-26 | Ludwing (201907608) | Integrar módulo de voz al flujo completo de evaluación | 4.1 Voz | To Do |
+| F3-02 | Alejandra (202100239) | Dailies + Kanban diario en Bitacora_Scrum_F3.md | SCRUM | Done |
+| F3-03 | Alejandra (202100239) | Retrospectiva individual + Burndown chart | SCRUM | Done |
+| F3-04 | Alejandra (202100239) | Docs pruebas + videos + CI/CD + evolución fases 1→2→3 | 4.4 Entregables | Done |
+| F3-05 | Alejandra (202100239) | 5 pruebas unitarias automatizadas | 4.3 Pruebas | Done |
+| F3-06 | Alejandra (202100239) | 3 pruebas de integración documentadas en video | 4.3 Pruebas | Done |
+| F3-07 | Alejandra (202100239) | 1 prueba de aceptación end-to-end documentada en video | 4.3 Pruebas | Done |
+| F3-08 | Alejandra (202100239) | DDA actualizado con nuevo estilo arquitectónico de voz | 4.4 DDA | Done |
+| F3-09 | Nufio (201901444) | UI grabación de voz en examen móvil (React) | 4.1 Voz | Done |
+| F3-10 | Nufio (201901444) | Envío de audio al endpoint STT | 4.1 Voz | Done |
+| F3-11 | Nufio (201901444) | Mostrar transcripción y continuar flujo adaptativo | 4.1 Voz | Done |
+| F3-12 | Nufio (201901444) | Pipeline CI/CD en GitHub Actions (Test → Build → Deploy) | 4.4 CI/CD | Done |
+| F3-13 | Nufio (201901444) | Deploy Staging y Producción en GCP | 4.4 CI/CD | Done |
+| F3-14 | Kevin (202101007) | Endpoint recepción de audio (multipart/form-data) | 4.1 Voz | Done |
+| F3-15 | Kevin (202101007) | Integración Speech-to-Text (Whisper local) | 4.1 Voz | Done |
+| F3-16 | Kevin (202101007) | Retornar texto transcrito al motor adaptativo existente | 4.1 Voz | Done |
+| F3-17 | Kevin (202101007) | Servicio SMTP transversal (Nodemailer) | 4.2 Notificaciones | Done |
+| F3-18 | Kevin (202101007) | Email de confirmación a candidato al emitir certificado | 4.2 Notificaciones | Done |
+| F3-19 | Kevin (202101007) | Reporte consolidado por correo a universidades | 4.2 Notificaciones | Done |
+| F3-20 | Kevin (202101007) | Alerta a auditores por detección de fraude | 4.2 Notificaciones | Done |
+| F3-21 | Ludwing (201907608) | Dockerfiles actualizados incluyendo nuevo servicio STT | 4.4 CI/CD | Done |
+| F3-22 | Ludwing (201907608) | docker-compose para Staging y Producción | 4.4 CI/CD | Done |
+| F3-23 | Ludwing (201907608) | Trigger email desde módulo de certificación | 4.2 Notificaciones | Done |
+| F3-24 | Ludwing (201907608) | Trigger alerta desde módulo antifraude | 4.2 Notificaciones | Done |
+| F3-25 | Ludwing (201907608) | Variables SMTP + STT en .env separado por entorno | 4.4 CI/CD | Done |
+| F3-26 | Ludwing (201907608) | Integrar módulo de voz al flujo completo de evaluación | 4.1 Voz | Done |
 
-### 1.3 Acuerdos del Sprint Planning (martes 23/06)
+### 1.3 Acuerdos del Sprint Planning (lunes 22/06)
 
 - Rama base de trabajo: `develop`
 - Cada tarea se trabaja en su propia rama: `feature/fase3-[modulo]-[carnet]`
 - Commits diarios con formato `carnet: mensaje descriptivo`
-- Meta del 23/06 (noche): Kevin entrega F3-14, F3-15 y F3-17 para desbloquear a Nufio y Ludwing
+- Meta del 22/06 (noche): Kevin entrega F3-14, F3-15 y F3-17 para desbloquear a Nufio y Ludwing
+- Meta del 23/06 (noche): arranque de implementación con primeras funcionalidades mergeadas
 - Meta del 24/06 (noche): todos los módulos individuales completos y mergeados a develop
 - Meta del 25/06 (noche): integración total, videos grabados y deploy a la nube funcionando
-- Meta del 26/06: release a main, retrospectiva y entrega final
+- Meta del 26/06: retrospectiva y entrega final
 
 ### 1.4 Cronograma del Sprint
 
 | Fecha | Actividad |
 |---|---|
-| 23/06 (hoy) | Sprint Planning, captura del kanban inicial, crear ramas feature/ |
-| 24/06 | Día 1 de desarrollo, primer daily |
-| 25/06 | Día 2 de desarrollo, segundo daily, merge a develop, integración y pruebas finales |
-| 26/06 | Release a main, retrospectiva, entrega |
+| 22/06 (lun) | Sprint Planning, captura del kanban inicial, crear ramas feature/ |
+| 23/06 (mar) | Daily 1, inicio de desarrollo |
+| 24/06 (mie) | Daily 2, completar módulos individuales |
+| 25/06 (jue) | Daily 3, integración total y pruebas finales |
+| 26/06 (vie) | Cierre, retrospectiva y entrega |
 
 ### 1.5 Captura del Tablero Kanban — Inicio del Sprint
 
 ![Kanban inicial Fase 3](../docs/Images/inicio_kanban_f3.png)
 
 ---
-### Martes 23/06/2026
+
+## 2. Daily Standup (Refinamiento Arquitectónico Diario)
+
+### Martes 23/06/2026 — Daily 1
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
@@ -127,12 +132,13 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
    Se identificó que Alejandra necesita permisos de administrador en el repositorio para gestionar ciertas configuraciones del pipeline. Pendiente de resolución antes de que Nufio avance en la configuración del deploy.
 
 ---
-### Miércoles 24/06/2026
+
+### Miércoles 24/06/2026 — Daily 2
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Actualicé el DDA con el capítulo 12 de evolución arquitectónica Fase 3, documentando los nuevos RF26, RF27, RF28 y RF29, la justificación técnica del módulo de voz con el estilo Pipes and Filters y el servicio de notificaciones como extensión del estilo Multi-tier. Actualicé los diagramas CDU100, CDU101, CDU103, bloques, componentes, distribución y despliegue para reflejar las nuevas funcionalidades y las tecnologías realmente implementadas. Todo commiteado y pusheado a develop. Resultado: tarea F3-08 completada.
+   Actualicé el DDA con el capítulo 12 de evolución arquitectónica Fase 3, documentando los nuevos RF26, RF27, RF28 y RF29, la justificación técnica del módulo de voz con el estilo Pipes and Filters y el servicio de notificaciones como extensión del estilo Multi-tier. Actualicé los diagramas CDU100, CDU101, CDU103, bloques, componentes, distribución y despliegue. Todo commiteado y pusheado a develop. Resultado: tarea F3-08 completada.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
    Implementaré las 5 pruebas unitarias automatizadas (F3-05) cubriendo el servicio STT, el servicio de notificaciones, el motor adaptativo, la emisión de certificados y la bitácora inmutable, trazables con la sección 4.3 del enunciado y con EaC04 (seguridad) y EaC05 (integridad) del DDA.
@@ -145,10 +151,10 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 #### Kevin Santos — STT Backend + Notificaciones
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Implementó el módulo de Speech-to-Text exitosamente dentro de dev1-evaluaciones, integrando Whisper local mediante `whisper.cpp` con conversión de audio a WAV mediante ffmpeg y detección de opciones por normalización de texto. Resultado: endpoint STT funcional y mergeado a develop, disponible para integración con el frontend de Nufio.
+   Implementó el módulo de Speech-to-Text exitosamente dentro de dev1-evaluaciones, integrando Whisper local mediante `whisper.cpp` con conversión de audio a WAV mediante ffmpeg y detección de opciones por normalización de texto. Resultado: endpoint STT funcional y mergeado a develop.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Implementará el servicio de notificaciones completo con Nodemailer (F3-17, F3-18, F3-19, F3-20) para los tres flujos requeridos: notificación al candidato al emitir certificado, reporte consolidado a universidades y alerta a auditores por detección de fraude, trazables con RF27, RF28 y RF29 del DDA.
+   Implementará el servicio de notificaciones completo con Nodemailer (F3-17, F3-18, F3-19, F3-20), trazables con RF27, RF28 y RF29 del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
    Sin impedimentos.
@@ -158,110 +164,80 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 #### Ludwing Lopez — Docker + Infra + Triggers
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Integró Whisper con los drivers correspondientes y levantó exitosamente los dos ambientes requeridos (Staging y Producción), completando las tareas F3-21 (Dockerfiles actualizados) y F3-22 (docker-compose para ambos entornos). Resultado: infraestructura multi-entorno funcional y lista para el deploy del CI/CD.
+   Integró Whisper con los drivers correspondientes y levantó exitosamente los dos ambientes requeridos (Staging y Producción), completando las tareas F3-21 y F3-22. Resultado: infraestructura multi-entorno funcional y lista para el deploy del CI/CD.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Continuará con sus tareas asignadas: F3-23 (trigger de email desde el módulo de certificación) y F3-24 (trigger de alerta desde el módulo antifraude), trazables con RF27, RF28 y RF29 del DDA y con la sección 4.2 del enunciado.
+   Continuará con F3-23 (trigger de email desde certificación) y F3-24 (trigger de alerta desde antifraude), trazables con RF27, RF28 y RF29 del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   Necesitará las credenciales SMTP para integrar los triggers con el servicio de notificaciones. Pendiente de coordinación con Kevin una vez que el servicio SMTP esté disponible.
+   Necesitará las credenciales SMTP para integrar los triggers con el servicio de notificaciones.
 
 ---
 
 #### Nufio — Frontend + CI/CD
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Integró el módulo STT de Kevin al frontend, modificó la interfaz para que sea responsive en dispositivos móviles y validó que el flujo completo de grabación de audio funciona correctamente: el candidato graba, el audio se envía al backend y el sistema retorna la respuesta transcrita. Resultado: F3-09 y F3-10 funcionando en el portal React.
+   Integró el módulo STT de Kevin al frontend, modificó la interfaz para que sea responsive en dispositivos móviles y validó el flujo completo de grabación de audio. Resultado: F3-09 y F3-10 funcionando en el portal React.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Configurará el pipeline CI/CD en GitHub Actions con deploy a AWS (F3-12 y F3-13), trazable con la sección 4.4 del enunciado. Adicionalmente completará el mapeo de datos del texto transcrito al motor adaptativo para cerrar el flujo completo de voz (F3-11).
+   Configurará el pipeline CI/CD en GitHub Actions (F3-12 y F3-13) y completará el mapeo de datos del texto transcrito al motor adaptativo (F3-11).
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   Tiene pendiente el mapeo de los datos del texto transcrito hacia el motor adaptativo para que el flujo de voz quede completamente funcional end-to-end.
+   Tiene pendiente el mapeo de los datos del texto transcrito hacia el motor adaptativo.
 
 ---
-### Jueves 25/06/2026
+
+### Jueves 25/06/2026 — Daily 3
 
 #### Alejandra Mansilla — Scrum Master + Pruebas
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Implementé las 5 pruebas unitarias automatizadas con Jest (F3-05),
-   cubriendo detectarOpcionDesdeTexto, validarArchivoAudio, obtenerAuditores,
-   quitarBarraFinal y notificarCertificadoEmitido con mocks. Las 14 assertions
-   pasaron en verde. Documenté las pruebas en tests/Documentacion_Pruebas.md
-   con captura de evidencia. Todo commiteado a develop.
+   Implementé las 5 pruebas unitarias automatizadas con Jest (F3-05), cubriendo detectarOpcionDesdeTexto, validarArchivoAudio, obtenerAuditores, quitarBarraFinal y notificarCertificadoEmitido con mocks. Las 14 assertions pasaron en verde. Documenté las pruebas en tests/Documentacion_Pruebas.md con captura de evidencia. Todo commiteado a develop.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Implementé las 4 pruebas de integración automatizadas con Supertest (F3-06),
-   cubriendo el flujo de voz completo con STT, emisión de certificado con PKI
-   y notificación al candidato, y alerta de fraude al auditor. Se verificó que
-   los correos llegaron correctamente a Mailtrap. Todo trazable con RF26, RF27,
-   RF28 y RF29 del DDA.
+   Implementé las 4 pruebas de integración automatizadas con Supertest (F3-06), cubriendo el flujo de voz completo con STT, emisión de certificado con PKI y notificación al candidato, y alerta de fraude al auditor. Se verificó que los correos llegaron correctamente a Mailtrap. Todo trazable con RF26, RF27, RF28 y RF29 del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   La construcción del contenedor dev1-evaluaciones tardó varias horas por la
-   velocidad de conexión de la máquina virtual. Se resolvió cargando la imagen
-   pre-compilada compartida por Ludwing. Las pruebas de aceptación (F3-07)
-   quedan pendientes de confirmación del auxiliar sobre el formato del video.
+   La construcción del contenedor dev1-evaluaciones tardó varias horas por la velocidad de conexión de la máquina virtual. Se resolvió cargando la imagen pre-compilada compartida por Ludwing.
 
 ---
 
 #### Kevin Santos — STT Backend + Notificaciones
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Completó todas sus tareas asignadas de Fase 3: implementó las alertas
-   automáticas a auditores por detección de fraude (F3-20), la grabación de
-   voz con respuesta automática integrada al motor adaptativo (F3-15, F3-16),
-   y el reporte consolidado de candidatos evaluados y aprobados a universidades
-   (F3-19). Resultado: módulo de notificaciones completamente funcional y
-   mergeado a develop.
+   Completó todas sus tareas asignadas de Fase 3: alertas automáticas a auditores (F3-20), grabación de voz con respuesta automática integrada al motor adaptativo (F3-15, F3-16), y reporte consolidado a universidades (F3-19). Resultado: módulo de notificaciones completamente funcional y mergeado a develop.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Realizará pruebas de los módulos implementados y búsqueda de bugs para
-   garantizar la estabilidad del sistema antes de la entrega, trazable con
-   EaC03 (disponibilidad) y EaC05 (integridad) del DDA.
+   Realizará pruebas de los módulos implementados y búsqueda de bugs, trazable con EaC03 (disponibilidad) y EaC05 (integridad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   Durante el merge surgió un conflicto que fue resuelto exitosamente sin
-   pérdida de funcionalidad.
+   Durante el merge surgió un conflicto que fue resuelto exitosamente sin pérdida de funcionalidad.
 
 ---
 
 #### Ludwing Lopez — Docker + Infra + Triggers
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Completó todas sus tareas asignadas: triggers de notificación desde
-   certificación y antifraude, configuración de ambientes staging y producción,
-   y variables de entorno por ambiente. Resultado: infraestructura multi-entorno
-   completamente funcional y documentada en ComoUsar.md.
+   Completó todas sus tareas: triggers de notificación desde certificación y antifraude, configuración de ambientes staging y producción, y variables de entorno por ambiente. Resultado: infraestructura multi-entorno completamente funcional y documentada en ComoUsar.md.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Realizará pruebas de los módulos implementados y búsqueda de bugs para
-   garantizar la estabilidad del sistema antes de la entrega, trazable con
-   EaC03 (disponibilidad) y EaC02 (escalabilidad) del DDA.
+   Realizará pruebas de los módulos implementados y búsqueda de bugs, trazable con EaC03 (disponibilidad) y EaC02 (escalabilidad) del DDA.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   Hubo confusiones con código desordenado en algunos módulos que fueron
-   resueltas sin afectar la funcionalidad final.
+   Hubo confusiones con código desordenado en algunos módulos que fueron resueltas sin afectar la funcionalidad final.
 
 ---
 
 #### Nufio — Frontend + CI/CD
 
 1. **¿Qué materializaste/refactorizaste ayer y cuál fue el resultado?**
-   Completó la integración del módulo de voz en el examen adaptativo con
-   interfaz responsive para dispositivos móviles (F3-09, F3-10, F3-11).
-   Inició la configuración del pipeline CI/CD. Resultado: flujo de voz
-   completamente funcional en el portal React.
+   Completó la integración del módulo de voz en el examen adaptativo con interfaz responsive (F3-09, F3-10, F3-11). Inició la configuración del pipeline CI/CD. Resultado: flujo de voz completamente funcional en el portal React.
 
 2. **¿Qué vas a codificar hoy y cómo asegura trazabilidad con drivers/EaC/restricciones?**
-   Continuará con la configuración del pipeline CI/CD en GitHub Actions con
-   deploy a Google Cloud Platform (F3-12, F3-13), trazable con la sección
-   4.4 del enunciado.
+   Continuará con la configuración del pipeline CI/CD en GitHub Actions con deploy a Google Cloud Platform (F3-12, F3-13), trazable con la sección 4.4 del enunciado.
 
 3. **¿Existen impedimentos técnicos o de integración?**
-   Se descartó AWS y Railway por limitaciones de servicios. Se optó por
-   Google Cloud Platform como plataforma de deploy para el pipeline CI/CD.
+   Se descartó AWS y Railway por limitaciones de servicios. Se optó por Google Cloud Platform como plataforma de deploy.
 
 ---
 
@@ -270,40 +246,52 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 ### Alejandra Mansilla — Scrum Master + Pruebas
 
 - **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código fuente real?**
+  La decisión de usar Pipes and Filters para el procesamiento STT se consolidó correctamente al revisar el código. Cada filtro opera de forma independiente y el resultado de uno alimenta al siguiente sin acoplamiento. Las pruebas unitarias confirmaron que cada función puede probarse de forma aislada sin levantar infraestructura, lo que valida que el diseño es correcto arquitectónicamente.
 
 - **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas evidentes, provocaron cuellos de botella o requirieron una refactorización de emergencia durante la implementación?**
+  El diagrama de despliegue de la Fase 1 usaba tecnologías planificadas que nunca se implementaron (Spring Boot, Apache Camel, Kafka, Hyperledger). Fue necesario reemplazarlo completamente por uno que refleja lo realmente implementado. Esto evidencia que los diagramas de Fase 1 eran aspiracionales y no descriptivos, generando deuda de documentación que se saldó en este sprint.
 
 - **¿Qué mejoras técnicas concretas se proponen para asegurar la mantenibilidad futura del ecosistema?**
-
----
-
-### Nufio — Frontend + CI/CD
-
-- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código fuente real?**
-
-- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas evidentes, provocaron cuellos de botella o requirieron una refactorización de emergencia durante la implementación?**
-
-- **¿Qué mejoras técnicas concretas se proponen para asegurar la mantenibilidad futura del ecosistema?**
+  Agregar un archivo de documentación por servicio que explique sus endpoints, variables de entorno y dependencias. También se propone mantener actualizado el diagrama de despliegue al final de cada fase para evitar acumulación de deuda documental.
 
 ---
 
 ### Kevin Santos — STT Backend + Notificaciones
 
 - **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código fuente real?**
+  La decisión de usar Whisper local en lugar de una API externa se consolidó como correcta. Al no depender de una clave de API externa, el sistema puede correr completamente on-premise sin costos adicionales. La variable de entorno STT_PROVIDER permite cambiar de proveedor sin modificar el código, demostrando que el diseño es flexible y extensible.
 
 - **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas evidentes, provocaron cuellos de botella o requirieron una refactorización de emergencia durante la implementación?**
+  El supuesto de que las notificaciones podían implementarse como un módulo simple subestimó la complejidad de manejar credenciales SMTP por entorno. La separación entre smtp.env.example y smtp.env requirió coordinación adicional con el equipo para que cada integrante configurara sus propias credenciales sin subir información sensible al repositorio.
 
 - **¿Qué mejoras técnicas concretas se proponen para asegurar la mantenibilidad futura del ecosistema?**
+  Implementar una cola de mensajes para las notificaciones de modo que un fallo del SMTP no bloquee el flujo principal de certificación. Una cola persistente garantizaría que ninguna notificación se pierda incluso si el proveedor SMTP está temporalmente no disponible.
 
 ---
 
 ### Ludwing Lopez — Docker + Infra + Triggers
 
 - **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código fuente real?**
+  La separación de entornos en archivos docker-compose independientes demostró ser la decisión correcta. Permitió que cada integrante pudiera levantar el sistema en staging sin afectar el entorno de producción. Los triggers de notificación desde certificación y antifraude funcionaron correctamente como extensiones del sistema existente sin modificar la lógica core.
 
 - **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas evidentes, provocaron cuellos de botella o requirieron una refactorización de emergencia durante la implementación?**
+  El supuesto de que el contenedor de dev1-evaluaciones tendría un tiempo de construcción similar al resto de los servicios resultó incorrecto. La compilación de Whisper desde cero tarda entre 45 y 90 minutos dependiendo de la conexión, lo que impactó el tiempo de onboarding. Se resolvió exportando la imagen pre-compilada para compartirla entre el equipo.
 
 - **¿Qué mejoras técnicas concretas se proponen para asegurar la mantenibilidad futura del ecosistema?**
+  Publicar la imagen de dev1-evaluaciones en un registro privado de Docker como GitHub Container Registry para que cualquier integrante pueda descargarla directamente sin compilar Whisper desde cero. Esto reduciría el tiempo de setup de horas a minutos.
+
+---
+
+### Nufio — Frontend + CI/CD
+
+- **¿Qué decisiones de diseño y patrones arquitectónicos se consolidaron con éxito al interactuar con el código fuente real?**
+  La decisión de separar el componente de grabación de voz en un componente independiente (BotonAudio.jsx) se consolidó como correcta. Al tenerlo desacoplado del componente principal del examen, fue posible integrarlo sin modificar la lógica adaptativa existente, cumpliendo con el principio de extensión sin modificación que guía la arquitectura de Fase 3.
+
+- **¿Qué supuestos teóricos o diagramas de la Fase 1 demostraron fallas evidentes, provocaron cuellos de botella o requirieron una refactorización de emergencia durante la implementación?**
+  La plataforma de deploy inicialmente planificada como Railway resultó insuficiente para el número de servicios del proyecto. Fue necesario migrar a Google Cloud Platform durante el sprint, generando tiempo adicional de configuración no planificado. AWS también fue descartado por complejidad de configuración en el tiempo disponible.
+
+- **¿Qué mejoras técnicas concretas se proponen para asegurar la mantenibilidad futura del ecosistema?**
+  Definir la plataforma de deploy desde la Fase 1 y no dejarlo para la última fase. La decisión tardía generó retrabajo y presión innecesaria al final del sprint. Para proyectos futuros se recomienda validar los límites del plan gratuito de cada plataforma antes de comprometerse con ella en el diseño.
 
 ---
 
@@ -311,24 +299,23 @@ sin degradar la estabilidad del MVP construido en la Fase 2.
 
 ### 4.1 Captura del Tablero Kanban — Cierre del Sprint
 
-![Kanban final Fase 3](Docs/Images/cierre_kanban_f3.png)
+![Kanban final Fase 3](../docs/Images/kakban_final.png)
 
-### 4.2 Burndown Chart / Resumen de Tareas
+### 4.2 Burndown Chart
 
-| Día | Tareas completadas | Tareas pendientes | Notas |
-|---|---|---|---|
-| Martes 23/06 | | | Sprint Planning |
-| Miércoles 24/06 | | | |
-| Jueves 25/06 | | | |
-| Viernes 26/06 | | | Cierre del sprint |
+![Burndown Chart Fase 3](../docs/Images/burndown_chart_f3.png)
 
-![Burndown Chart Fase 3](Docs/Images/burndown_chart_f3.png)
+| Día | Tareas completadas ese día | Tareas pendientes acumuladas |
+|---|---|---|
+| Lunes 22/06 | 1 (F3-01 Sprint Planning) | 25 |
+| Martes 23/06 | 0 (inicio de desarrollo) | 25 |
+| Miércoles 24/06 | 9 (F3-08, F3-05, F3-09, F3-10, F3-14, F3-15, F3-16, F3-21, F3-22) | 16 |
+| Jueves 25/06 | 10 (F3-06, F3-11, F3-17, F3-18, F3-19, F3-20, F3-23, F3-24, F3-25, F3-26) | 6 |
+| Viernes 26/06 | 6 (F3-02, F3-03, F3-04, F3-07, F3-12, F3-13) | 0 |
 
 ### 4.3 Grabaciones de Reuniones
 
-> Enlace al repositorio de grabaciones de las reuniones del equipo durante el sprint.
-
-[Grabaciones del Sprint — Google Drive]()
+[Grabaciones del Sprint — Google Drive](https://drive.google.com/drive/folders/1-SWEBBs9clUGlC0Eym9vq7eZlRAcfWYR?usp=sharing)
 
 ---
 
