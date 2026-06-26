@@ -1,6 +1,6 @@
 const API_BASE =
   import.meta.env.VITE_ANTIFRAUDE_API_URL ||
-  'http://localhost:4004'
+  'http://136.114.93.149:4004'
 
 export async function fetchMetricas(
   filtros = {}
@@ -64,8 +64,8 @@ export async function fetchMetricas(
   if (!respuesta.ok) {
     throw new Error(
       datos.message ||
-        datos.error ||
-        'No fue posible consultar las métricas'
+      datos.error ||
+      'No fue posible consultar las métricas'
     )
   }
 

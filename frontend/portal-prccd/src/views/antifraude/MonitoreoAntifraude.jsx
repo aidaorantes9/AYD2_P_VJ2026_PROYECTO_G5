@@ -16,7 +16,7 @@ import {
 
 const API_BASE =
   import.meta.env.VITE_ANTIFRAUDE_API_URL ||
-  'http://localhost:4004'
+  'http://136.114.93.149:4004'
 
 const INTERVALO_CAPTURA_MS = 2 * 60 * 1000
 const INTERVALO_LOGS_MS = 15 * 1000
@@ -59,8 +59,8 @@ export default function MonitoreoAntifraude({
     if (!respuesta.ok) {
       throw new Error(
         datos.error ||
-          datos.message ||
-          'No fue posible almacenar la evidencia'
+        datos.message ||
+        'No fue posible almacenar la evidencia'
       )
     }
 

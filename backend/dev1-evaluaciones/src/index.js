@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 4001;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://136.114.93.149:5173',
   })
 );
 
@@ -27,5 +27,5 @@ app.get('/api/salud', (req, res) => {
 app.use('/api/evaluacion', evaluacionRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Motor de evaluaciones ejecutándose en http://localhost:${PORT}`);
+  console.log(`Motor de evaluaciones ejecutándose en http://136.114.93.149:${PORT}`);
 });

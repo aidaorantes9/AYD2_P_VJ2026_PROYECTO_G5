@@ -7,7 +7,7 @@ import {
 } from '@coreui/react'
 import FachadaIntegracion from '../facades/FachadaIntegracion'
 
-const API_BASE_URL = import.meta.env.VITE_INTEGRACION_API_URL || 'http://localhost:4002'
+const API_BASE_URL = import.meta.env.VITE_INTEGRACION_API_URL || 'http://136.114.93.149:4002'
 
 function LoginIntegracion() {
   const navigate = useNavigate()

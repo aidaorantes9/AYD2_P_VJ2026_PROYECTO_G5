@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 4002;
 // Permite solicitudes únicamente desde el frontend configurado
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://136.114.93.149:5173',
   })
 );
 
@@ -42,5 +42,5 @@ app.use('/api/integracion/ingesta', ingestionRoutes);
 app.use('/api/candidato', candidatoRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Módulo Dev2 ejecutándose en http://localhost:${PORT}`);
+  console.log(`Módulo Dev2 ejecutándose en http://136.114.93.149:${PORT}`);
 });

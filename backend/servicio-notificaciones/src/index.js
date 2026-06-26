@@ -13,7 +13,7 @@ const app = express()
 const PORT = process.env.PORT || 4006
 
 // URL permitida para consumir el servicio desde el frontend.
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://136.114.93.149:5173'
 
 // Habilita CORS solamente para el frontend configurado.
 app.use(cors({

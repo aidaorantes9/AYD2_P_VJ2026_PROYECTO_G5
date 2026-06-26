@@ -11,7 +11,7 @@ const app = express()
 
 const PORT = Number(process.env.PORT || 4004)
 const FRONTEND_URL =
-  process.env.FRONTEND_URL || 'http://localhost:5173'
+  process.env.FRONTEND_URL || 'http://136.114.93.149:5173'
 
 app.use(
   cors({
@@ -60,6 +60,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(
-    `Antifraude y métricas ejecutándose en http://localhost:${PORT}`
+    `Antifraude y métricas ejecutándose en http://136.114.93.149:${PORT}`
   )
 })
