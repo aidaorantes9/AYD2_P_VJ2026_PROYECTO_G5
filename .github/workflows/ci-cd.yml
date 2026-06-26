@@ -98,6 +98,11 @@ jobs:
             echo "=== Actualizando código ==="
             git pull origin main
 
+            echo "=== Configurando variables de entorno de producción ==="
+            cp .env.production .env
+            # Aseguramos que la IP dinámica del secret reemplace la IP estática del archivo
+            sed -i "s/136.114.93.149/${{ secrets.GCP_VM_HOST }}/g" .env
+
             echo "=== Creando .env del frontend con IP pública ==="
             cat > frontend/portal-prccd/.env << 'EOF'
             VITE_EVALUACIONES_API_URL=http://${{ secrets.GCP_VM_HOST }}:4001
