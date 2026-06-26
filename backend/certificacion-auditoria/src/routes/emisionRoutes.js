@@ -6,11 +6,18 @@ const {
 
 const {
   notificarCertificadoEmitido,
+  notificarReporteUniversidad,
 } = require(
   '../services/notificacionCertificadoService'
 );
 
 const router = express.Router();
+
+function esperar(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 router.post('/emitir', async (req, res) => {
   try {
@@ -24,12 +31,13 @@ router.post('/emitir', async (req, res) => {
     const idCandidato =
       Number(id_candidato);
 
+    const idEvaluacion =
+      Number(id_evaluacion);
+
     const certificado =
       await emitirCertificado({
         idCandidato,
-
-        idEvaluacion:
-          Number(id_evaluacion),
+        idEvaluacion,
 
         datosCertificado:
           datos_certificado,
@@ -42,36 +50,69 @@ router.post('/emitir', async (req, res) => {
       enviada: false,
     };
 
+    let reporteUniversidad = {
+      intentada: false,
+      enviada: false,
+    };
+
     /*
-     * Solo se envía el correo cuando
-     * el certificado acaba de crearse.
-     * Si se reutiliza uno existente,
-     * se evita mandar correos duplicados.
+      Para la demostración se envía siempre el correo de credencial,
+      aunque el certificado ya exista, porque el candidato debe recibir
+      nuevamente su enlace/hash de verificación.
+    */
+    try {
+      await notificarCertificadoEmitido({
+        idCandidato,
+        certificado,
+      });
+
+      notificacion = {
+        intentada: true,
+        enviada: true,
+      };
+    } catch (errorNotificacion) {
+      console.error(
+        'Certificado emitido, pero no se pudo enviar la notificación:',
+        errorNotificacion.message
+      );
+
+      notificacion = {
+        intentada: true,
+        enviada: false,
+        advertencia:
+          'El certificado fue emitido, pero el correo al candidato no pudo enviarse.',
+      };
+    }
+
+    /*
+     * Mailtrap free limita correos por segundo.
+     * Se espera antes de enviar el reporte universitario
+     * para no mandar dos correos al mismo tiempo.
      */
-    if (!certificado.reutilizado) {
-      try {
-        await notificarCertificadoEmitido({
-          idCandidato,
-          certificado,
-        });
+    await esperar(5000);
 
-        notificacion = {
-          intentada: true,
-          enviada: true,
-        };
-      } catch (errorNotificacion) {
-        console.error(
-          'Certificado emitido, pero no se pudo enviar la notificación:',
-          errorNotificacion.message
-        );
+    try {
+      await notificarReporteUniversidad({
+        idCandidato,
+        idEvaluacion,
+      });
 
-        notificacion = {
-          intentada: true,
-          enviada: false,
-          advertencia:
-            'El certificado fue emitido, pero el correo no pudo enviarse.',
-        };
-      }
+      reporteUniversidad = {
+        intentada: true,
+        enviada: true,
+      };
+    } catch (errorReporte) {
+      console.error(
+        'Certificado emitido, pero no se pudo enviar el reporte universitario:',
+        errorReporte.message
+      );
+
+      reporteUniversidad = {
+        intentada: true,
+        enviada: false,
+        advertencia:
+          'El certificado fue emitido, pero el reporte universitario no pudo enviarse.',
+      };
     }
 
     return res
@@ -88,6 +129,7 @@ router.post('/emitir', async (req, res) => {
 
         certificado,
         notificacion,
+        reporte_universidad: reporteUniversidad,
       });
   } catch (error) {
     const estados = {

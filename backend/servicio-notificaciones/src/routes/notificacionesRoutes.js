@@ -9,6 +9,12 @@ const {
 
 const router = express.Router()
 
+function esperar(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms)
+    })
+}
+
 // Verifica si las credenciales SMTP funcionan correctamente.
 router.get('/smtp/verificar', async (req, res) => {
     try {
@@ -206,12 +212,19 @@ router.post('/reporte-universidad', async (req, res) => {
             periodo,
             total_aprobados,
             total_evaluados,
+            aprobados = [],
         } = req.body
 
-        // Asunto específico para reportes universitarios.
         const asunto = `Reporte PRCCD - ${universidad || 'Universidad'}`
 
-        // Mensaje de texto plano.
+        const filasTexto = aprobados.length > 0
+            ? aprobados
+                .map((item, indice) => {
+                    return `${indice + 1}. ${item.nombre || 'Sin nombre'} - ${item.correo || 'Sin correo'} - Nota: ${item.calificacion ?? 'N/A'}`
+                })
+                .join('\n')
+            : 'No hay estudiantes aprobados para listar.'
+
         const mensaje = `
 Reporte consolidado PRCCD.
 
@@ -220,22 +233,63 @@ Periodo: ${periodo || 'No especificado'}
 Total evaluados: ${total_evaluados || 0}
 Total aprobados: ${total_aprobados || 0}
 
+Estudiantes aprobados:
+${filasTexto}
+
 PRCCD - SICA
         `.trim()
 
-        // Mensaje HTML con datos del reporte.
+        const filasHtml = aprobados.length > 0
+            ? aprobados
+                .map((item, indice) => {
+                    return `
+                        <tr>
+                            <td>${indice + 1}</td>
+                            <td>${item.nombre || 'Sin nombre'}</td>
+                            <td>${item.correo || 'Sin correo'}</td>
+                            <td>${item.calificacion ?? 'N/A'}</td>
+                        </tr>
+                    `
+                })
+                .join('')
+            : `
+                <tr>
+                    <td colspan="4">No hay estudiantes aprobados para listar.</td>
+                </tr>
+            `
+
         const html = `
             <h2>Reporte consolidado PRCCD</h2>
+
             <ul>
                 <li><strong>Universidad:</strong> ${universidad || 'No especificada'}</li>
                 <li><strong>Periodo:</strong> ${periodo || 'No especificado'}</li>
                 <li><strong>Total evaluados:</strong> ${total_evaluados || 0}</li>
                 <li><strong>Total aprobados:</strong> ${total_aprobados || 0}</li>
             </ul>
+
+            <h3>Estudiantes aprobados</h3>
+
+            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Nota</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filasHtml}
+                </tbody>
+            </table>
+
             <p>PRCCD - SICA</p>
         `
+        
+        // ojala si jale jaja ya me canse de esto 
+        await esperar(5000)
 
-        // Envía el reporte a los destinatarios indicados.
         const resultado = await enviarCorreo({
             destinatarios,
             asunto,
@@ -246,7 +300,6 @@ PRCCD - SICA
         return res.status(200).json({
             ok: true,
             servicio: 'servicio-notificaciones',
-            tarea: 'F3-17 Servicio SMTP transversal',
             tipo_notificacion: 'reporte_universidad',
             mensaje: 'Reporte universitario enviado correctamente.',
             resultado,
