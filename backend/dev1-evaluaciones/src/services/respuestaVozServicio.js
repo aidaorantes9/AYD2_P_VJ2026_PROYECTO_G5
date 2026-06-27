@@ -152,5 +152,5 @@ function detectarOpcionDesdeTexto(textoTranscrito, opciones) {
 }
 
 module.exports = {
-    detectarOpcionDesdeTexto,
+    detectarOpcionDesdeTextoS,
 }
