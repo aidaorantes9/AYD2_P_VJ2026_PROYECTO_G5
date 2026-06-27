@@ -145,9 +145,97 @@ certificado y recepcion del correo de notificacion.
 
 ---
 
+## Pipeline CI/CD
+
+### Descripción general
+
+Se implementó un flujo de Integración Continua y Despliegue Continuo utilizando
+GitHub Actions, Docker Compose y una máquina virtual de Google Cloud Platform
+(Compute Engine). El pipeline se activa automáticamente ante eventos de push y
+pull request sobre la rama `main`.
+
+### Fases del pipeline
+
+**Fase 1 — Pruebas unitarias**
+
+Se instalan las dependencias del proyecto y se ejecuta automáticamente la batería
+de pruebas unitarias con el comando:
+
+```bash
+cd tests && npm test
+```
+
+Si alguna prueba falla, el pipeline se detiene y el deploy no se ejecuta.
+
+**Fase 2 — Verificación del frontend**
+
+Se instalan las dependencias del frontend y se realiza un build de compilación
+para verificar que la aplicación React puede generarse correctamente. Durante
+esta fase se inyectan las variables de entorno con la IP pública de la VM
+almacenada en GitHub Secrets.
+
+**Fase 3 — Despliegue automático**
+
+Únicamente cuando el evento es un push a `main`, GitHub Actions se conecta
+por SSH a la máquina virtual de GCP y ejecuta el proceso completo de
+actualización y despliegue de los contenedores Docker.
+
+### GitHub Secrets configurados
+
+| Secret | Descripción |
+|---|---|
+| `GCP_VM_HOST` | Dirección IP pública de la máquina virtual |
+| `GCP_VM_USER` | Usuario SSH de la VM |
+| `GCP_SSH_KEY` | Llave privada SSH para autenticación |
+| `GCP_VM_REPO_PATH` | Ruta del repositorio dentro de la VM |
+
+### Proceso de despliegue paso a paso
+
+Cuando se hace push a `main` el workflow ejecuta automáticamente:
+
+1. Conexión SSH a la máquina virtual de Compute Engine
+2. `git pull` para actualizar el código
+3. Generación del archivo `.env` de producción desde `.env.production`
+4. Sustitución dinámica de la IP pública desde GitHub Secrets
+5. Generación del `.env` del frontend con las URLs públicas de los microservicios
+6. `docker compose down` para detener contenedores existentes
+7. `docker compose build` para reconstruir todas las imágenes
+8. `docker compose up -d` para levantar todos los servicios
+9. Verificación del estado final de los contenedores
+
+### Arquitectura del flujo
+
+```text
+Desarrollador
+      │
+      ▼
+Git Push (main)
+      │
+      ▼
+GitHub Actions
+      │
+      ├── Pruebas unitarias (npm test)
+      ├── Build del frontend
+      └── Si todo es correcto
+              │
+              ▼
+       Conexión SSH a Compute Engine
+              │
+              ▼
+       git pull + configuración .env
+              │
+              ▼
+    Docker Compose rebuild y deploy
+              │
+              ▼
+     Aplicación disponible en GCP
+     http://136.114.93.149:5173
+```
+
 ## Videos de Evidencia
 
-Los videos de las pruebas de integracion y la prueba de aceptacion
-se encuentran en la siguiente carpeta de Google Drive:
+Todos los videos de evidencia del proyecto (pruebas de integración, prueba de
+aceptación end-to-end y deploy completo del CI/CD) se encuentran en la siguiente
+carpeta de Google Drive:
 
 [Ver videos de evidencia](https://drive.google.com/drive/folders/1-SWEBBs9clUGlC0Eym9vq7eZlRAcfWYR?usp=sharing)
