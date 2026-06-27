@@ -58,6 +58,6 @@ RUN mkdir -p /app/tmp/audio
 EXPOSE 4001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD node -e "fetch('http://localhost:4001/api/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+    CMD node -e "fetch('http://136.114.93.149:4001/api/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
 
 CMD ["node", "src/index.js"]

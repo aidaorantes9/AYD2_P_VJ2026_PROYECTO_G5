@@ -120,20 +120,20 @@ describe('quitarBarraFinal', () => {
 
   // una URL con barra final debe quedar sin ella
   test('elimina la barra final de una URL', () => {
-    const resultado = quitarBarraFinal('http://localhost:4006/')
-    expect(resultado).toBe('http://localhost:4006')
+    const resultado = quitarBarraFinal('http://136.114.93.149:4006/')
+    expect(resultado).toBe('http://136.114.93.149:4006')
   })
 
   // una URL sin barra final debe quedar igual
   test('no modifica una URL sin barra final', () => {
-    const resultado = quitarBarraFinal('http://localhost:4006')
-    expect(resultado).toBe('http://localhost:4006')
+    const resultado = quitarBarraFinal('http://136.114.93.149:4006')
+    expect(resultado).toBe('http://136.114.93.149:4006')
   })
 
   // debe eliminar multiples barras finales tambien
   test('elimina multiples barras finales', () => {
-    const resultado = quitarBarraFinal('http://localhost:4006///')
-    expect(resultado).toBe('http://localhost:4006')
+    const resultado = quitarBarraFinal('http://136.114.93.149:4006///')
+    expect(resultado).toBe('http://136.114.93.149:4006')
   })
 
 })

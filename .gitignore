@@ -13,6 +13,7 @@ node_modules/
 
 # Archivos .env locales de los servicios
 **/.env
+.env.production
 
 # Credenciales SMTP reales por ambiente
 environments/staging/smtp.env

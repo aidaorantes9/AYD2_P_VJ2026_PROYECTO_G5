@@ -13,7 +13,7 @@ const PORT = Number(process.env.PORT || 4003);
 app.use(express.json());
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'http://136.114.93.149:5173',
 }));
 
 app.get('/api/salud', async (req, res) => {
@@ -44,7 +44,7 @@ app.use((req, res) => {
 
 const server = app.listen(PORT, () => {
   console.log(
-    `Certificación y auditoría ejecutándose en http://localhost:${PORT}`
+    `Certificación y auditoría ejecutándose en http://136.114.93.149:${PORT}`
   );
 });
 

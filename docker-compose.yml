@@ -11,8 +11,8 @@ services:
       - "${MYSQL_HOST_PORT:-3306}:3306"
     volumes:
       - prccd_mysql_data:/var/lib/mysql
-      - ./backend/shared/schema_completo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./backend/shared/seed_completo.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - ./backend/shared/schema_completo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro,z 
+      - ./backend/shared/seed_completo.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro,z
     healthcheck:
       test:
         [
@@ -51,7 +51,7 @@ services:
       NOTIFICACIONES_CERTIFICADO_ACTIVAS: ${NOTIFICACIONES_CERTIFICADO_ACTIVAS:-true}
 
       # para la F3-18: enlace público enviado al candidato
-      CERTIFICADO_VERIFICACION_BASE_URL: ${CERTIFICADO_VERIFICACION_BASE_URL:-http://localhost:5173/certificado/ver}certificado/ver}
+      CERTIFICADO_VERIFICACION_BASE_URL: ${CERTIFICADO_VERIFICACION_BASE_URL:-http://localhost:5173/certificado/ver}
     ports:
       - "${CERTIFICACION_HOST_PORT:-4003}:4003"
     volumes:

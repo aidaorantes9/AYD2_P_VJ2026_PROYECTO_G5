@@ -62,7 +62,7 @@ async function obtenerDatosCandidato(idCandidato) {
 function construirUrlVerificacion(codigoVerificacion) {
   const basePublica = quitarBarraFinal(
     process.env.CERTIFICACION_PUBLIC_URL ||
-      'http://localhost:4003'
+    'http://136.114.93.149:4003'
   );
 
   return (
@@ -75,14 +75,14 @@ function construirUrlVerificacion(codigoVerificacion) {
 function obtenerServicioNotificaciones() {
   return quitarBarraFinal(
     process.env.NOTIFICACIONES_API_URL ||
-      'http://servicio-notificaciones:4006'
+    'http://servicio-notificaciones:4006'
   );
 }
 
 function obtenerTimeoutNotificaciones() {
   return Number(
     process.env.NOTIFICACIONES_TIMEOUT_MS ||
-      10000
+    10000
   );
 }
 
@@ -147,8 +147,8 @@ async function notificarCertificadoEmitido({
   if (!respuesta.ok) {
     throw new Error(
       resultado.detalle ||
-        resultado.error ||
-        `El servicio de notificaciones respondió ${respuesta.status}`
+      resultado.error ||
+      `El servicio de notificaciones respondió ${respuesta.status}`
     );
   }
 
@@ -336,8 +336,8 @@ async function notificarReporteUniversidad({
   if (!respuesta.ok) {
     throw new Error(
       resultado.detalle ||
-        resultado.error ||
-        `El servicio de notificaciones respondió ${respuesta.status}`
+      resultado.error ||
+      `El servicio de notificaciones respondió ${respuesta.status}`
     );
   }
 

@@ -17,7 +17,7 @@ import {
 
 const API_BASE =
   import.meta.env.VITE_INTEGRACION_API_URL ||
-  'http://localhost:4002'
+  'http://136.114.93.149:4002'
 
 function obtenerSesionActual() {
   try {
@@ -143,7 +143,7 @@ function PanelIngestionDatos() {
         mensaje: 'Administrador autorizado para procesar archivos académicos',
       },
     }
-    }
+  }
 
   const validarArchivo = async () => {
     limpiarMensajes()

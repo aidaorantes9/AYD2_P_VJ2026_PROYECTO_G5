@@ -2,7 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app     = express();
+const app = express();
 const PORT = process.env.PORT || 4005;
 
 // permite recibir JSON en el body de las peticiones
@@ -18,7 +18,7 @@ app.get('/api/salud', (req, res) => {
 });
 
 // permite que el frontend en puerto 5173 pueda llamar a este servidor
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: 'http://136.114.93.149:5173' }));
 
 // rutas del modulo de seguridad
 const seguridadRoutes = require('./routes/seguridad');

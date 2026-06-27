@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { CAlert, CBadge, CButton, CCard, CCardBody, CCol, CContainer, CFormInput, CRow, CSpinner, CTable,
-  CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
+import {
+  CAlert, CBadge, CButton, CCard, CCardBody, CCol, CContainer, CFormInput, CRow, CSpinner, CTable,
+  CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow
+} from '@coreui/react'
 
-const API_BASE = import.meta.env.VITE_CERTIFICACION_API_URL || 'http://localhost:4003'
+const API_BASE = import.meta.env.VITE_CERTIFICACION_API_URL || 'http://136.114.93.149:4003'
 // DEBE MODIFICARSE POR EL PUERTO DE ALLAN QUE ES 4004
 
 // AQUI DEBE IR PARA CONSUMIR EL BACKEND DE ALLAN, OJO ALLI ESTO SE TIENE QUE CAMBIAR SI O SI 
@@ -109,13 +111,13 @@ function AuditoriaReportes() {
   const eventos = resultado?.eventos?.length
     ? resultado.eventos
     : [
-        {
-          fecha: 'Sin registros',
-          evento: 'No hay eventos de auditoria para mostrar',
-          actor: '-',
-          estado: '-',
-        },
-      ]
+      {
+        fecha: 'Sin registros',
+        evento: 'No hay eventos de auditoria para mostrar',
+        actor: '-',
+        estado: '-',
+      },
+    ]
 
   return (
     <CContainer fluid style={{ padding: '32px' }}>

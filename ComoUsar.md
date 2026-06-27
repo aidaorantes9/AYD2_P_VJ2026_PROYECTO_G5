@@ -6,6 +6,16 @@
 
 > En caso de que usen podman, solo cambien la palabra `docker` por `podman`.
 
+### PARA PRODUCCION
+
+```bash
+docker compose \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d --build
+```
+
 ### Arrancar Staging
 
 ```bash
@@ -19,8 +29,8 @@ docker compose \
 Accesos:
 
 ```text
-Frontend: http://localhost:5174
-APIs:     http://localhost:4101 hasta http://localhost:4106
+Frontend: http://136.114.93.149:5174
+APIs:     http://136.114.93.149:4101 hasta http://136.114.93.149:4106
 MySQL:    localhost:3307
 ```
 Para revisar los contenedores:
@@ -58,8 +68,8 @@ docker compose \
 Accesos:
 
 ```text
-Frontend: http://localhost:5173
-APIs:     http://localhost:4001 hasta http://localhost:4006
+Frontend: http://136.114.93.149:5173
+APIs:     http://136.114.93.149:4001 hasta http://136.114.93.149:4006
 MySQL:    localhost:3306
 ```
 
@@ -88,7 +98,7 @@ docker compose \
 
 El frontend estará disponible en:
 
-http://localhost:5174
+http://136.114.93.149:5174
 
 Para revisar su estado:
 
@@ -126,7 +136,7 @@ docker compose \
 
 En Producción se abre en:
 
-http://localhost:5173
+http://136.114.93.149:5173
 
 
 ## 4. Conectarse MySQL

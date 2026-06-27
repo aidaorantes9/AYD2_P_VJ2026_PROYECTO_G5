@@ -21,7 +21,7 @@ import CertificadoVisual, {
 
 const API_BASE =
   import.meta.env.VITE_CERTIFICACION_API_URL ||
-  'http://localhost:4003'
+  'http://136.114.93.149:4003'
 
 export default function VerificacionAuditoria() {
   const navigate = useNavigate()
@@ -74,8 +74,8 @@ export default function VerificacionAuditoria() {
       if (!respuesta.ok || !datos.valido) {
         throw new Error(
           datos.error ||
-            datos.mensaje ||
-            'El certificado no es válido'
+          datos.mensaje ||
+          'El certificado no es válido'
         )
       }
 
@@ -160,11 +160,10 @@ export default function VerificacionAuditoria() {
             maxWidth: '90%',
             margin: '24px auto',
             padding: '20px',
-            border: `3px solid ${
-              aprobado
+            border: `3px solid ${aprobado
                 ? '#159447'
                 : '#dc2626'
-            }`,
+              }`,
             borderRadius: '9px',
             backgroundColor: aprobado
               ? '#dcfce7'

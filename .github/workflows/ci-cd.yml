@@ -1,0 +1,126 @@
+name: PRCCD CI/CD — Grupo 5
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ──────────────────────────────────────
+  # ETAPA 1: Pruebas unitarias
+  # ──────────────────────────────────────
+  test:
+    name: Pruebas Unitarias
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Instalar dependencias de pruebas
+        run: |
+          cd tests
+          npm ci
+
+      - name: Ejecutar pruebas unitarias
+        run: |
+          cd tests
+          npm test
+
+  # ──────────────────────────────────────
+  # ETAPA 2: Verificar build del frontend
+  # ──────────────────────────────────────
+  build-check:
+    name: Verificar Build Frontend
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/portal-prccd/package-lock.json
+
+      - name: Instalar dependencias del frontend
+        run: |
+          cd frontend/portal-prccd
+          npm ci
+
+      - name: Verificar que el build compila
+        run: |
+          cd frontend/portal-prccd
+          npm run build
+        env:
+          VITE_EVALUACIONES_API_URL: http://${{ secrets.GCP_VM_HOST }}:4001
+          VITE_INTEGRACION_API_URL: http://${{ secrets.GCP_VM_HOST }}:4002
+          VITE_CERTIFICACION_API_URL: http://${{ secrets.GCP_VM_HOST }}:4003
+          VITE_ANTIFRAUDE_API_URL: http://${{ secrets.GCP_VM_HOST }}:4004
+          VITE_SEGURIDAD_API_URL: http://${{ secrets.GCP_VM_HOST }}:4005
+          VITE_NOTIFICACIONES_API_URL: http://${{ secrets.GCP_VM_HOST }}:4006
+
+  # ──────────────────────────────────────
+  # ETAPA 3: Deploy en GCP
+  # Solo cuando se hace push a main
+  # ──────────────────────────────────────
+  deploy:
+    name: Deploy en GCP VM
+    runs-on: ubuntu-latest
+    needs: [test, build-check]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Conectar a VM y hacer deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_VM_HOST }}
+          username: ${{ secrets.GCP_VM_USER }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "=== Entrando al repositorio ==="
+            cd ${{ secrets.GCP_VM_REPO_PATH }}
+
+            echo "=== Actualizando código ==="
+            git pull origin main
+
+            echo "=== Configurando variables de entorno de producción ==="
+            cp .env.production .env
+            # Aseguramos que la IP dinámica del secret reemplace la IP estática del archivo
+            sed -i "s/136.114.93.149/${{ secrets.GCP_VM_HOST }}/g" .env
+
+            echo "=== Creando .env del frontend con IP pública ==="
+            cat > frontend/portal-prccd/.env << 'EOF'
+            VITE_EVALUACIONES_API_URL=http://${{ secrets.GCP_VM_HOST }}:4001
+            VITE_INTEGRACION_API_URL=http://${{ secrets.GCP_VM_HOST }}:4002
+            VITE_CERTIFICACION_API_URL=http://${{ secrets.GCP_VM_HOST }}:4003
+            VITE_ANTIFRAUDE_API_URL=http://${{ secrets.GCP_VM_HOST }}:4004
+            VITE_SEGURIDAD_API_URL=http://${{ secrets.GCP_VM_HOST }}:4005
+            VITE_NOTIFICACIONES_API_URL=http://${{ secrets.GCP_VM_HOST }}:4006
+            EOF
+
+            echo "=== Reconstruyendo y levantando contenedores ==="
+            docker compose down --remove-orphans
+            docker compose up -d --build
+
+            echo "=== Esperando que los servicios suban ==="
+            sleep 20
+
+            echo "=== Estado final ==="
+            docker compose ps
+
+            echo "=== Deploy completado ==="

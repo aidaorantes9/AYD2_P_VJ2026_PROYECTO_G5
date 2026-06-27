@@ -22,7 +22,7 @@ import CertificadoVisual, {
 
 const API_BASE =
   import.meta.env.VITE_CERTIFICACION_API_URL ||
-  'http://localhost:4003'
+  'http://136.114.93.149:4003'
 
 export default function CertificadoDetalle() {
   const { codigo } = useParams()
@@ -59,8 +59,8 @@ export default function CertificadoDetalle() {
         if (!respuesta.ok || !datos.valido) {
           throw new Error(
             datos.error ||
-              datos.mensaje ||
-              'Certificado no válido'
+            datos.mensaje ||
+            'Certificado no válido'
           )
         }
 
@@ -237,9 +237,8 @@ function Estado({
     <div
       style={{
         padding: '13px',
-        border: `1px solid ${
-          valido ? '#22c55e' : '#ef4444'
-        }`,
+        border: `1px solid ${valido ? '#22c55e' : '#ef4444'
+          }`,
         borderRadius: '6px',
         backgroundColor: valido
           ? '#dcfce7'

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const API_BASE = import.meta.env.VITE_EVALUACIONES_API_URL || 'http://localhost:4001';
-const CERTIFICACION_API_BASE = import.meta.env.VITE_CERTIFICACION_API_URL || 'http://localhost:4003';
+const API_BASE = import.meta.env.VITE_EVALUACIONES_API_URL || 'http://136.114.93.149:4001';
+const CERTIFICACION_API_BASE = import.meta.env.VITE_CERTIFICACION_API_URL || 'http://136.114.93.149:4003';
 const TOTAL_PREGUNTAS = 10;
 const TIEMPO_TOTAL_SEG = 30 * 60;
 
@@ -326,7 +326,7 @@ export function useExamen(navigate) {
     manejarResultadoVoz,
     formatearTiempo,
 
-    
+
     ID_CANDIDATO,
     NOMBRE_CANDIDATO,
     API_BASE,

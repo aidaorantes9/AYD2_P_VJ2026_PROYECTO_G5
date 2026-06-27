@@ -4,9 +4,9 @@
 const request = require('supertest')
 const path = require('path')
 
-const API_EVALUACIONES = 'http://localhost:4101'
-const API_CERTIFICACION = 'http://localhost:4103'
-const API_ANTIFRAUDE = 'http://localhost:4104'
+const API_EVALUACIONES = 'http://136.114.93.149:4101'
+const API_CERTIFICACION = 'http://136.114.93.149:4103'
+const API_ANTIFRAUDE = 'http://136.114.93.149:4104'
 
 const ID_CANDIDATO = 2
 
