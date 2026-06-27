@@ -18,8 +18,7 @@ Tests:       14 passed, 14 total
 
 Time:        0.984 s
 
-![Pruebas unitarias funcionando](../Docs/Images/unitarias_funcionando.png)
-
+![Pruebas unitarias funcionando](../docs/Images/unitarias_funcionando.png)
 ---
 
 ### Detalle de las pruebas
@@ -112,7 +111,7 @@ de ejecucion es aproximadamente 40 segundos.
 
 ### Resultado
 
-![Pruebas de integracion funcionando](../Docs/Images/pruebas_integracion.png)
+![Pruebas de integracion funcionando](../docs/Images/pruebas_integracion.png)
 
 ---
 
